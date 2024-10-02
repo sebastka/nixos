@@ -8,13 +8,13 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs @ {
+  outputs = {
       self,
       nixpkgs,
       nixos-hardware,
       home-manager,
       ...
-    }: {
+    } @ inputs : {
     nixosConfigurations = {
       fjordmail-xps15 = let
         username = "sebastian";

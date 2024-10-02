@@ -29,7 +29,7 @@
   networking.networkmanager.dispatcherScripts = [ {
     source = pkgs.writeText "checkNS" ''
       #!/usr/bin/env ${pkgs.bash}/bin/bash
-      # Only allow local DNS from home network. Oterwise use systemd-resolved's default
+      # Only allow local DNS from home network. Oterwise use defaults.
       set -eu
       iface="$1"
       action="$2"
@@ -40,10 +40,16 @@
 
       ${pkgs.networkmanager}/bin/nmcli device modify "$iface" ipv4.ignore-auto-dns yes
       ${pkgs.networkmanager}/bin/nmcli device modify "$iface" ipv6.ignore-auto-dns yes
+      sed -i '/^domain home\.karlsen\.fr$/d' /etc/resolv.conf
     '';
     type = "basic";
     }
   ];
+
+  networking.extraHosts = 
+    ''
+      192.168.4.60 paperless.homeswarm.atlas.home.karlsen.fr
+    '';
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

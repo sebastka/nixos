@@ -4,7 +4,6 @@
 }:
 {
   programs.bash.enable = true;
-  home.sessionVariables.HISTCONTROL = "ignoreboth";
 
   programs.starship.enable = true;
   programs.starship.enableBashIntegration = true;

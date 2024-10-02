@@ -7,6 +7,7 @@
   xdg.cacheHome = config.home.homeDirectory + "/.local/cache";
 
   xdg.mimeApps.enable = true;
+  xdg.configFile."mimeapps.list".force = true;
   #xdg.mimeApps.defaultApplications = {};
 
   xdg.userDirs.enable = true;

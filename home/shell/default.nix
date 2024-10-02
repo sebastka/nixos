@@ -1,6 +1,7 @@
 {
   imports = [
-    ./common.nix
+    ./env.nix
+    ./alias.nix
     ./bash.nix
     ./xdg.nix
   ];
