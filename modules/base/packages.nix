@@ -6,9 +6,10 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vim nano
+    unzip
     wget curl dig
     screen
     git jq
-    htop sysstat lm_sensors
+    sysstat lm_sensors
   ];
 }

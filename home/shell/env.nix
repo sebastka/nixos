@@ -35,5 +35,9 @@
 
     # Bash
     BASH_COMPLETION_USER_FILE = "${config.xdg.configHome}/bash-completion/bash_completion";
+
+    # AWSCLI
+    AWS_SHARED_CREDENTIALS_FILE="${config.xdg.configHome}/aws/credentials";
+    AWS_CONFIG_FILE="${config.xdg.configHome}/aws/config";
   };
 }

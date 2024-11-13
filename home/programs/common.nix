@@ -4,8 +4,9 @@
 }:
 {
   home.packages = with pkgs; [
-    duf ldns nmap
+    duf ldns nmap whois
     terraform ansible
+    terragrunt
   ];
 
   programs.vim = {

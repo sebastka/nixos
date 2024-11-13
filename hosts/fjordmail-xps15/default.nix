@@ -8,6 +8,7 @@
     ../../modules/desktop
     ../../modules/nb_NO.nix
     ../../modules/tailscale.nix
+    ./nfs.nix
   ];
 
   # Nvidia
@@ -26,28 +27,31 @@
   networking.domain = "home.karlsen.fr";
 
   # https://man.archlinux.org/man/NetworkManager-dispatcher.8.en
-  networking.networkmanager.dispatcherScripts = [ {
-    source = pkgs.writeText "checkNS" ''
-      #!/usr/bin/env ${pkgs.bash}/bin/bash
-      # Only allow local DNS from home network. Oterwise use defaults.
-      set -eu
-      iface="$1"
-      action="$2"
+  # networking.networkmanager.dispatcherScripts = [
+  #   {
+  #     source = pkgs.writeText "checkNS" ''
+  #       #!/usr/bin/env ${pkgs.bash}/bin/bash
+  #       # Only allow local DNS from home network. Oterwise use defaults.
+  #       set -eu
+  #       iface="$1"
+  #       action="$2"
 
-      echo "$iface" | grep -q -x 'wlp59s0' || exit 0
-      echo "$action" | grep -q -x 'up' || exit 0
-      echo "$CONNECTION_ID" | grep -q 'NETGEAR30' && exit 0
+  #       echo "$iface" | grep -q -x 'wlp59s0' || exit 0
+  #       echo "$action" | grep -q -x 'up' || exit 0
+  #       echo "$CONNECTION_ID" | grep -q 'NETGEAR30' && exit 0
 
-      ${pkgs.networkmanager}/bin/nmcli device modify "$iface" ipv4.ignore-auto-dns yes
-      ${pkgs.networkmanager}/bin/nmcli device modify "$iface" ipv6.ignore-auto-dns yes
-      sed -i '/^domain home\.karlsen\.fr$/d' /etc/resolv.conf
-    '';
-    type = "basic";
-    }
-  ];
+  #       ${pkgs.networkmanager}/bin/nmcli device modify "$iface" ipv4.ignore-auto-dns yes
+  #       ${pkgs.networkmanager}/bin/nmcli device modify "$iface" ipv6.ignore-auto-dns yes
+  #       sed -i '/^domain home\.karlsen\.fr$/d' /etc/resolv.conf
+  #     '';
+  #     type = "basic";
+  #   }
+  # ];
 
   networking.extraHosts = 
     ''
+      192.168.2.1 helios.home.karlsen.fr
+      192.168.4.2 atlas.home.karlsen.fr
       192.168.4.60 paperless.homeswarm.atlas.home.karlsen.fr
     '';
 
