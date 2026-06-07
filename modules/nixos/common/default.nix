@@ -51,9 +51,8 @@
     options = "--delete-older-than 30d";
   };
 
-  # Latest upstream kernel for best hardware support and driver coverage on laptops.
-  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
-
+  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest; # Latest upstream kernel for best hardware support and driver coverage on laptops.
+  boot.tmp.useTmpfs = true;
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;

@@ -21,6 +21,7 @@
       url = "github:nix-community/nixos-apple-silicon";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    impermanence.url = "github:nix-community/impermanence";
   };
 
   outputs =
@@ -33,6 +34,7 @@
       nix-claude-code,
       sops-nix,
       nixos-apple-silicon,
+      impermanence,
     }:
     let
       mkPkgsUnstable =
@@ -52,6 +54,7 @@
             home-manager
             nix-claude-code
             sops-nix
+            impermanence
             ;
           pkgs-unstable = mkPkgsUnstable "x86_64-linux";
         };

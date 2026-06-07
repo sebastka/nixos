@@ -4,6 +4,7 @@
   imports = [
     nixos-hardware.nixosModules.dell-xps-15-7590
     ./hardware-configuration.nix
+    ./impermanence.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
   ];
