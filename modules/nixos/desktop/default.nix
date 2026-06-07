@@ -29,7 +29,7 @@
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
-    pinentryPackage = pkgs.pinentry-curses;
+    pinentryPackage = pkgs.pinentry-qt;
     settings = {
       default-cache-ttl = 36000;
       max-cache-ttl = 36000;
