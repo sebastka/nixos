@@ -1,0 +1,17 @@
+# Edit secrets:
+# 1. Edit: $ GNUPGHOME=~/.local/share/gnupg nix shell nixpkgs#sops --command sops secrets/secrets.yaml
+# 2. Re-encrypt: $ sops updatekeys secrets/secrets.yaml
+---
+keys:
+  - &sebastian 3A1662012CEDC05ABA25613E35D314145F722F29  # Personal GPG encryption subkey used to encrypt secrets from the workstation
+
+  # Host age keys (derived from SSH host keys) used by each host to decrypt at activation
+  # To add a new host: $ cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
+  - &geras age1rtyyy54xeyhkm6krnnhct33km493hhcnl0a6yxpmx07d49htrdfq9m5dcw
+  # - &hermes XXX
+
+creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    key_groups:
+      - pgp: [*sebastian]
+        age: [*geras]  # *hermes
