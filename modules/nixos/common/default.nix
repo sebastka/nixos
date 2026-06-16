@@ -10,13 +10,15 @@
 {
   imports = [
     ../home-manager
+    ./openssh.nix
     sops-nix.nixosModules.sops
   ];
 
   sops.defaultSopsFile = "${self}/secrets/secrets.yaml";
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  sops.secrets."root-password".neededForUsers = true;
 
+  users.mutableUsers = false;
+  sops.secrets."root-password".neededForUsers = true;
   users.users.root.hashedPasswordFile = config.sops.secrets."root-password".path;
 
   nixpkgs.config.allowUnfree = true;
@@ -51,7 +53,7 @@
     options = "--delete-older-than 30d";
   };
 
-  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest; # Latest upstream kernel for best hardware support and driver coverage on laptops.
+  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
   boot.tmp.useTmpfs = true;
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
@@ -99,29 +101,4 @@
     dig
   ];
 
-  services.openssh = {
-    enable = true;
-    authorizedKeysFiles = lib.mkForce [ "/etc/ssh/authorized_keys.d/%u" ];
-    settings = {
-      PermitRootLogin = "no";
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-      X11Forwarding = false;
-      LoginGraceTime = 5;
-      MaxAuthTries = 3;
-    };
-    extraConfig = ''
-      AllowTcpForwarding no
-      AllowAgentForwarding no
-      ChannelTimeout *=2h
-      UnusedConnectionTimeout 1m
-      PrintMotd no
-
-      # SSH CA: uncomment once CA infrastructure is in place
-      # TrustedUserCAKeys /etc/ssh/user_ca_key.pub
-      # RevokedKeys /etc/ssh/revoked_keys
-      # HostCertificate /etc/ssh/ssh_host_ed25519_key-cert.pub
-      # HostCertificate /etc/ssh/ssh_host_rsa_key-cert.pub
-    '';
-  };
 }

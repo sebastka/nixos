@@ -12,7 +12,6 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-claude-code.url = "github:ryoppippi/nix-claude-code";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,7 +30,6 @@
       nixpkgs-unstable,
       nixos-hardware,
       home-manager,
-      nix-claude-code,
       sops-nix,
       nixos-apple-silicon,
       impermanence,
@@ -52,7 +50,6 @@
             self
             nixos-hardware
             home-manager
-            nix-claude-code
             sops-nix
             impermanence
             ;
@@ -86,7 +83,6 @@
           inherit
             self
             home-manager
-            nix-claude-code
             sops-nix
             nixos-apple-silicon
             ;

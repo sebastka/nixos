@@ -1,15 +1,20 @@
-{ nixos-hardware, pkgs-unstable, ... }:
+{ impermanence, nixos-hardware, pkgs-unstable, ... }:
 
 {
   imports = [
     nixos-hardware.nixosModules.dell-xps-15-7590
     ./hardware-configuration.nix
-    ./impermanence.nix
+    # ./impermanence.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
   ];
 
   networking.hostName = "geras";
+
+  environment.etc."machine-id" = {
+    mode = "0444";
+    text = "fe81453ecccd409195ac2f358b61452c\n";
+  };
 
   # Power off the NVIDIA GTX 1650 dGPU at boot to save battery (uses bbswitch).
   hardware.nvidiaOptimus.disable = true;
