@@ -15,6 +15,8 @@
 
   # systemd-based initrd: unit-based stage 1, enables TPM2/FIDO2 LUKS unlock via systemd-cryptenroll.
   boot.initrd.systemd.enable = true;
+  boot.initrd.verbose = false; # Less initrd chatter around the LUKS prompt
+  boot.consoleLogLevel = 3;    # Hide kernel errors like i915's lspcon probe; critical messages still show
 
   # Power off the NVIDIA GTX 1650 dGPU at boot to save battery (uses bbswitch).
   hardware.nvidiaOptimus.disable = true;
