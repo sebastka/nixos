@@ -26,6 +26,7 @@ jq="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#jq^bin')
 sops="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#sops^out')"
 pcscd="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#pcsclite^out')/bin/pcscd"
 ccid="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#ccid^out')"
+pinentry="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#pinentry-curses^out')/bin/pinentry-curses"
 export PATH="${gnupg}/bin:${jq}/bin:${sops}/bin:${PATH}"
 
 if ! pgrep -x pcscd > /dev/null; then
@@ -36,7 +37,12 @@ fi
 install -d -m 700 "${HOME}/.gnupg"
 grep -qx disable-ccid "${HOME}/.gnupg/scdaemon.conf" 2> /dev/null \
     || echo disable-ccid >> "${HOME}/.gnupg/scdaemon.conf"  # Use pcscd, not scdaemon's own USB driver
-gpgconf --kill scdaemon
+# The live ISO has no pinentry configured: use a terminal one to ask for the Yubikey PIN.
+sed -i '/^pinentry-program /d' "${HOME}/.gnupg/gpg-agent.conf" 2> /dev/null || true
+echo "pinentry-program ${pinentry}" >> "${HOME}/.gnupg/gpg-agent.conf"
+GPG_TTY="$(tty)"
+export GPG_TTY
+gpgconf --kill gpg-agent scdaemon
 gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "${gpg_key}"
 gpg --card-status > /dev/null  # Links the public key to the Yubikey's private keys
 
