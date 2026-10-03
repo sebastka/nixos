@@ -10,6 +10,7 @@
 {
   imports = [
     ../home-manager
+    ./openssh.nix
     sops-nix.nixosModules.sops
   ];
 
@@ -52,7 +53,7 @@
     options = "--delete-older-than 30d";
   };
 
-  boot.kernelPackages = lib.mkOverride 1001 pkgs.linuxPackages_latest; # Latest upstream kernel for best hardware support and driver coverage on laptops. Priority below mkDefault, so hardware modules (RPi, Asahi) win.
+  boot.kernelPackages = lib.mkOverride 1001 pkgs.linuxPackages_latest; # Below mkDefault, so hardware modules (RPi, Asahi) pick their own kernel
   boot.tmp.useTmpfs = true;
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
@@ -99,39 +100,4 @@
     yq-go
     dig
   ];
-
-  # Pre-generated host keys (see secrets/*-ssh-host-key.sops.yaml), trusted on every host.
-  programs.ssh.knownHosts.geras = {
-    hostNames = [ "geras" "geras.home.karlsen.fr" ];
-    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5F4tGsBn04q+EMOlVyawiG+bn5+hL83bv6aOXfdsxf";
-  };
-
-  services.openssh = {
-    enable = true;
-    authorizedKeysFiles = lib.mkForce [ "/etc/ssh/authorized_keys.d/%u" ];
-    hostKeys = [
-      { path = "/etc/ssh/ssh_host_ed25519_key"; type = "ed25519"; }
-    ];
-    settings = {
-      PermitRootLogin = "no";
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-      X11Forwarding = false;
-      LoginGraceTime = 5;
-      MaxAuthTries = 3;
-    };
-    extraConfig = ''
-      AllowTcpForwarding no
-      AllowAgentForwarding no
-      ChannelTimeout *=2h
-      UnusedConnectionTimeout 1m
-      PrintMotd no
-
-      # SSH CA: uncomment once CA infrastructure is in place
-      # TrustedUserCAKeys /etc/ssh/user_ca_key.pub
-      # RevokedKeys /etc/ssh/revoked_keys
-      # HostCertificate /etc/ssh/ssh_host_ed25519_key-cert.pub
-      # HostCertificate /etc/ssh/ssh_host_rsa_key-cert.pub
-    '';
-  };
 }

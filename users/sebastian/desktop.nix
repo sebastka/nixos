@@ -10,6 +10,5 @@
     kdePackages.kate
     thunderbird
     bitwarden-desktop
-    claude-code
   ];
 }
