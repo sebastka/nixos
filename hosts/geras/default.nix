@@ -4,12 +4,17 @@
   imports = [
     nixos-hardware.nixosModules.dell-xps-15-7590
     ./hardware-configuration.nix
-    ./impermanence.nix
+    ./disko.nix
+    ./secure-boot.nix
+    # ./impermanence.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
   ];
 
   networking.hostName = "geras";
+
+  # systemd-based initrd: unit-based stage 1, enables TPM2/FIDO2 LUKS unlock via systemd-cryptenroll.
+  boot.initrd.systemd.enable = true;
 
   # Power off the NVIDIA GTX 1650 dGPU at boot to save battery (uses bbswitch).
   hardware.nvidiaOptimus.disable = true;

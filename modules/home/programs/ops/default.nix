@@ -63,17 +63,20 @@ in
     ---
     apiVersion: kubectl.config.k8s.io/v1beta1
     kind: Preference
+    credentialPluginPolicy: Allowlist
+    credentialPluginAllowlist: [{command: kubectl-oidc_login},{command: doctl}]
     defaults:
-      - command: apply  # (1) default server-side apply
-        options:
-          - name: server-side
-            default: 'true'
-
-      - command: delete  # (2) default interactive deletion
-        options:
-          - name: interactive
-            default: 'true'
-
-    credentialPluginPolicy: DenyAll  # See the above note about managed providers before selecting DenyAll
+      - {command: apply,  options: [{name: server-side, default: 'true'}]}  # (1) default server-side apply
+      # - {command: delete, options: [{name: interactive, default: 'true'}]}  # (2) default interactive deletion
+    aliases:
+      - {name: klogs, command: logs,     appendArgs: [--tail=50, --follow]}
+      - {name: gn,    command: get,      appendArgs: [nodes, --output=wide]}
+      - {name: dn,    command: describe, appendArgs: [nodes, --output=wide]}
+      - {name: gp,    command: get,      appendArgs: [pods, --output=wide]}
+      - {name: dp,    command: describe, appendArgs: [pods, --output=wide]}
+      - {name: gd,    command: get,      appendArgs: [deployments, --output=wide]}
+      - {name: dd,    command: describe, appendArgs: [deployments, --output=wide]}
+      - {name: gs,    command: get,      appendArgs: [services, --output=wide]}
+      - {name: ds,    command: describe, appendArgs: [services, --output=wide]}
   '';
 }

@@ -1,27 +1,38 @@
-{ impermanence, ... }:
+{ impermanence, pkgs, ... }:
 
 {
   imports = [ impermanence.nixosModules.impermanence ];
 
-  # Use systemd-based initrd so we can run a service before the root is mounted.
-  boot.initrd.systemd.enable = true;
-  boot.initrd.supportedFilesystems = [ "btrfs" ];
+  # Bind mounts below need /persist before activation (filesystem itself is defined in ./disko.nix).
+  fileSystems."/persist".neededForBoot = true;
+
+  # The rollback service below requires the systemd initrd (enabled in ./default.nix).
+  boot.initrd.systemd.storePaths = [ pkgs.coreutils ];
 
   # On each boot, delete @root and restore it from the empty @root-blank snapshot.
   # This runs after LUKS is unlocked and before the root filesystem is mounted.
   boot.initrd.systemd.services.rollback = {
     description = "Rollback BTRFS root subvolume to blank snapshot";
     wantedBy = [ "initrd.target" ];
-    after = [ "systemd-cryptsetup@luks-adfc686d-fd51-471c-afb1-1313b9874d46.service" ];
+    after = [ "cryptsetup.target" ];
+    requires = [ "cryptsetup.target" ];
     before = [ "sysroot.mount" ];
     unitConfig.DefaultDependencies = "no";
     serviceConfig.Type = "oneshot";
     script = ''
+      set -euo pipefail
       mkdir -p /mnt
-      mount -t btrfs -o subvol=/ /dev/mapper/luks-adfc686d-fd51-471c-afb1-1313b9874d46 /mnt
+      mount -t btrfs -o subvol=/ /dev/mapper/cryptroot /mnt
       mkdir -p /mnt/old_roots
-      timestamp=$(stat -c %Y /mnt/@root)
+      timestamp=$(date +%s)
       btrfs subvolume snapshot -r /mnt/@root "/mnt/old_roots/$timestamp"
+      # Delete any nested subvolumes first (e.g. /var/lib/machines created by systemd).
+      # sort -r gives deepest paths first so children are deleted before parents.
+      # btrfs list format: ID N gen N top level N path PATH — PATH is field 9.
+      btrfs subvolume list -o /mnt/@root | sort -r | \
+        while read -r _ _ _ _ _ _ _ _ sv; do
+          btrfs subvolume delete "/mnt/$sv"
+        done
       btrfs subvolume delete /mnt/@root
       btrfs subvolume snapshot /mnt/@root-blank /mnt/@root
       umount /mnt
@@ -63,6 +74,7 @@
       "/etc/NetworkManager/system-connections"
       "/var/lib/bluetooth"
       "/var/lib/nixos"
+      "/var/lib/sbctl"
       "/var/lib/sddm"
       "/var/lib/systemd/coredump"
       "/var/lib/systemd/timers"
@@ -75,10 +87,6 @@
     ];
     files = [
       "/etc/machine-id"
-      "/etc/ssh/ssh_host_ed25519_key"
-      "/etc/ssh/ssh_host_ed25519_key.pub"
-      "/etc/ssh/ssh_host_rsa_key"
-      "/etc/ssh/ssh_host_rsa_key.pub"
     ];
   };
 }

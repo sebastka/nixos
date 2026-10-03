@@ -16,7 +16,9 @@
 
   # Firmware blobs extracted from macOS are required for Wi-Fi, Bluetooth, GPU, etc.
   # Copy them from macOS before installing: https://github.com/tpwrules/nixos-apple-silicon
-  hardware.asahi.peripheralFirmwareDirectory = ./firmware;
+  # Only enabled once ./firmware exists, so the configuration evaluates before boreas is set up.
+  hardware.asahi.extractPeripheralFirmware = builtins.pathExists ./firmware;
+  hardware.asahi.peripheralFirmwareDirectory = lib.mkIf (builtins.pathExists ./firmware) ./firmware;
 
   console.keyMap = "no";
   services.xserver.xkb = {

@@ -13,10 +13,11 @@
     sops-nix.nixosModules.sops
   ];
 
-  sops.defaultSopsFile = "${self}/secrets/secrets.yaml";
+  sops.defaultSopsFile = "${self}/secrets/common.sops.yaml";
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  sops.secrets."root-password".neededForUsers = true;
 
+  users.mutableUsers = false;
+  sops.secrets."root-password".neededForUsers = true;
   users.users.root.hashedPasswordFile = config.sops.secrets."root-password".path;
 
   nixpkgs.config.allowUnfree = true;
@@ -51,7 +52,7 @@
     options = "--delete-older-than 30d";
   };
 
-  boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest; # Latest upstream kernel for best hardware support and driver coverage on laptops.
+  boot.kernelPackages = lib.mkOverride 1001 pkgs.linuxPackages_latest; # Latest upstream kernel for best hardware support and driver coverage on laptops. Priority below mkDefault, so hardware modules (RPi, Asahi) win.
   boot.tmp.useTmpfs = true;
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
@@ -99,9 +100,18 @@
     dig
   ];
 
+  # Pre-generated host keys (see secrets/*-ssh-host-key.sops.yaml), trusted on every host.
+  programs.ssh.knownHosts.geras = {
+    hostNames = [ "geras" "geras.home.karlsen.fr" ];
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5F4tGsBn04q+EMOlVyawiG+bn5+hL83bv6aOXfdsxf";
+  };
+
   services.openssh = {
     enable = true;
     authorizedKeysFiles = lib.mkForce [ "/etc/ssh/authorized_keys.d/%u" ];
+    hostKeys = [
+      { path = "/etc/ssh/ssh_host_ed25519_key"; type = "ed25519"; }
+    ];
     settings = {
       PermitRootLogin = "no";
       PasswordAuthentication = false;

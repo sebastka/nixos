@@ -1,3 +1,4 @@
-.claude
+.*
+!.sops.yaml
 result
 result-*

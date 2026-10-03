@@ -1,4 +1,4 @@
-{ pkgs, nix-claude-code, ... }:
+{ pkgs, config, self, nix-claude-code, ... }:
 
 {
   nixpkgs.overlays = [ nix-claude-code.overlays.default ];
@@ -35,6 +35,28 @@
       max-cache-ttl = 36000;
       default-cache-ttl-ssh = 36000;
       max-cache-ttl-ssh = 36000;
+    };
+  };
+
+  sops.secrets."wifi-home-ssid".sopsFile = "${self}/secrets/desktop.sops.yaml";
+  sops.secrets."wifi-home-psk".sopsFile = "${self}/secrets/desktop.sops.yaml";
+
+  sops.templates."networkmanager.env" = {
+    content = ''
+      HOME_SSID=${config.sops.placeholder."wifi-home-ssid"}
+      HOME_PSK=${config.sops.placeholder."wifi-home-psk"}
+    '';
+    restartUnits = [ "NetworkManager-ensure-profiles.service" ];
+  };
+
+  networking.networkmanager.ensureProfiles = {
+    environmentFiles = [ config.sops.templates."networkmanager.env".path ];
+    profiles.home = {
+      connection = { id = "Home"; type = "wifi"; };
+      wifi = { ssid = "$HOME_SSID"; mode = "infrastructure"; };
+      wifi-security = { key-mgmt = "wpa-psk"; psk = "$HOME_PSK"; };  # "sae" for WPA3-only
+      ipv4.method = "auto";
+      ipv6 = { method = "auto"; addr-gen-mode = "stable-privacy"; };
     };
   };
 

@@ -1,9 +1,6 @@
 {
   description = "Sebastian's NixOS configuration";
 
-  # To do:
-  # - Set up secure boot with lanzaboote
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -22,6 +19,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     impermanence.url = "github:nix-community/impermanence";
+    disko = {
+      url = "github:nix-community/disko/latest";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.2.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -35,6 +40,8 @@
       sops-nix,
       nixos-apple-silicon,
       impermanence,
+      disko,
+      lanzaboote,
     }:
     let
       mkPkgsUnstable =
@@ -55,6 +62,8 @@
             nix-claude-code
             sops-nix
             impermanence
+            disko
+            lanzaboote
             ;
           pkgs-unstable = mkPkgsUnstable "x86_64-linux";
         };
