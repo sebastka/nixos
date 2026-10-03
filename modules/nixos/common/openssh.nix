@@ -21,7 +21,7 @@
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
       X11Forwarding = false;
-      LoginGraceTime = 5;
+      LoginGraceTime = 10; # Leaves time for the Yubikey touch (sk keys)
       MaxAuthTries = 3;
     };
     extraConfig = ''

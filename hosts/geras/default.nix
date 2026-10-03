@@ -25,6 +25,10 @@
   # based on a false thermal signal from the battery sensor, not actual CPU temp.
   services.throttled.enable = true;
 
+  # Apply powertop's power-saving tunables at boot (runtime PM, SATA/audio power management,
+  # NMI watchdog, VM writeback...). May add a short wake-up lag to external USB mice/keyboards.
+  powerManagement.powertop.enable = true;
+
   # Uncomment to build aarch64 (e.g. hermes) on geras via QEMU emulation.
   # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
