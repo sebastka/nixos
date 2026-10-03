@@ -14,5 +14,9 @@
       personal-digest-preferences = "SHA512";
       cert-digest-algo = "SHA512";
     };
+
+    # Talk to the Yubikeys through pcscd (services.pcscd), instead of scdaemon's own USB driver,
+    # so other tools (ykman, browsers...) can share the card.
+    scdaemonSettings.disable-ccid = true;
   };
 }

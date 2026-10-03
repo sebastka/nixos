@@ -7,6 +7,7 @@
     ./gnupg.nix
     ./networkmanager.nix
     ./plasma.nix
+    ./ssh-agent.nix
   ];
 
   services.printing.enable = true;
