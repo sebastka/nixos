@@ -11,10 +11,8 @@ in
     description = "Sebastian Karlsen";
     extraGroups = [ "wheel" ] ++ lib.optional config.services.xserver.enable "networkmanager";
     shell = pkgs.zsh;
-    # Yubikey-backed (FIDO2) key, see ~/.ssh/key/private.id_ed25519_sk_rk
-    openssh.authorizedKeys.keys = [
-      "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIMf9bldc1/uS+kAo4WGX1CW6ex0ewLP0P1v+9/+QItJcAAAABHNzaDo= sebastian@karlsen.fr"
-    ];
+    # Personal Yubikey's PIV key (used through the agent, see modules/home/programs/ssh)
+    openssh.authorizedKeys.keyFiles = [ ./keys/private.id_ed25519_piv.pub ];
     hashedPasswordFile = config.sops.secrets."sebastian-password".path;
   };
 
