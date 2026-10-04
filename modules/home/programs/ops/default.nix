@@ -71,6 +71,10 @@ in
     autoload -U +X bashcompinit && bashcompinit
     complete -o nospace -C ${lib.getExe pkgs-unstable.opentofu} tofu
     complete -C ${awscli2}/bin/aws_completer aws
+
+    # bw can't generate its completion at build time (pkgs/bitwarden-cli): load it on first use
+    _bw() { unfunction _bw; eval "$(${lib.getExe bitwarden-cli} completion --shell zsh 2>/dev/null)"; _bw "$@"; }
+    compdef _bw bw
   '';
 
   xdg.configFile."kube/rc.yaml".text = ''
