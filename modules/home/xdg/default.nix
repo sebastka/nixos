@@ -1,6 +1,10 @@
 { config, ... }:
 
 {
+  # Home-manager modules that support it (dircolors, npm, readline, kubecolor...) write their files
+  # to XDG directories. Only affects modules enabled through home-manager.
+  home.preferXdgDirectories = true;
+
   # Redirect GTK 2 reads to XDG. KDE still writes ~/.gtkrc-2.0 (unavoidable),
   # but GTK 2 apps read from the XDG path which includes it.
   home.sessionVariables.GTK2_RC_FILES = "${config.xdg.configHome}/gtk-2.0/gtkrc";
@@ -35,4 +39,32 @@
   # AWS CLI
   home.sessionVariables.AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
   home.sessionVariables.AWS_SHARED_CREDENTIALS_FILE = "${config.xdg.configHome}/aws/credentials";
+
+  # Docker CLI: config.json (registry logins) instead of ~/.docker
+  home.sessionVariables.DOCKER_CONFIG = "${config.xdg.configHome}/docker";
+
+  # wget: its HSTS database instead of ~/.wget-hsts (no env variable for it: set through wgetrc)
+  home.sessionVariables.WGETRC = "${config.xdg.configHome}/wget/wgetrc";
+  xdg.configFile."wget/wgetrc".text = ''
+    hsts-file = ${config.xdg.cacheHome}/wget-hsts
+  '';
+
+  # Languages, mostly used from project devShells (direnv): their caches and tools out of ~/
+  # Go: modules cache and `go install` binaries instead of ~/go
+  home.sessionVariables.GOPATH = "${config.xdg.dataHome}/go";
+
+  # Rust: toolchains and crates instead of ~/.rustup, ~/.cargo
+  home.sessionVariables.RUSTUP_HOME = "${config.xdg.dataHome}/rustup";
+  home.sessionVariables.CARGO_HOME = "${config.xdg.dataHome}/cargo";
+
+  # npm: user config, cache and logs instead of ~/.npmrc, ~/.npm
+  home.sessionVariables.NPM_CONFIG_USERCONFIG = "${config.xdg.configHome}/npm/npmrc";
+  home.sessionVariables.NPM_CONFIG_CACHE = "${config.xdg.cacheHome}/npm";
+  home.sessionVariables.NPM_CONFIG_LOGS_DIR = "${config.xdg.stateHome}/npm/logs";
+
+  # Node.js REPL history instead of ~/.node_repl_history
+  home.sessionVariables.NODE_REPL_HISTORY = "${config.xdg.stateHome}/node_repl_history";
+
+  # Python 3.13+ REPL history instead of ~/.python_history
+  home.sessionVariables.PYTHON_HISTORY = "${config.xdg.stateHome}/python_history";
 }

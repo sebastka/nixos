@@ -12,6 +12,8 @@ nix="nix --extra-experimental-features nix-command --extra-experimental-features
 packages=(
     "argocd        argoproj/argo-cd           v"
     "awscli2       aws/aws-cli                -"
+    "bitwarden-cli bitwarden/clients          cli-v"
+    "bws           bitwarden/sdk-sm           bws-v"
     "cilium-cli    cilium/cilium-cli          v"
     "helm          helm/helm                  v"
     "kube-capacity robscott/kube-capacity     v"

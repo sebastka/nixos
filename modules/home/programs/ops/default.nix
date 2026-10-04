@@ -14,6 +14,8 @@ let
   cilium-cli = pkgs.callPackage ../../../../pkgs/cilium-cli { };
   awscli2 = pkgs.callPackage ../../../../pkgs/awscli2 { };
   stripe-cli = pkgs.callPackage ../../../../pkgs/stripe-cli { };
+  bitwarden-cli = pkgs.callPackage ../../../../pkgs/bitwarden-cli { };
+  bws = pkgs.callPackage ../../../../pkgs/bws { };
 in
 
 {
@@ -31,7 +33,6 @@ in
     cilium-cli
     pkgs-unstable.egctl
     pkgs.talosctl
-    pkgs.talhelper
     longhorn-cli
 
     # Infrastructure as code
@@ -56,6 +57,8 @@ in
     # Secrets & encryption
     pkgs.sops
     pkgs.age
+    bitwarden-cli # bw: Bitwarden password manager
+    bws           # Bitwarden Secrets Manager
   ];
 
   xdg.configFile."kube/rc.yaml".text = ''

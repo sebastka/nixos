@@ -14,6 +14,7 @@
     (import ../../../modules/home/environment)
     (import ../../../modules/home/programs/direnv)
     (import ../../../modules/home/programs/htop)
+    (import ../../../modules/home/programs/readline)
     (import ../../../modules/home/programs/ssh)
     (import ../../../modules/home/programs/starship)
     (import ../../../modules/home/programs/git)
