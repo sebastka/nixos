@@ -1,8 +1,12 @@
 { pkgs, ... }:
 
+let
+  libykcs11 = "${pkgs.yubico-piv-tool}/lib/libykcs11.so";
+in
 {
-  # Load the Yubikeys' PIV SSH keys into the agent, once per session (asks for the PIV PIN)
-  home.shellAliases.ssh-add-yubikey = "ssh-add -s ${pkgs.yubico-piv-tool}/lib/libykcs11.so";
+  # Load the Yubikeys' PIV SSH keys into the agent (asks for the PIV PIN): once per session,
+  # and again after replugging a Yubikey (unloads the stale smartcard session first)
+  home.shellAliases.ssh-add-yubikey = "ssh-add -e ${libykcs11} 2>/dev/null; ssh-add -s ${libykcs11}";
 
   programs.ssh = {
     enable = true;
