@@ -27,7 +27,7 @@
 
   # kubectl
   home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/config.yaml";
-  home.sessionVariables.KUBECTL_KUBERC = "${config.xdg.configHome}/kube/rc.yaml";
+  home.sessionVariables.KUBERC = "${config.xdg.configHome}/kube/rc.yaml";
   home.sessionVariables.KUBECACHEDIR = "${config.xdg.cacheHome}/kube";
   # talosctl
   home.sessionVariables.TALOSCONFIG = "${config.xdg.configHome}/talos/config.yaml";
