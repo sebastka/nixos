@@ -58,7 +58,7 @@ in
     pkgs.age
   ];
 
-  xdg.configFile."kube/kuberc".text = ''
+  xdg.configFile."kube/rc.yaml".text = ''
     # https://kubernetes.io/docs/reference/kubectl/kuberc/#suggested-defaults
     ---
     apiVersion: kubectl.config.k8s.io/v1beta1
