@@ -8,6 +8,6 @@ updates:
     schedule:
       interval: weekly
     # Only propose releases at least 7 days old (compromised releases are usually caught by then):
-    # pull requests are auto-merged, see .github/workflows/lint.yaml
+    # pull requests are auto-merged, see .github/workflows/ci.yaml
     cooldown:
       default-days: 7
