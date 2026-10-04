@@ -2,6 +2,7 @@
   pkgs,
   pkgs-unstable,
   config,
+  lib,
   ...
 }:
 
@@ -60,6 +61,17 @@ in
     bitwarden-cli # bw: Bitwarden password manager
     bws           # Bitwarden Secrets Manager
   ];
+
+  # zsh completions not provided by the packages themselves (pkgs/ generate theirs at build time)
+  programs.zsh.initContent = ''
+    # `k` alias: kubecolor's completion file only registers kubectl
+    compdef kubecolor=kubectl
+
+    # tofu (`tf` alias) and aws only provide bash-style completion
+    autoload -U +X bashcompinit && bashcompinit
+    complete -o nospace -C ${lib.getExe pkgs-unstable.opentofu} tofu
+    complete -C ${awscli2}/bin/aws_completer aws
+  '';
 
   xdg.configFile."kube/rc.yaml".text = ''
     # https://kubernetes.io/docs/reference/kubectl/kuberc/#suggested-defaults

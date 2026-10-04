@@ -21,11 +21,32 @@
     dotDir = "${config.xdg.configHome}/zsh";
     completionInit = "autoload -U compinit && compinit -d ${config.xdg.cacheHome}/zsh/zcompdump-$ZSH_VERSION";
     shellAliases = {
+      # Files and text (`ls` colors: NixOS sets `ls --color=tty`)
       ll = "ls -alhvN --group-directories-first";
       grep = "grep --color=auto";
+      diff = "diff --color=auto";
+      ip = "ip -color=auto";
+
+      # Editor and pager (expanded when used)
+      e = "$EDITOR";
+      v = "$VISUAL";
+      m = "$PAGER";
       se = "sudoedit";
+      tailer = "tail --follow=name --retry"; # Keep following a file across log rotations
+
+      # systemd (EDITOR and PAGER go through sudo: env_keep in modules/nixos/common)
       sctl = "sudo systemctl";
       jctl = "sudo journalctl";
+
+      # Git (commits are signed by default)
+      g = "git";
+      gc = "git commit -v";
+
+      # GnuPG: encrypt to yourself (default-recipient-self), decrypt to the original file name
+      encrypt = "gpg --armor --encrypt";
+      decrypt = "gpg --decrypt --use-embedded-filename";
+
+      # Ops
       k = "kubecolor";
       tf = "tofu";
     };
