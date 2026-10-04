@@ -7,6 +7,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.." # Repo root
 
+# Locally, update on top of origin/master (fast-forward only: stops if local commits diverge).
+# Not in CI: the workflow's later jobs apply the changes to the commit the run started from.
+# stdout is the summary, so git's output goes to stderr.
+if [ -z "${CI:-}" ] && [ "$(git branch --show-current)" = master ]; then
+    git pull --ff-only origin master >&2
+fi
+
 nix="nix --extra-experimental-features nix-command --extra-experimental-features flakes"
 
 echo "## flake.lock"
