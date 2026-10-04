@@ -1,10 +1,10 @@
 { fetchurl, stdenv, lib }:
 
 let
-  version = "1.12.0";
+  version = "1.13.0";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-HX7w5kTNEYWhEgYDug04nJKjJERQru1eZSdcHFLVwIM="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-N+TS7LeyqB7asIlx5tqwfVfWpPq/kaUuwMyBVfmB8d0="; };
+    x86_64-linux  = { arch = "amd64"; hash = "sha256-I1TsG5/wWPpLfheEUdNEWVnNS2QGMX13eLY38DFOEFE="; };
+    aarch64-linux = { arch = "arm64"; hash = "sha256-RMICRMlFHrUiFnt6E2jn1NqHnnRosxolUhzDkEAigQM="; };
   };
   asset = assets.${stdenv.hostPlatform.system}
     or (throw "longhorn-cli: unsupported platform ${stdenv.hostPlatform.system}");

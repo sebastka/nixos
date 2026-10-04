@@ -1,10 +1,10 @@
 { fetchurl, stdenv, lib }:
 
 let
-  version = "4.2.0";
+  version = "4.3.0";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-l9vrlxvkrEsn44OZdtlWTA+zXG87Haid0eKS0javQJY="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-H43hMN+9BN5kl457hSp6VHvhQElWo2ZggnbSUgtnhnA="; };
+    x86_64-linux  = { arch = "amd64"; hash = "sha256-hlhKVN73NXBVj2b1ERzFPf7VZoljeuMsEgEgXUlPVPs="; };
+    aarch64-linux = { arch = "arm64"; hash = "sha256-McV5TdVcZqUea30uKsehFK6LHeQf8dm6UXSKyXOwagg="; };
   };
   asset = assets.${stdenv.hostPlatform.system}
     or (throw "helm: unsupported platform ${stdenv.hostPlatform.system}");

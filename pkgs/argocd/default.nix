@@ -1,10 +1,10 @@
 { fetchurl, stdenv, lib }:
 
 let
-  version = "3.4.3";
+  version = "3.5.3";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-+yMPl7qHs5N0aszxZwZ+C3XSDS3l7nz4R9UNQ2H5Ll8="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-hwWqJImls7mvDbh6lg9J424uPz3ESJc28dKPMbT341Y="; };
+    x86_64-linux  = { arch = "amd64"; hash = "sha256-uGD3P1fL3dmTzURvUjbXl8GxrIVUhXsmg9JmnxfnZbQ="; };
+    aarch64-linux = { arch = "arm64"; hash = "sha256-uzfl1i34l+oWEPfGR/3Hhleg46ko3CGJP6979mpGRss="; };
   };
   asset = assets.${stdenv.hostPlatform.system}
     or (throw "argocd: unsupported platform ${stdenv.hostPlatform.system}");

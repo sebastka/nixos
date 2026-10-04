@@ -1,10 +1,10 @@
 { fetchurl, stdenv, lib, unzip }:
 
 let
-  version = "2.34.63";
+  version = "2.37.9";
   assets = {
-    x86_64-linux  = { arch = "x86_64";  hash = "sha256-vBWwU+9XEL5jydjFQInsaEdzdFepNqELEgoKTQjHx3E="; };
-    aarch64-linux = { arch = "aarch64"; hash = "sha256-I+0vgws75gGtDY+cKcf0o2laVVSG3n7STf9F354IYNE="; };
+    x86_64-linux  = { arch = "x86_64";  hash = "sha256-azpqPXuzmXko8L33uGaRQiSr8kLC5U4dzrvoS+5k81Y="; };
+    aarch64-linux = { arch = "aarch64"; hash = "sha256-59LMo2Iq9HZYcf6c5+7tA6zQncoQqZ68RukvedeHZcA="; };
   };
   asset = assets.${stdenv.hostPlatform.system}
     or (throw "awscli2: unsupported platform ${stdenv.hostPlatform.system}");
