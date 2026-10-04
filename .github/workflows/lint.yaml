@@ -19,3 +19,21 @@ jobs:
       # yamllint from the flake's nixpkgs: pinned by flake.lock, updated with it
       - name: yamllint
         run: nix run --inputs-from . nixpkgs#yamllint -- --strict .
+
+  # Merge Dependabot pull requests once lint passed (releases are at least 7 days old, see dependabot.yml)
+  dependabot-merge:
+    needs: yamllint
+    if: >-
+      github.event_name == 'pull_request'
+      && github.actor == 'dependabot[bot]'
+      && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Merge
+        run: gh pr merge --squash "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
