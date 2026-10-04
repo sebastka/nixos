@@ -9,6 +9,10 @@ name: Update dependencies
 permissions:
   contents: read
 
+env:
+  # The updates are uncommitted on purpose: don't warn on every Nix command
+  NIX_CONFIG: warn-dirty = false
+
 jobs:
   # Update flake.lock and pkgs/, and hand the changes over as a patch
   update:
