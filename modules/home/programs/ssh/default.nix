@@ -1,6 +1,9 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
+  # Load the Yubikeys' PIV SSH keys into the agent, once per session (asks for the PIV PIN)
+  home.shellAliases.ssh-add-yubikey = "ssh-add -s ${pkgs.yubico-piv-tool}/lib/libykcs11.so";
+
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;

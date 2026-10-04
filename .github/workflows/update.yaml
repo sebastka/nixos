@@ -46,7 +46,7 @@ jobs:
             ${{ runner.temp }}/body.md
 
   # Fail before opening the pull request if an update breaks a host's evaluation or a package.
-  # `nix flake check` evaluates every host and builds pkgs/ for the runner's system.
+  # `nix flake check` builds pkgs/ for the runner's system, then every host is evaluated.
   check:
     needs: update
     if: needs.update.outputs.changed == 'true'
@@ -71,6 +71,18 @@ jobs:
 
       - name: Check
         run: nix flake check --print-build-logs
+
+      # `nix flake check` doesn't fully evaluate NixOS configurations (it let a broken boreas through).
+      # Same result on any system: run it once.
+      - name: Evaluate hosts
+        if: runner.arch == 'X64'
+        run: |
+          for host in hosts/*/; do
+            host="$(basename "${host}")"
+            echo "Evaluating ${host}"
+            nix eval --raw ".#nixosConfigurations.${host}.config.system.build.toplevel.drvPath"
+            echo
+          done
 
   pull-request:
     needs: check

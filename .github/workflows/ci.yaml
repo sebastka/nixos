@@ -41,6 +41,18 @@ jobs:
       - name: nix flake check
         run: nix flake check --print-build-logs
 
+      # `nix flake check` doesn't fully evaluate NixOS configurations
+      # Same result on any system: run it once.
+      - name: Evaluate hosts
+        if: runner.arch == 'X64'
+        run: |
+          for host in hosts/*/; do
+            host="$(basename "${host}")"
+            echo "Evaluating ${host}"
+            nix eval --raw ".#nixosConfigurations.${host}.config.system.build.toplevel.drvPath"
+            echo
+          done
+
   # Merge Dependabot pull requests once all checks passed (releases are at least 7 days old, see dependabot.yml)
   dependabot-merge:
     needs:

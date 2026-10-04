@@ -16,7 +16,10 @@
     };
 
     # Talk to the Yubikeys through pcscd (services.pcscd), instead of scdaemon's own USB driver,
-    # so other tools (ykman, browsers...) can share the card.
-    scdaemonSettings.disable-ccid = true;
+    # and don't lock the card: the SSH agent uses its PIV keys (libykcs11) at the same time.
+    scdaemonSettings = {
+      disable-ccid = true;
+      pcsc-shared = true;
+    };
   };
 }
