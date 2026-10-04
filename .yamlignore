@@ -1,0 +1,3 @@
+# Files yamllint skips, on top of .gitignore
+# Written by sops
+secrets/

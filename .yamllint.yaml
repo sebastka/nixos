@@ -1,0 +1,12 @@
+---
+extends: default
+
+ignore-from-file:
+  - .gitignore
+  - .yamlignore
+
+rules:
+  line-length:
+    max: 120
+  commas:
+    max-spaces-after: -1  # Allow aligning keys over multiple lines

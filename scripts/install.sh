@@ -6,8 +6,16 @@
 #    and Secure Boot keys (if the host has some)
 # 4. Install NixOS
 #
-# Usage: ./install.sh <host>   (as the live ISO user, from the repo root, Yubikey plugged in)
+# Usage: scripts/install.sh <host>   (as the live ISO user, Yubikey plugged in)
 set -eu
+cd "$(dirname "$0")/.." # Repo root
+
+# Use what is on origin/master (fast-forward only: stops if local commits diverge)
+if [ "$(git branch --show-current)" = master ]; then
+    git pull --ff-only origin master
+else
+    echo "Not on master: skipping git pull" >&2
+fi
 
 host="${1:?Usage: $0 <host>}"
 root="/mnt"

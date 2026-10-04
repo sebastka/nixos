@@ -1,3 +1,4 @@
+# yamllint disable rule:line-length
 # Update keys:
 # for f in secrets/*.sops.yaml; do sops updatekeys "$f"; done
 ---

@@ -50,6 +50,16 @@
         };
     in
     {
+      # Packages from pkgs/, for both systems: used as `nix flake check` checks
+      # (CI builds them natively on x86_64 and aarch64)
+      packages = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (
+        system:
+        nixpkgs.lib.mapAttrs (
+          name: _: nixpkgs.legacyPackages.${system}.callPackage ./pkgs/${name} { }
+        ) (builtins.readDir ./pkgs)
+      );
+      checks = self.packages;
+
       # Dell XPS 15 7590 (2020)
       nixosConfigurations.geras = nixpkgs.lib.nixosSystem {
         specialArgs = {

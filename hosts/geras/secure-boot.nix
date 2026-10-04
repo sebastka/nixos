@@ -8,7 +8,7 @@
 
   boot.lanzaboote = {
     enable = true;
-    # Pre-generated keys (secrets/geras-secure-boot.sops.yaml), restored by ./install.sh.
+    # Pre-generated keys (secrets/geras-secure-boot.sops.yaml), restored by scripts/install.sh.
     pkiBundle = "/var/lib/sbctl";
 
     # On first boot, stage the keys on the ESP and reboot: systemd-boot then enrolls them,

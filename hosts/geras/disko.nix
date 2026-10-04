@@ -3,7 +3,7 @@
 {
   imports = [ disko.nixosModules.disko ];
 
-  # Declarative partitioning, used by ./install.sh to wipe, format and mount the disk.
+  # Declarative partitioning, used by scripts/install.sh to wipe, format and mount the disk.
   # Layout: ESP + single LUKS container holding BTRFS subvolumes (swapfile included, so one passphrase).
   disko.devices.disk.main = {
     type = "disk";
@@ -28,7 +28,7 @@
             name = "cryptroot"; # Passphrase is prompted when formatting, kept as recovery
             settings = {
               allowDiscards = true;
-              # Unlock with the Yubikey (FIDO2 + PIN + touch), enrolled by ./install.sh.
+              # Unlock with the Yubikey (FIDO2 + PIN + touch), enrolled by scripts/install.sh.
               # Falls back to the passphrase prompt if the Yubikey is not plugged in within 10s.
               crypttabExtraOpts = [ "fido2-device=auto" "token-timeout=10" ];
             };

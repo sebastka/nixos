@@ -1,4 +1,7 @@
 .*
-!.sops.yaml
+!/.sops.yaml
+!/.github
+!/.yamllint.yaml
+!/.yamlignore
 result
 result-*
