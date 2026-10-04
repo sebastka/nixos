@@ -89,10 +89,20 @@ jobs:
       - name: Apply changes
         run: git apply "${RUNNER_TEMP}/update/update.patch"
 
-      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1  # v8.1.1
+      - id: pr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1  # v8.1.1
         with:
           branch: automated/update-dependencies
           delete-branch: true
+          sign-commits: true  # Commit through the GitHub API, signed by GitHub: "Verified"
           commit-message: "chore: Update flake.lock and pkgs"
           title: "chore: Update flake.lock and pkgs"
           body-path: ${{ runner.temp }}/update/body.md
+
+      # Already checked on both systems by the check job
+      - name: Merge
+        if: contains(fromJSON('["created", "updated"]'), steps.pr.outputs.pull-request-operation)
+        run: gh pr merge --squash "${PR_NUMBER}"
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
