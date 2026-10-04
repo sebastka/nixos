@@ -26,6 +26,10 @@
       url = "github:nix-community/lanzaboote/v1.2.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    tern = {
+      url = "github:sebastka/tern";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -40,6 +44,7 @@
       impermanence,
       disko,
       lanzaboote,
+      tern,
     }:
     let
       mkPkgsUnstable =

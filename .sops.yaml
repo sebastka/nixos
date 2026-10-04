@@ -18,3 +18,4 @@ creation_rules:
   - {path_regex: 'secrets/\.?[^/]*-(ssh-host-key|secure-boot)\.sops\.yaml$', key_groups: [{pgp: [*sebastian]}]}
   - {path_regex: 'secrets/\.?common\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*geras]}]}  # *hermes, *boreas
   - {path_regex: 'secrets/\.?desktop\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras]}]}  # *boreas
+  - {path_regex: 'secrets/\.?tern\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras]}]}  # *boreas

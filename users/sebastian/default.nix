@@ -4,6 +4,8 @@ let
   hostFile = ./hosts/${config.networking.hostName}.nix;
 in
 {
+  imports = [ ./tern.nix ]; # Desktops only
+
   sops.secrets."sebastian-password".neededForUsers = true;
 
   users.users."sebastian" = {

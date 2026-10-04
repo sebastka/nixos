@@ -285,7 +285,8 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "sops-nix": "sops-nix"
+        "sops-nix": "sops-nix",
+        "tern": "tern"
       }
     },
     "rust-overlay": {
@@ -326,6 +327,26 @@
       "original": {
         "owner": "Mic92",
         "repo": "sops-nix",
+        "type": "github"
+      }
+    },
+    "tern": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791149970,
+        "narHash": "sha256-m6I3GnMX5KmrIHJFsB/hAumn4grf7ru/jVcC/yZfuB0=",
+        "owner": "sebastka",
+        "repo": "tern",
+        "rev": "136c4b798d9fb9dd78416c5f4aa1a230da425f2f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sebastka",
+        "repo": "tern",
         "type": "github"
       }
     }
