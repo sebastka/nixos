@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   yamllint:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
@@ -27,8 +27,8 @@ jobs:
     strategy:
       matrix:
         runner:
-          - ubuntu-24.04  # x86_64-linux
-          - ubuntu-24.04-arm  # aarch64-linux
+          - ubuntu-latest  # x86_64-linux
+          - ubuntu-26.04-arm  # aarch64-linux
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -47,7 +47,7 @@ jobs:
       github.event_name == 'pull_request'
       && github.actor == 'dependabot[bot]'
       && github.event.pull_request.user.login == 'dependabot[bot]'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
