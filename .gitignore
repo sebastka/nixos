@@ -3,5 +3,6 @@
 !/.github
 !/.yamllint.yaml
 !/.yamlignore
+!/.envrc
 result
 result-*

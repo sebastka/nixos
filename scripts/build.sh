@@ -12,8 +12,8 @@ else
     echo "Not on master: skipping git pull" >&2
 fi
 
-find hosts -mindepth 1 -maxdepth 1 -type d | cut -d'/' -f2 | while read host; do
-    echo "${host}" | grep -qx geras && true || continue  # Temp: Only build geras for now
+find hosts -mindepth 1 -maxdepth 1 -type d | cut -d'/' -f2 | while read -r host; do
+    [ "${host}" = geras ] || continue  # Temp: Only build geras for now
 
     # --no-update-lock-file: fail instead of writing flake.lock (e.g. new input in flake.nix)
     if hostname | grep -qx "${host}"; then

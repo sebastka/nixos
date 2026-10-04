@@ -60,6 +60,27 @@
       );
       checks = self.packages;
 
+      # Tools to work on this repo, loaded by direnv (.envrc) and used by CI (`nix develop -c ...`).
+      # GnuPG comes from the host (configured gpg-agent and pinentry).
+      devShells = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              sops       # Secrets (secrets/*.sops.yaml)
+              ssh-to-age # Host SSH key -> age recipient (.sops.yaml)
+              sbctl      # Secure Boot keys (secrets/*-secure-boot.sops.yaml)
+              nixfmt
+              shellcheck
+              yamllint
+            ];
+          };
+        }
+      );
+
       # Dell XPS 15 7590 (2020)
       nixosConfigurations.geras = nixpkgs.lib.nixosSystem {
         specialArgs = {
