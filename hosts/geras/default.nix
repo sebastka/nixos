@@ -18,19 +18,27 @@
   boot.initrd.verbose = false; # Less initrd chatter around the LUKS prompt
   boot.consoleLogLevel = 3;    # Hide kernel errors like i915's lspcon probe; critical messages still show
 
-  # Power off the NVIDIA GTX 1650 dGPU at boot to save battery (uses bbswitch).
-  hardware.nvidiaOptimus.disable = true;
+  # NVIDIA GTX 1650 dGPU: unused, powered off by the kernel's runtime PM (see the udev rule below),
+  # instead of bbswitch (hardware.nvidiaOptimus.disable, unmaintained out-of-tree module).
+  # No driver may bind to it, or it would stay awake.
+  boot.blacklistedKernelModules = [
+    "nouveau"
+    "nvidia"
+    "nvidiafb"
+    "nvidia-drm"
+    "nvidia-uvm"
+    "nvidia-modeset"
+  ];
 
   # The XPS 15 is notorious for a BD PROCHOT issue: the CPU throttles itself
   # based on a false thermal signal from the battery sensor, not actual CPU temp.
   services.throttled.enable = true;
 
-  # Power-saving tunables from `powertop`, set explicitly instead of `powertop --auto-tune`:
-  # auto-tune also enabled runtime PM on the NVIDIA dGPU, racing with bbswitch at boot,
-  # which froze geras (black screen, no network).
+  # Power-saving tunables from `powertop`, set explicitly instead of `powertop --auto-tune`.
+  # Never combine with bbswitch: runtime PM on the dGPU racing with bbswitch at boot froze geras.
   services.udev.extraRules = ''
-    # Runtime PM for all PCI devices, except the NVIDIA dGPU (vendor 0x10de, powered off by bbswitch)
-    ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}!="0x10de", ATTR{power/control}="auto"
+    # Runtime PM for all PCI devices, including the NVIDIA dGPU (should reach D3cold)
+    ACTION=="add", SUBSYSTEM=="pci", ATTR{power/control}="auto"
     # SATA link power management
     ACTION=="add", SUBSYSTEM=="scsi_host", KERNEL=="host*", ATTR{link_power_management_policy}="med_power_with_dipm"
   '';
