@@ -27,6 +27,7 @@ in
     ../../modules/home/programs/coding-agents
     ../../modules/home/programs/ops
     ../../modules/home/programs/vscode
+    ./web-apps.nix
   ];
 
   home.packages =
@@ -35,6 +36,7 @@ in
       kdePackages.kate
       thunderbird
       bitwarden-desktop
+      chromium
     ]
     ++ scripts;
 
@@ -71,4 +73,17 @@ in
   # and linked from outside the Nix store.
   xdg.configFile."bws/inboxcom.config".source =
     config.lib.file.mkOutOfStoreSymlink osConfig.sops.secrets."bws-inboxcom-config".path;
+
+  # Never start Bitwarden desktop at login. Its "Start on login" setting writes this file (outside Flatpak):
+  # read-only and hidden here, so the setting can't turn it back on.
+  xdg.configFile."autostart/bitwarden.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Bitwarden
+    Comment=Bitwarden startup script
+    Exec=${lib.getExe pkgs.bitwarden-desktop}
+    StartupNotify=true
+    Terminal=false
+    Hidden=true
+  '';
 }
