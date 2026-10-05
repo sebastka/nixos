@@ -70,4 +70,8 @@
 
   # Sigstore (cosign): TUF trust data instead of ~/.sigstore
   home.sessionVariables.TUF_ROOT = "${config.xdg.dataHome}/sigstore/root";
+
+  # Delete cache files unused for 30 days (systemd-tmpfiles-clean.timer, daily): caches survive reboots,
+  # without growing forever. Not a tmpfs: npm, browsers, Nix... caches are several GB, and would start cold.
+  systemd.user.tmpfiles.rules = [ "e ${config.xdg.cacheHome} - - - 30d" ];
 }
