@@ -11,6 +11,7 @@
   imports = [
     ../home-manager
     ./openssh.nix
+    ./webfinger-accounts.nix
     sops-nix.nixosModules.sops
   ];
 

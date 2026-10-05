@@ -34,6 +34,7 @@ in
     # Personal Yubikey's PIV key (used through the agent, see modules/home/programs/ssh)
     openssh.authorizedKeys.keyFiles = [ ./keys/private.id_ed25519_piv.pub ];
     hashedPasswordFile = config.sops.secrets."sebastian-password".path;
+    webfinger = "sebastian@karlsen.fr"; # Email and picture on desktops (modules/nixos/common/webfinger-accounts.nix)
   };
 
   home-manager.users.sebastian = {
