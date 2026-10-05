@@ -61,8 +61,11 @@
 
   time.timeZone = "Europe/Oslo";
 
+  # English messages, Norwegian formats, except dates and sorting
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
+    LC_TIME = "en_DK.UTF-8"; # English names, ISO dates (2026-10-05), 24-hour clock
+    LC_COLLATE = "C.UTF-8"; # Byte order: dotfiles, then uppercase before lowercase (ls, sort, globs)
     LC_ADDRESS = "nb_NO.UTF-8";
     LC_IDENTIFICATION = "nb_NO.UTF-8";
     LC_MEASUREMENT = "nb_NO.UTF-8";
@@ -71,7 +74,6 @@
     LC_NUMERIC = "nb_NO.UTF-8";
     LC_PAPER = "nb_NO.UTF-8";
     LC_TELEPHONE = "nb_NO.UTF-8";
-    LC_TIME = "nb_NO.UTF-8";
   };
 
   networking.domain = "home.karlsen.fr";
