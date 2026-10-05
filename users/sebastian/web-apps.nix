@@ -14,20 +14,20 @@ let
     }:
     let
       # Wayland app_id Chromium gives the window: chrome-<host>_<path, / as _>-<profile directory>, query
-      # and fragment dropped (--class is ignored on Wayland). As StartupWMClass it lets the task manager
-      # match the window to this entry: its icon instead of the generic one, grouped under a pinned launcher.
-      # The profile directory makes it unique for apps sharing a URL (the bitwarden.eu accounts).
+      # and fragment dropped (--class is ignored on Wayland). Used as the desktop file's name, so KWin and
+      # the task manager match the window to this entry: its icon (task manager and title bar) instead of
+      # the generic one, grouped under a pinned launcher. The profile directory makes it unique for apps
+      # sharing a URL (the bitwarden.eu accounts).
       parts = builtins.match "https://([^/?#]+)(/[^?#]*)?.*" url;
       path = if builtins.elemAt parts 1 == null then "/" else builtins.elemAt parts 1;
       appId = "chrome-${builtins.elemAt parts 0}_${lib.replaceStrings [ "/" ] [ "_" ] path}-${profile}";
     in
-    {
+    lib.nameValuePair appId {
       inherit name genericName comment icon;
       # Quoted: `#` is reserved in Exec (desktop entry specification)
       exec = ''${lib.getExe pkgs.chromium} "--app=${url}" --new-window --user-data-dir=${config.xdg.configHome}/chromium-apps/${profile} --profile-directory=${profile}'';
       terminal = false;
       startupNotify = true;
-      settings.StartupWMClass = appId;
     };
 
   bitwarden = account: url: {
@@ -39,7 +39,7 @@ let
   };
 in
 {
-  xdg.desktopEntries = lib.mapAttrs (_: webApp) {
+  xdg.desktopEntries = lib.mapAttrs' (_: webApp) {
     bitwarden-private = bitwarden "sebastian@karlsen.fr" "https://vault.bitwarden.com/#/vault" // {
       profile = "bitwarden-private-sebastian.karlsen.fr";
     };
