@@ -103,4 +103,6 @@
     yq-go
     dig
   ];
+
+  programs.screen.enable = true; # Not just the package: also its PAM service, for locking (C-a x)
 }
