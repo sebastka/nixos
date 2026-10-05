@@ -15,8 +15,12 @@ let
   cilium-cli = pkgs.callPackage ../../../../pkgs/cilium-cli { };
   awscli2 = pkgs.callPackage ../../../../pkgs/awscli2 { };
   stripe-cli = pkgs.callPackage ../../../../pkgs/stripe-cli { };
+  mailcore-cli = pkgs.callPackage ../../../../pkgs/mailcore-cli { };
+  domeneshop-cli = pkgs.callPackage ../../../../pkgs/domeneshop-cli { };
   bitwarden-cli = pkgs.callPackage ../../../../pkgs/bitwarden-cli { };
   bws = pkgs.callPackage ../../../../pkgs/bws { };
+  topf = pkgs.callPackage ../../../../pkgs/topf { };
+  zitadel = pkgs.callPackage ../../../../pkgs/zitadel { };
 in
 
 {
@@ -34,7 +38,14 @@ in
     cilium-cli
     pkgs-unstable.egctl
     pkgs.talosctl
+    topf
     longhorn-cli
+    pkgs.cmctl
+    pkgs.kyverno
+    pkgs.kubectl-validate
+    pkgs.kubelogin-oidc
+    pkgs.hubble
+    pkgs.cri-tools
 
     # Infrastructure as code
     pkgs-unstable.opentofu
@@ -46,6 +57,7 @@ in
     awscli2
     pkgs.doctl
     stripe-cli
+    mailcore-cli
 
     # CI/CD
     pkgs.gh
@@ -54,12 +66,17 @@ in
     # DNS
     pkgs.drill
     pkgs.cli53
+    domeneshop-cli
+
+    # Identity
+    zitadel
 
     # Secrets & encryption
     pkgs.sops
     pkgs.age
     bitwarden-cli # bw: Bitwarden password manager
     bws           # Bitwarden Secrets Manager
+    pkgs.cosign
   ];
 
   # zsh completions not provided by the packages themselves (pkgs/ generate theirs at build time)

@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, lib, self, ... }:
 
 let
   hostFile = ./hosts/${config.networking.hostName}.nix;
@@ -6,7 +6,17 @@ in
 {
   imports = [ ./tern.nix ]; # Desktops only
 
-  sops.secrets."sebastian-password".neededForUsers = true;
+  sops.secrets = lib.mkMerge [
+    { "sebastian-password".neededForUsers = true; }
+
+    # Config files, linked under ~/.config by ./desktop.nix.
+    (lib.mkIf config.services.xserver.enable (
+      lib.genAttrs [ "bws-inboxcom-config" ] (_: {
+        sopsFile = "${self}/secrets/desktop.sops.yaml";
+        owner = "sebastian";
+      })
+    ))
+  ];
 
   users.users."sebastian" = {
     isNormalUser = true;

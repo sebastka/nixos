@@ -10,16 +10,20 @@ nix="nix --extra-experimental-features nix-command --extra-experimental-features
 
 # Package directory, upstream Git repository, tag prefix
 packages=(
-    "argocd        argoproj/argo-cd           v"
-    "awscli2       aws/aws-cli                -"
-    "bitwarden-cli bitwarden/clients          cli-v"
-    "bws           bitwarden/sdk-sm           bws-v"
-    "cilium-cli    cilium/cilium-cli          v"
-    "helm          helm/helm                  v"
-    "kube-capacity robscott/kube-capacity     v"
-    "kubeseal      bitnami-labs/sealed-secrets v"
-    "longhorn-cli  longhorn/cli               v"
-    "stripe-cli    stripe/stripe-cli          v"
+    "argocd         argoproj/argo-cd            v"
+    "awscli2        aws/aws-cli                 -"
+    "bitwarden-cli  bitwarden/clients           cli-v"
+    "bws            bitwarden/sdk-sm            bws-v"
+    "cilium-cli     cilium/cilium-cli           v"
+    "domeneshop-cli sebastka/domeneshop-sdk     v"
+    "helm           helm/helm                   v"
+    "kube-capacity  robscott/kube-capacity      v"
+    "kubeseal       bitnami-labs/sealed-secrets v"
+    "longhorn-cli   longhorn/cli                v"
+    "mailcore-cli   Fjordmail/mailcore-cli      v"
+    "stripe-cli     stripe/stripe-cli           v"
+    "topf           postfinance/topf            v"
+    "zitadel        zitadel/zitadel             v"
 )
 
 # Latest stable (X.Y.Z, no pre-release) tag of a GitHub repository, without its prefix.
@@ -35,6 +39,19 @@ latest_version() {
 src_url() {
     local pkg="$1" system="$2"
     ${nix} eval --raw ".#packages.${system}.${pkg}.src.url"
+}
+
+# Hash the build of a package reports for its first fixed-output derivation with an empty hash.
+build_hash_mismatch() {
+    local pkg="$1" log hash
+    log="$(${nix} build --no-link ".#${pkg}" 2>&1 || true)"
+    hash="$(sed -n 's|.*got: *\(sha256-[A-Za-z0-9+/=]*\).*|\1|p' <<< "${log}" | head -n 1)"
+    if [ -z "${hash}" ]; then
+        echo "${pkg}: no hash mismatch reported by the build" >&2
+        echo "${log}" >&2
+        exit 1
+    fi
+    echo "${hash}"
 }
 
 for entry in "${packages[@]}"; do
@@ -60,6 +77,14 @@ for entry in "${packages[@]}"; do
         url="$(src_url "${pkg}" "${system}")"
         hash="$(${nix} store prefetch-file --json --hash-type sha256 "${url}" | sed -n 's|.*"hash":"\([^"]*\)".*|\1|p')"
         sed -i -E "s|^( *${system} *=.*hash = \")[^\"]*(\".*)|\1${hash}\2|" "${file}"
+    done
+
+    # Built from source: emptied, each hash is reported by the build (source first, then dependencies)
+    for attr in hash vendorHash; do
+        grep -qE "^ *${attr} = \"" "${file}" || continue
+        sed -i -E "s|^( *${attr} = \")[^\"]*(\";)|\1\2|" "${file}"
+        hash="$(build_hash_mismatch "${pkg}")"
+        sed -i -E "s|^( *${attr} = \")[^\"]*(\";)|\1${hash}\2|" "${file}"
     done
 
     echo "- \`${pkg}\`: ${current} → ${latest} ([releases](https://github.com/${repo}/releases))"

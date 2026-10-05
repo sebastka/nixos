@@ -18,8 +18,8 @@
   # Move GNUPGHOME out of ~/ into the XDG data directory.
   home.sessionVariables.GNUPGHOME = "${config.xdg.dataHome}/gnupg";
 
-  # Move Claude Code config out of ~/.claude into the XDG config directory.
-  home.sessionVariables.CLAUDE_CONFIG_DIR = "${config.xdg.configHome}/claude";
+  # Claude Code (CLAUDE_CONFIG_DIR) and Codex (CODEX_HOME): set by their home-manager modules,
+  # see modules/home/programs/coding-agents
 
   # Move .dotnet out of ~/ into the XDG data directory.
   home.sessionVariables.DOTNET_CLI_HOME = "${config.xdg.dataHome}/dotnet";
@@ -67,4 +67,7 @@
 
   # Python 3.13+ REPL history instead of ~/.python_history
   home.sessionVariables.PYTHON_HISTORY = "${config.xdg.stateHome}/python_history";
+
+  # Sigstore (cosign): TUF trust data instead of ~/.sigstore
+  home.sessionVariables.TUF_ROOT = "${config.xdg.dataHome}/sigstore/root";
 }

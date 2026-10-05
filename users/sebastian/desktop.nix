@@ -1,9 +1,9 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, osConfig, ... }:
 
 let
   bitwarden-cli = pkgs.callPackage ../../pkgs/bitwarden-cli { };
 
-  # Bitwarden accounts: one bw data directory and one bws config file each.
+  # Bitwarden password manager accounts: one bw data directory each.
   # Selecting an account in a project's .envrc: see README.md.
   # server = null: Bitwarden's default server (bitwarden.com).
   bitwardenProfiles = {
@@ -11,18 +11,32 @@ let
     inboxcom = { server = "https://vault.bitwarden.eu"; };
   };
   bwDataDir = name: "${config.xdg.dataHome}/bitwarden-cli/${name}";
+
+  # Personal scripts (./scripts/<name>.sh), checked by shellcheck at build time
+  scripts = map (
+    name:
+    pkgs.writeShellApplication {
+      inherit name;
+      runtimeInputs = [ pkgs.kubectl ];
+      text = builtins.readFile ./scripts/${name}.sh;
+    }
+  ) [ "to_paperless" "to_deluge" ];
 in
 {
   imports = [
+    ../../modules/home/programs/coding-agents
     ../../modules/home/programs/ops
     ../../modules/home/programs/vscode
   ];
 
-  home.packages = with pkgs; [
-    kdePackages.kate
-    thunderbird
-    bitwarden-desktop
-  ];
+  home.packages =
+    with pkgs;
+    [
+      kdePackages.kate
+      thunderbird
+      bitwarden-desktop
+    ]
+    ++ scripts;
 
   # Bitwarden CLI (bw): the private account by default. For the other one, e.g. in a project's .envrc:
   #   export BITWARDENCLI_APPDATA_DIR="$XDG_DATA_HOME/bitwarden-cli/inboxcom"
@@ -43,17 +57,9 @@ in
     )
   );
 
-  # Bitwarden Secrets Manager (bws): one config file per account, selected with BWS_CONFIG_FILE, e.g.
-  #   export BWS_CONFIG_FILE="$XDG_CONFIG_HOME/bws/inboxcom.config"
-  # The access token comes from BWS_ACCESS_TOKEN, never from these files.
-  xdg.configFile = lib.mapAttrs' (
-    name: profile:
-    lib.nameValuePair "bws/${name}.config" {
-      text = lib.concatLines (
-        [ "[profiles.default]" ]
-        ++ lib.optional (profile.server != null) ''server_base = "${profile.server}"''
-        ++ [ ''state_dir = "${config.xdg.stateHome}/bws/${name}"'' ]
-      );
-    }
-  ) bitwardenProfiles;
+  # Bitwarden Secrets Manager (bws): inboxcom account only, selected with BWS_CONFIG_FILE (see README.md).
+  # Its config is a secret (secrets/desktop.sops.yaml), decrypted by sops-nix (users/sebastian/default.nix)
+  # and linked from outside the Nix store.
+  xdg.configFile."bws/inboxcom.config".source =
+    config.lib.file.mkOutOfStoreSymlink osConfig.sops.secrets."bws-inboxcom-config".path;
 }

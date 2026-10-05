@@ -49,8 +49,8 @@ The repository includes a development shell with the tools to work on it (`sops`
 - **`scripts/build.sh`** pulls `origin/master` (fast-forward only, on `master`), then runs `nixos-rebuild switch`
   locally or over SSH (`--target-host`). It never writes `flake.lock` (`--no-update-lock-file`). For now it only
   deploys `geras`.
-- **`scripts/update.sh`** runs `nix flake update` and `scripts/update-pkgs.sh` (latest release and hashes of each
-  package in `pkgs/`), and prints a Markdown summary. Locally on `master`, it pulls `origin/master` first.
+- **`scripts/update.sh`** runs `nix flake update`, `scripts/update-pkgs.sh` (latest release and hashes of each
+  package in `pkgs/`, plus `vendorHash` for the PHP ones), and prints a Markdown summary. Locally on `master`, it pulls `origin/master` first.
 - **`nix flake check`** builds `pkgs/` for the current system. It doesn't fully evaluate the NixOS configurations, so
   CI also evaluates each host's `config.system.build.toplevel.drvPath`:
 
@@ -141,17 +141,18 @@ creating or changing it). The variables below switch tools from their default ac
 
 ### Bitwarden
 
-Two accounts are configured (`bitwardenProfiles` in `users/sebastian/desktop.nix`):
+Two password manager (`bw`) accounts are configured (`bitwardenProfiles` in `users/sebastian/desktop.nix`), and one
+Secrets Manager (`bws`) account:
 
-| Account | Server | Default |
-|---|---|---|
-| `private` | bitwarden.com | `bw` |
-| `inboxcom` | vault.bitwarden.eu | — |
+| Account | Server | `bw` | `bws` |
+|---|---|---|---|
+| `private` | bitwarden.com | default | — |
+| `inboxcom` | vault.bitwarden.eu | ✓ | ✓ |
 
 | Variable | Tool | Value | Default |
 |---|---|---|---|
 | `BITWARDENCLI_APPDATA_DIR` | `bw` | `$XDG_DATA_HOME/bitwarden-cli/<account>` | `private` |
-| `BWS_CONFIG_FILE` | `bws` | `$XDG_CONFIG_HOME/bws/<account>.config` | none: set it |
+| `BWS_CONFIG_FILE` | `bws` | `$XDG_CONFIG_HOME/bws/inboxcom.config` | none: set it |
 | `BWS_ACCESS_TOKEN` | `bws` | machine account access token | none: **secret** |
 | `BW_SESSION` | `bw` | output of `bw unlock --raw` | none: **secret** |
 
@@ -162,14 +163,8 @@ Example `.envrc` for a work project:
 export BITWARDENCLI_APPDATA_DIR="$XDG_DATA_HOME/bitwarden-cli/inboxcom"
 export BWS_CONFIG_FILE="$XDG_CONFIG_HOME/bws/inboxcom.config"
 
-# Secrets (BWS_ACCESS_TOKEN...) never go in .envrc: keep them in an untracked file
+# Secrets (BWS_ACCESS_TOKEN...) never go in .envrc: keep them in an untracked file (in the project's .gitignore)
 source_env_if_exists .envrc.local
-```
-
-With `.envrc.local` (add it to the project's `.gitignore`):
-
-```sh
-export BWS_ACCESS_TOKEN="..."
 ```
 
 Notes:
@@ -177,9 +172,11 @@ Notes:
 - Each `bw` account keeps its own login: run `bw login` once per account (with its `BITWARDENCLI_APPDATA_DIR`), then
   `export BW_SESSION="$(bw unlock --raw)"` in the shell when needed. A session only unlocks the account it was
   created for.
-- The `bws` config files only hold the server and a state directory (`$XDG_STATE_HOME/bws/<account>`); the token is
-  always read from `BWS_ACCESS_TOKEN`.
-- Both config files exist for both accounts, so `BWS_CONFIG_FILE` can also point to `private.config`.
+- `bws/inboxcom.config` is a sops secret (`bws-inboxcom-config` in `secrets/desktop.sops.yaml`); the token is always
+  read from `BWS_ACCESS_TOKEN`.
+- Work credentials (`BWS_ACCESS_TOKEN`, `MAILCORE_API_KEY`...) are never in this repository, not even encrypted: it is
+  public. They stay in the inboxcom vault, e.g. in `.envrc.local`, with the inboxcom `BITWARDENCLI_APPDATA_DIR` and
+  an unlocked session (`BW_SESSION`): `export BWS_ACCESS_TOKEN="$(bw get password <item>)"`.
 
 ## Known caveats
 

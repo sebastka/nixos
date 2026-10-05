@@ -23,7 +23,7 @@ jobs:
         run: nix develop --command yamllint --strict .
 
       - name: shellcheck
-        run: nix develop --command shellcheck scripts/*.sh
+        run: nix develop --command shellcheck scripts/*.sh users/*/scripts/*.sh
 
   # Evaluate every host and build pkgs/, natively on both systems
   flake-check:
