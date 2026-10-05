@@ -38,6 +38,9 @@ in
     ]
     ++ scripts;
 
+  # Browser opened by command-line tools (gh, git web--browse, Python's webbrowser...)
+  home.sessionVariables.BROWSER = "firefox";
+
   # Bitwarden CLI (bw): the private account by default. For the other one, e.g. in a project's .envrc:
   #   export BITWARDENCLI_APPDATA_DIR="$XDG_DATA_HOME/bitwarden-cli/inboxcom"
   home.sessionVariables.BITWARDENCLI_APPDATA_DIR = bwDataDir "private";
