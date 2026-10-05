@@ -47,6 +47,10 @@ in
     pkgs.hubble
     pkgs.cri-tools
 
+    # Container images
+    pkgs.skopeo # Inspect, copy and verify images in registries
+    pkgs.cosign # Sign and verify images (Sigstore)
+
     # Infrastructure as code
     pkgs-unstable.opentofu
 
@@ -76,7 +80,6 @@ in
     pkgs.age
     bitwarden-cli # bw: Bitwarden password manager
     bws           # Bitwarden Secrets Manager
-    pkgs.cosign
   ];
 
   # zsh completions not provided by the packages themselves (pkgs/ generate theirs at build time)
