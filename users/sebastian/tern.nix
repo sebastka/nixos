@@ -13,13 +13,14 @@ let
   user = "sebastian";
   profiles = [
     "private"
+    "inboxcom"
     "inboxcom-test"
   ];
 
   # Same settings for both profiles
   profile = ''
-    display_name = "Sebastian Karlsen"
-    archive = "Archive/{year}"
+    # display_name = "Sebastian Karlsen"
+    archive = "Archives/{year}"
 
     [store]
     compress = true        # zstd-compress stored messages
