@@ -35,13 +35,20 @@ in
     [
       kdePackages.kate
       thunderbird
-      bitwarden-desktop
       chromium
     ]
+    ++ lib.optional discord.meta.available discord # x86_64 only: not on boreas (aarch64)
     ++ scripts;
 
   # Browser opened by command-line tools (gh, git web--browse, Python's webbrowser...)
   home.sessionVariables.BROWSER = "firefox";
+
+  # No Flatpak: stop Plasma Browser Integration from writing its host into ~/.var/app/<browser> of known
+  # Flatpak browsers at every login. kded6rc stays writable (kded keeps its own state there).
+  home.activation.noFlatpakBrowserIntegration = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    run ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 --file kded6rc \
+      --group Module-browserintegrationflatpakintegrator --key autoload --type bool false
+  '';
 
   # Bitwarden CLI (bw): the private account by default. For the other one, e.g. in a project's .envrc:
   #   export BITWARDENCLI_APPDATA_DIR="$XDG_DATA_HOME/bitwarden-cli/inboxcom"
@@ -73,17 +80,4 @@ in
   # and linked from outside the Nix store.
   xdg.configFile."bws/inboxcom.config".source =
     config.lib.file.mkOutOfStoreSymlink osConfig.sops.secrets."bws-inboxcom-config".path;
-
-  # Never start Bitwarden desktop at login. Its "Start on login" setting writes this file (outside Flatpak):
-  # read-only and hidden here, so the setting can't turn it back on.
-  xdg.configFile."autostart/bitwarden.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=Bitwarden
-    Comment=Bitwarden startup script
-    Exec=${lib.getExe pkgs.bitwarden-desktop}
-    StartupNotify=true
-    Terminal=false
-    Hidden=true
-  '';
 }

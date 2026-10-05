@@ -33,13 +33,13 @@ let
   bitwarden = account: url: {
     name = "Bitwarden (${account})";
     inherit url;
-    icon = "${./icons/bitwarden.svg}"; # Not bitwarden-desktop's: it may not stay installed
+    icon = "${./icons/bitwarden.svg}";
     genericName = "Password Manager";
     comment = "Bitwarden web vault for ${account}";
   };
 in
 {
-  xdg.desktopEntries = lib.mapAttrs' (_: webApp) {
+  xdg.desktopEntries = lib.mapAttrs' (_: webApp) ({
     bitwarden-private = bitwarden "sebastian@karlsen.fr" "https://vault.bitwarden.com/#/vault" // {
       profile = "bitwarden-private-sebastian.karlsen.fr";
     };
@@ -65,5 +65,16 @@ in
       genericName = "Meetings";
       comment = "Video Conferencing, Meetings, Calling";
     };
-  };
+  }
+  # Where the desktop app isn't available (x86_64 only, see ./desktop.nix)
+  // lib.optionalAttrs (!pkgs.discord.meta.available) {
+    discord = {
+      name = "Discord";
+      url = "https://discord.com/app";
+      profile = "discord";
+      icon = "${./icons/discord.svg}"; # From the Papirus icon theme (GPL-3.0)
+      genericName = "Internet Messenger";
+      comment = "All-in-one voice and text chat";
+    };
+  });
 }
