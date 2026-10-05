@@ -101,7 +101,8 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
 | File | Content | Encrypted for |
 |---|---|---|
 | `secrets/common.sops.yaml` | User password hashes | GnuPG key, every host |
-| `secrets/desktop.sops.yaml` | NetworkManager Wi-Fi PSKs (`nm-wifi-env`) | GnuPG key, desktops |
+| `secrets/desktop.sops.yaml` | NetworkManager Wi-Fi PSKs (`nm-wifi-env`), bws inboxcom config (`bws-inboxcom-config`) | GnuPG key, desktops |
+| `secrets/ssh-work.sops.yaml` | Work SSH hosts (`ssh-work-config`, linked as `~/.ssh/config.d/work.conf`) and their keys (`ssh-work-known-hosts`, `~/.ssh/known_hosts.d/inboxcom`) | GnuPG key, desktops |
 | `secrets/tern.sops.yaml` | Tern account files and signatures, names included: a `files` list of `path`/`content` (`users/sebastian/tern.nix`) | GnuPG key, desktops |
 | `secrets/<host>-ssh-host-key.sops.yaml` | The host's SSH host key (also its age identity) | GnuPG key only |
 | `secrets/<host>-secure-boot.sops.yaml` | The host's Secure Boot keys (PK, KEK, db) | GnuPG key only |

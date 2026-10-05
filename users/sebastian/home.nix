@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 {
   # GnuPG keys live on Yubikeys (private primary keys are offline).
@@ -41,11 +41,31 @@
   home.file.".ssh/key/private.id_ed25519_piv.pub".source = ./keys/private.id_ed25519_piv.pub;
   home.file.".ssh/key/inboxcom.id_ed25519_piv.pub".source = ./keys/inboxcom.id_ed25519_piv.pub;
 
+  # Personal SSH hosts (./ssh/config.d/*.conf; work hosts: a secret, see ./desktop.nix). Read before the blocks
+  # below: the first value set for an option wins.
+  programs.ssh.includes = [ "config.d/*.conf" ];
+  home.file.".ssh/config.d" = {
+    source = ./ssh/config.d;
+    recursive = true; # Links each file: ./desktop.nix adds work.conf to the directory
+  };
+  # Host keys: common (GitHub, AUR) and private here, work a secret (./desktop.nix)
+  home.file.".ssh/known_hosts.d" = {
+    source = ./ssh/known_hosts.d;
+    recursive = true;
+  };
+
   programs.ssh.settings = {
     # Work servers: inboxcom Yubikey
     "*.fjordmail.no".IdentityFile = "~/.ssh/key/inboxcom.id_ed25519_piv.pub";
     # Everything else: personal Yubikey
     "*".IdentityFile = "~/.ssh/key/private.id_ed25519_piv.pub";
+    # Writable file first: ssh saves new host keys there (the others are read-only, missing ones are skipped)
+    "*".UserKnownHostsFile = lib.concatMapStringsSep " " (f: "~/.ssh/${f}") [
+      "known_hosts"
+      "known_hosts.d/common"
+      "known_hosts.d/private"
+      "known_hosts.d/inboxcom"
+    ];
   };
 
   home.stateVersion = "26.05";

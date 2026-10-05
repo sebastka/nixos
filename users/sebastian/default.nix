@@ -16,6 +16,14 @@ in
         owner = "sebastian";
       })
     ))
+
+    # Work (inboxcom) SSH hosts and their keys (company infrastructure: encrypted), linked under ~/.ssh by ./desktop.nix
+    (lib.mkIf config.services.xserver.enable (
+      lib.genAttrs [ "ssh-work-config" "ssh-work-known-hosts" ] (_: {
+        sopsFile = "${self}/secrets/ssh-work.sops.yaml";
+        owner = "sebastian";
+      })
+    ))
   ];
 
   users.users."sebastian" = {

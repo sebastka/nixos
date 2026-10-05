@@ -60,6 +60,12 @@ in
     )
   );
 
+  # Work (inboxcom) SSH hosts and their keys: secrets/ssh-work.sops.yaml (users/sebastian/default.nix)
+  home.file.".ssh/config.d/work.conf".source =
+    config.lib.file.mkOutOfStoreSymlink osConfig.sops.secrets."ssh-work-config".path;
+  home.file.".ssh/known_hosts.d/inboxcom".source =
+    config.lib.file.mkOutOfStoreSymlink osConfig.sops.secrets."ssh-work-known-hosts".path;
+
   # Bitwarden Secrets Manager (bws): inboxcom account only, selected with BWS_CONFIG_FILE (see README.md).
   # Its config is a secret (secrets/desktop.sops.yaml), decrypted by sops-nix (users/sebastian/default.nix)
   # and linked from outside the Nix store.

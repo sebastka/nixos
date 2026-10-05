@@ -1,0 +1,12 @@
+# home.karlsen.fr
+@cert-authority *.home.karlsen.fr,192.168.*.* ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHgbZrDraC8RJIX0KJCmApTGAIFfRsD+Jh0uBLPnXE9N Host CA
+
+atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICn6NGamFAzk9umVRi/b2nYv6uUU4YFl1AS9Lt9/CdFQ
+file.atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAr16EBRLtY9/Cu5xa35rT3xZ9RwxIl+99+2L4Aa9SQK
+torrent.atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE38yF5W6AowQewGM2RxEK443wquVoz45U4oKlVbdk7D
+n1.homeswarm.atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEPhwNG6rznDbCym3OS9Cx7QtMTMw9vgDYQIQZDYKszP
+n2.homeswarm.atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOnJ222Flx5digI7U4Ty00jpMbWlNyqorjiVO6/rRo2i
+n3.homeswarm.atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOB+FnOFcxh7zJA4bciRmaMkwjBG8NT+3EzsXAYE+XO
+db10.atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGwj8rKwxaRMFnEh2BLSAFbv0Wd+TeCPoyA1smgEnNqC
+db20.atlas.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIApYv/+tlgsfkXUDvblOWW9YnTXor36rX/EVCbq6QDcY
+zeus.home.karlsen.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG9psu/NezOCO5wKx9C/BFkedhU0NC0u2NvguQPMc1ot
