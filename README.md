@@ -26,7 +26,7 @@ modules/nixos/
   desktop/             Desktops: Plasma, PipeWire, NetworkManager (Wi-Fi from sops), GnuPG, SSH agent, fonts
   server/              Servers: systemd-networkd, resolved, unattended upgrades
   home-manager/        home-manager integration, modules shared by every user
-modules/home/          home-manager modules: zsh, starship, git, gpg, ssh, vim, htop, readline, direnv, XDG...
+modules/home/          home-manager modules: zsh, starship, git, gpg, ssh, neovim, vim, htop, readline, direnv, XDG...
 users/<user>/          User account, identities (keys/, SSH, git, GnuPG), per-host and desktop additions
 pkgs/                  Packages built from upstream release binaries (both architectures), updated nightly
 secrets/               sops-encrypted secrets (see Secrets)

@@ -82,8 +82,8 @@
   programs.zsh.enable = true;
 
   environment.variables = {
-    EDITOR = "vim";
-    VISUAL = "vim";
+    EDITOR = "nvim";
+    VISUAL = "nvim";
     PAGER = "less";
   };
 
