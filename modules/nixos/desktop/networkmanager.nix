@@ -8,6 +8,27 @@
 
   networking.networkmanager.ensureProfiles = {
     environmentFiles = [ config.sops.secrets."nm-wifi-env".path ];
+    profiles."NETGEAR30" = {
+      connection = {
+        id = "NETGEAR30";
+        uuid = "98e51fc9-e58f-42ec-9ad7-fc8f8cabd2bf";
+        type = "wifi";
+      };
+      wifi = {
+        mode = "infrastructure";
+        ssid = "NETGEAR30";
+        "cloned-mac-address" = "permanent"; # Hardware MAC, never randomized
+      };
+      "wifi-security" = {
+        "key-mgmt" = "sae";
+        psk = "$NM_NETGEAR30_PSK";
+      };
+      ipv4.method = "auto";
+      ipv6 = {
+        "addr-gen-mode" = "default";
+        method = "auto";
+      };
+    };
     profiles."NETGEAR30-5G" = {
       connection = {
         id = "NETGEAR30-5G";
@@ -17,6 +38,7 @@
       wifi = {
         mode = "infrastructure";
         ssid = "NETGEAR30-5G";
+        "cloned-mac-address" = "permanent"; # Hardware MAC, never randomized
       };
       "wifi-security" = {
         "key-mgmt" = "sae";
