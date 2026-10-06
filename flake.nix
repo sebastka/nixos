@@ -149,6 +149,7 @@
             home-manager
             sops-nix
             nixos-apple-silicon
+            disko
             ;
           pkgs-unstable = mkPkgsUnstable "aarch64-linux";
         };

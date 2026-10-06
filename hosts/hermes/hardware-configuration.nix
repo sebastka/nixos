@@ -1,12 +1,13 @@
 { lib, ... }:
 
+# Raspberry Pi 4 Model B Rev 1.4, 8 GB, booting from the SD card (116 GB).
+# Filesystems: the SD card image's, by label (NIXOS_SD and FIRMWARE), defined by sd-image.nix (./default.nix).
 {
-  # Run nixos-generate-config on the Pi and replace this file with the result.
-  # Placeholder until the Pi is set up: label used by the NixOS SD card image.
-  fileSystems."/" = {
-    device = "/dev/disk/by-label/NIXOS_SD";
-    fsType = "ext4";
-  };
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "usbhid"
+    "usb_storage"
+  ];
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

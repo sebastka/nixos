@@ -9,15 +9,14 @@ keys:
   # Host age keys (derived from SSH host keys) used by each host to decrypt at activation
   # To add a new host: $ cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
   # - &helios: XXXX
-  # - &atlas: XXXX
   - &geras age1q7nfvyrnh4cjt8yuzecvn9lhpfwpkw29anfctltu8e7qww75ssfqpnynva
   - &zeus age1qhx39d2vurl082udf4r9mwr29yr8gr86czp8qvcv5jnh7fgj3adqdyvktm
-  # - &hermes XXX
-  # - &boreas XXX
+  - &hermes age1d5vr8uawrgpgr2y0arkcxt567dtmv2nkfs8gugm43zzvjky26qqqzr2hk9
+  - &boreas age1wm5xu5tq2rv3ch76pgezw4c6a5j7qvr3rmw7cck3s70233spj38ql034cr
 
 creation_rules:
   - {path_regex: 'secrets/\.?[^/]*-(ssh-host-key|secure-boot)\.sops\.yaml$', key_groups: [{pgp: [*sebastian]}]}
-  - {path_regex: 'secrets/\.?common\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*geras, *zeus]}]}  # *hermes, *boreas
-  - {path_regex: 'secrets/\.?desktop\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus]}]}  # *boreas
-  - {path_regex: 'secrets/\.?tern\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras, *zeus]}]}  # *boreas
-  - {path_regex: 'secrets/\.?ssh-work\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus]}]}  # *boreas
+  - {path_regex: 'secrets/\.?common\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *hermes, *boreas]}]}
+  - {path_regex: 'secrets/\.?desktop\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
+  - {path_regex: 'secrets/\.?tern\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
+  - {path_regex: 'secrets/\.?ssh-work\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}

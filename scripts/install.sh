@@ -77,9 +77,23 @@ test "${answer}" = yes || exit 1
 # shellcheck disable=SC2086 # ${nix} is intentionally split into command + flags
 sudo ${nix} run --inputs-from . disko -- --mode destroy,format,mount --yes-wipe-all-disks --flake ".#${host}"
 
+# /boot outside disko (boreas: the ESP made by the Asahi installer, which disko must not format)
+if ! mountpoint -q "${root}/boot"; then
+    boot_device="$(${nix} eval --raw ".#nixosConfigurations.${host}.config.fileSystems.\"/boot\".device")"
+    sudo install -d "${root}/boot"
+    sudo mount -o fmask=0077,dmask=0077 "${boot_device}" "${root}/boot"
+fi
+
+# Apple Silicon: the peripheral firmware extracted by the Asahi installer, referenced by its hash
+# (hardware.asahi.peripheralFirmwareDirectory), into the Nix store
+if test -f "${root}/boot/vendorfw/firmware.cpio"; then
+    sudo nix-store --add-fixed sha256 "${root}/boot/vendorfw/firmware.cpio"
+fi
+
 # Enroll the Yubikey (FIDO2) as LUKS unlock method: asks for the passphrase, FIDO2 PIN and a touch.
 # The passphrase stays enrolled as recovery.
-sudo systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
+luks_device="$(${nix} eval --raw ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.device")"
+sudo systemd-cryptenroll --fido2-device=auto "${luks_device}"
 
 # 3. SSH host key and Secure Boot keys
 sudo install -d -m 755 "${root}/etc/ssh"
