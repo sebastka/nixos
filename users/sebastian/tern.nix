@@ -11,28 +11,14 @@
 
 let
   user = "sebastian";
-  profiles = [
-    "private"
-    "inboxcom"
-    "inboxcom-test"
-  ];
-
-  # Same settings for both profiles
-  profile = ''
-    # display_name = "Sebastian Karlsen"
-    archive = "Archives/{year}"
-
-    [store]
-    compress = true        # zstd-compress stored messages
-    compression_level = 3
-  '';
-
   nixosConfig = config;
 in
 {
   config = lib.mkIf nixosConfig.services.xserver.enable {
-    # Account files and signatures are secrets, names included: secrets/tern.sops.yaml holds
+    # Profiles (found by Tern from their directories), account files and signatures are secrets, names
+    # included: secrets/tern.sops.yaml holds
     #   files: [ { path: <relative to ~/.config/tern>, content: <file content> } ]
+    # e.g. profiles/<profile>/profile.toml and profiles/<profile>/accounts/<id>.toml,
     # with both values encrypted. The host decrypts the whole file (readable by the user only).
     sops.secrets.tern-config = {
       sopsFile = "${self}/secrets/tern.sops.yaml";
@@ -48,28 +34,34 @@ in
           pkgs.libsecret # secret-tool: store the account passwords (password.keyring) in the keyring
         ];
 
-        xdg.configFile = {
-          # Tern never writes its configuration: read-only files are fine
-          "tern/tern.toml".text = ''
-            default_profile = "private"
-            ask_on_startup = true
+        # Tern never writes its configuration: read-only files are fine
+        xdg.configFile."tern/tern.toml".text = ''
+          default_profile = "private"
+          ask_on_startup = true
+          sent_folder = "Sent"
 
-            [ui]
-            threaded = false
-            prefer_plain_text = false
+          [ui]
+          threaded = false
+          prefer_plain_text = false
 
-            [gpg]
-            program = "gpg"
-            wkd_lookup = true
+          [ui.message_list]
+          # Left to right: flag, subject, from, to, correspondent, date, attachment, size.
+          # "correspondent" is From, or To in Sent and Drafts folders.
+          columns = ["flag", "subject", "from", "to", "date", "attachment", "size"]   # not empty, no duplicates
+          sort_by = "date"       # any of the above; it doesn't have to be shown
+          sort_order = "asc"     # asc | desc
 
-            [memory]
-            message_cache_mb = 64      # rendered messages kept in memory, attachments included
-            spare_renderer = true      # keep a spare Chromium renderer ready (faster, ~30 MiB more)
-          '';
-        }
-        // lib.genAttrs (map (p: "tern/profiles/${p}/profile.toml") profiles) (_: {
-          text = profile;
-        });
+          [gpg]
+          program = "gpg"
+          wkd_lookup = true
+
+          [compose]
+          format = "plain"   # default editor: plain | markdown | html (no signature here)
+
+          [memory]
+          message_cache_mb = 64      # rendered messages kept in memory, attachments included
+          spare_renderer = true      # keep a spare Chromium renderer ready (faster, ~30 MiB more)
+        '';
 
         # Write the secret files into ~/.config/tern (mode 600) when switching. The paths written are
         # recorded, so files removed from the secret are deleted at the next switch.
