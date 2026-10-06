@@ -48,12 +48,6 @@
     "vm.dirty_writeback_centisecs" = 1500; # VM writeback timeout: 15s
   };
 
-  console.keyMap = "no";
-  services.xserver.xkb = {
-    layout = "no";
-    variant = "";
-  };
-
   home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
 
   system.stateVersion = "26.05";

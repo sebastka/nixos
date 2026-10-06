@@ -22,14 +22,19 @@ Each host's install steps are at the top of its `hosts/<host>/default.nix`.
 
 ```
 flake.nix              Inputs, hosts (nixosConfigurations), pkgs/ as packages and checks, devShell
-hosts/<host>/          Per-host configuration (hardware, disko, Secure Boot, impermanence...)
+hosts/<host>/          Per-host configuration (hardware, disko, impermanence; helios: the router's services)
 modules/nixos/
-  common/              Every host: nix, boot, locale, sops-nix, users, OpenSSH server
-  desktop/             Desktops: Plasma, PipeWire, NetworkManager (Wi-Fi from sops), GnuPG, SSH agent, fonts
-  server/              Servers: systemd-networkd, resolved, unattended upgrades
+  common/              Every host: nix, boot, locale and keyboard, sops-nix, users (email and picture), OpenSSH server
+  desktop/             Desktops: Plasma (no Flatpak), PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH
+                       agent), Tailscale and KTailctl, fonts; apps for every user (Firefox, Thunderbird, Kate,
+                       Chromium, Tern), and their user config (coding agents, ops tools, VS Code)
+  server/              Servers: systemd-networkd, resolved, Zabbix agent, unattended upgrades
+  secure-boot.nix      Lanzaboote with our own keys (geras, zeus, helios)
   home-manager/        home-manager integration, modules shared by every user
-modules/home/          home-manager modules: zsh, starship, git, gpg, ssh, neovim, vim, htop, readline, direnv, XDG...
-users/<user>/          User account, identities (keys/, SSH, git, GnuPG), per-host and desktop additions
+modules/home/          home-manager modules: zsh, starship, git, gpg, ssh, neovim, vim, htop, readline, direnv, XDG,
+                       web apps (programs.webApps), and the desktop ones (coding agents, ops, VS Code)
+users/<user>/          User account; home.nix (every host: identities in keys/ and ssh/, git, GnuPG, scripts),
+                       desktop.nix, work.nix and tern.nix (desktops), assets/ (config files)
 pkgs/                  Packages built from upstream release binaries (both architectures), updated nightly
 secrets/               sops-encrypted secrets (see Secrets)
 scripts/               install.sh, build.sh, update.sh, update-pkgs.sh
@@ -124,6 +129,7 @@ Windows disks (980 PRO 500 GB with Windows' ESP, 980 PRO 2 TB) are never touched
 | `secrets/desktop.sops.yaml` | NetworkManager Wi-Fi PSKs (`nm-wifi-env`), bws inboxcom config (`bws-inboxcom-config`) | GnuPG key, desktops |
 | `secrets/ssh-work.sops.yaml` | Work SSH hosts (`ssh-work-config`, linked as `~/.ssh/config.d/work.conf`) and their keys (`ssh-work-known-hosts`, `~/.ssh/known_hosts.d/inboxcom`) | GnuPG key, desktops |
 | `secrets/tern.sops.yaml` | Tern account files and signatures, names included: a `files` list of `path`/`content` (`users/sebastian/tern.nix`) | GnuPG key, desktops |
+| `secrets/helios.sops.yaml` | Cloudflare API token (certificates, dynamic DNS), DNSSEC private keys of the local zones (`hosts/helios`) | GnuPG key, helios |
 | `secrets/<host>-ssh-host-key.sops.yaml` | The host's SSH host key (also its age identity) | GnuPG key only |
 | `secrets/<host>-secure-boot.sops.yaml` | The host's Secure Boot keys (PK, KEK, db) | GnuPG key only |
 
@@ -148,7 +154,7 @@ Two Yubikeys: personal (`private`) and work (`inboxcom`).
 
 | Use | Yubikey application | Details |
 |---|---|---|
-| Disk unlock (LUKS) | FIDO2 | PIN and touch at boot, passphrase as fallback (`crypttabExtraOpts`) |
+| Disk unlock (LUKS) | FIDO2 | PIN and touch at boot, passphrase as fallback (`crypttabExtraOpts`). zeus: passphrase by default, the Yubikey when plugged in. helios: the TPM (unattended). |
 | SSH | OpenPGP (authentication subkey) | Through gpg-agent (`SSH_AUTH_SOCK`), PIN once. Public keys in `users/sebastian/keys/*.id_ed25519_gpg.pub` |
 | Commit signing, sops | OpenPGP | Personal key by default, work key in `~/Dev/Work/` (`users/sebastian/work.nix`, desktops) |
 
@@ -162,8 +168,8 @@ creating or changing it). The variables below switch tools from their default ac
 
 ### Bitwarden
 
-Two password manager (`bw`) accounts are configured (`users/sebastian/desktop.nix`, work: `users/sebastian/work.nix`), and one
-Secrets Manager (`bws`) account:
+Two password manager (`bw`) accounts are configured (`users/sebastian/desktop.nix`, work: `users/sebastian/work.nix`),
+and one Secrets Manager (`bws`) account:
 
 | Account | Server | `bw` | `bws` |
 |---|---|---|---|
@@ -203,8 +209,6 @@ Notes:
 
 - **Hibernation after a kernel update:** reboot before hibernating. Otherwise the next boot starts the new kernel,
   which refuses the hibernation image of the old one, and the session is lost.
-- **Hibernation and Bitwarden desktop:** while it runs, it holds `memfd_secret` memory, which disables hibernation
-  (`disk` disappears from `/sys/power/state`). Quit it, or hibernation (and suspend-then-hibernate) is unavailable.
 - **NVIDIA dGPU on geras:** powered off by kernel runtime PM (no driver bound, see `hosts/geras/default.nix`). Never
   combine it with bbswitch: both at boot froze the machine.
 - **Impermanence** (`hosts/geras/impermanence.nix`) is prepared but disabled.

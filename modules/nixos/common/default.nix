@@ -62,6 +62,10 @@
 
   time.timeZone = "Europe/Oslo";
 
+  # Norwegian keyboard by default (also the LUKS passphrase prompt); a host with another keyboard sets its own
+  # (zeus). The graphical layout: modules/nixos/desktop.
+  console.keyMap = lib.mkDefault "no";
+
   # English messages, Norwegian formats, except dates and sorting
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {

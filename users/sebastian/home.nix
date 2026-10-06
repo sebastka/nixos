@@ -48,8 +48,7 @@
 
   # SSH keys: the OpenPGP authentication subkeys on the Yubikeys (private keys never leave the Yubikeys), exported
   # with `gpg --export-ssh-key <subkey>!`. Used through gpg-agent, see modules/nixos/desktop/gnupg.nix.
-  home.file.".ssh/key/private.id_ed25519_gpg.pub".source = ./keys/private.id_ed25519_gpg.pub;
-  home.file.".ssh/key/inboxcom.id_ed25519_gpg.pub".source = ./keys/inboxcom.id_ed25519_gpg.pub;
+  home.file.".ssh/key/private.id_ed25519_gpg.pub".source = ./keys/private.id_ed25519_gpg.pub; # Work key: ./work.nix
 
   # Personal SSH hosts (./ssh/config.d/*.conf; work hosts: a secret, see ./work.nix). Read before the blocks
   # below: the first value set for an option wins.
@@ -65,11 +64,10 @@
   };
 
   programs.ssh.settings = {
-    # Work servers: inboxcom Yubikey
-    "*.fjordmail.no".IdentityFile = "~/.ssh/key/inboxcom.id_ed25519_gpg.pub";
-    # Everything else: personal Yubikey
+    # Personal Yubikey (work servers: ./work.nix)
     "*".IdentityFile = "~/.ssh/key/private.id_ed25519_gpg.pub";
-    # Writable file first: ssh saves new host keys there (the others are read-only, missing ones are skipped)
+    # Writable file first: ssh saves new host keys there (the others are read-only, missing ones are skipped).
+    # One setting for all: known_hosts.d/inboxcom is from ./work.nix (desktops), skipped elsewhere.
     "*".UserKnownHostsFile = lib.concatMapStringsSep " " (f: "~/.ssh/${f}") [
       "known_hosts"
       "known_hosts.d/common"

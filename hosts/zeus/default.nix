@@ -40,10 +40,7 @@
   # US HHKB (Happy Hacking Keyboard): Control and the Fn layer are in the keyboard itself, nothing to remap.
   # Also the layout of the LUKS passphrase prompt (initrd).
   console.keyMap = "us";
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+  services.xserver.xkb.layout = "us";
 
   home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
 

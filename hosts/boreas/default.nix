@@ -69,12 +69,7 @@
     };
   };
 
-  console.keyMap = "no";
-  services.xserver.xkb = {
-    layout = "no";
-    model = "applealu_iso";
-    variant = "";
-  };
+  services.xserver.xkb.model = "applealu_iso"; # Norwegian layout: the default
 
   home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
 

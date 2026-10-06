@@ -52,7 +52,5 @@
     tmpfsSize = "2G";
   };
 
-  console.keyMap = "no";
-
   system.stateVersion = "26.05";
 }

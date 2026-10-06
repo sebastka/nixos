@@ -57,6 +57,11 @@ in
           }
         ];
 
+        # Work SSH key: the inboxcom Yubikey's OpenPGP authentication subkey (as the personal one, ./home.nix),
+        # for the work servers (and GitHub's work account, programs.git.includes above)
+        home.file.".ssh/key/inboxcom.id_ed25519_gpg.pub".source = ./keys/inboxcom.id_ed25519_gpg.pub;
+        programs.ssh.settings."*.fjordmail.no".IdentityFile = "~/.ssh/key/inboxcom.id_ed25519_gpg.pub";
+
         # Work SSH hosts and their keys (secrets above), next to the personal ones (./home.nix)
         home.file.".ssh/config.d/work.conf".source =
           config.lib.file.mkOutOfStoreSymlink nixosConfig.sops.secrets.ssh-work-config.path;

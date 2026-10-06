@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
@@ -17,6 +17,9 @@
     ../../home/programs/ops
     ../../home/programs/vscode
   ];
+
+  # Norwegian keyboard by default, as the console (modules/nixos/common)
+  services.xserver.xkb.layout = lib.mkDefault "no";
 
   services.printing.enable = true;
 
