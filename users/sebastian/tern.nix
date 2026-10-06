@@ -50,10 +50,15 @@ in
           columns = ["flag", "subject", "from", "to", "date", "attachment", "size"]   # not empty, no duplicates
           sort_by = "date"       # any of the above; it doesn't have to be shown
           sort_order = "asc"     # asc | desc
+          group_by_date = true
 
           [gpg]
           program = "gpg"
           wkd_lookup = true
+
+          [avatars]
+          lookup = "trusted"
+          sources = ["webfinger", "libravatar"]
 
           [compose]
           format = "plain"   # default editor: plain | markdown | html (no signature here)
@@ -61,6 +66,12 @@ in
           [memory]
           message_cache_mb = 64      # rendered messages kept in memory, attachments included
           spare_renderer = true      # keep a spare Chromium renderer ready (faster, ~30 MiB more)
+
+          [notifications]
+          enabled = true
+          sound = true
+          folders = ["*"]
+          # exclude_folders = []
         '';
 
         # Write the secret files into ~/.config/tern (mode 600) when switching. The paths written are
