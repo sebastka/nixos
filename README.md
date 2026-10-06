@@ -26,8 +26,9 @@ hosts/<host>/          Per-host configuration (hardware, disko, impermanence; he
 modules/nixos/
   common/              Every host: nix, boot, locale and keyboard, sops-nix, users (email and picture), OpenSSH server
   desktop/             Desktops: Plasma (no Flatpak), PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH
-                       agent), Tailscale and KTailctl, fonts; apps for every user (Firefox, Thunderbird, Kate,
-                       Chromium, Tern), and their user config (coding agents, ops tools, VS Code)
+                       agent), Tailscale (profiles in the network applet: plasma-nm-ts), fonts; apps for every user
+                       (Firefox, Thunderbird, Kate, Chromium, Tern), and their user config (coding agents, ops tools,
+                       VS Code)
   server/              Servers: systemd-networkd, resolved, Zabbix agent, unattended upgrades
   secure-boot.nix      Lanzaboote with our own keys (geras, zeus, helios)
   home-manager/        home-manager integration, modules shared by every user

@@ -30,6 +30,10 @@
       url = "github:sebastka/tern";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    plasma-nm-ts = {
+      url = "github:sebastka/plasma-nm-ts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -45,6 +49,7 @@
       disko,
       lanzaboote,
       tern,
+      plasma-nm-ts,
     }:
     let
       mkPkgsUnstable =

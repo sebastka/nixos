@@ -253,6 +253,26 @@
         "type": "github"
       }
     },
+    "plasma-nm-ts": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791312557,
+        "narHash": "sha256-F+6wEUMmVRfcNOYzM8rXXJetDNM+6T9gvW8zPwVlK4I=",
+        "owner": "sebastka",
+        "repo": "plasma-nm-ts",
+        "rev": "bcb94c207a721976df7c715052ad5e330545c15f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sebastka",
+        "repo": "plasma-nm-ts",
+        "type": "github"
+      }
+    },
     "pre-commit": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -285,6 +305,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "plasma-nm-ts": "plasma-nm-ts",
         "sops-nix": "sops-nix",
         "tern": "tern"
       }

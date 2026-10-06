@@ -1,22 +1,14 @@
-{ pkgs, ... }:
+{ self, ... }:
 
 {
-  # Tailscale on every desktop; sebastian can run tailscale up/down, switch tailnets... without sudo (KTailctl too)
+  imports = [ self.inputs.plasma-nm-ts.nixosModules.default ];
+
+  # Tailscale on every desktop; sebastian can run tailscale up/down, switch tailnets... without sudo
   services.tailscale.enable = true;
   services.tailscale.extraSetFlags = [ "--operator=sebastian" ];
 
-  # KTailctl: Tailscale in Plasma's system tray, started at login for every user
-  environment.systemPackages = [ pkgs.ktailctl ];
-  environment.etc."xdg/autostart/org.fkoehler.KTailctl.desktop".text = ''
-    [Desktop Entry]
-    Version=1.0
-    Type=Application
-    Name=KTailctl
-    Comment=GUI for tailscale on the KDE Plasma desktop
-    Exec=ktailctl
-    Icon=org.fkoehler.KTailctl
-    Terminal=false
-    Categories=Qt;KDE;System;
-    StartupNotify=false
-  '';
+  # Tailscale profiles as NetworkManager VPN connections, in Plasma's network applet (testing, instead of KTailctl).
+  # Prototype: connections are made with nmcli, e.g.
+  #   nmcli connection add type vpn vpn-type tailscale con-name "Tailscale (private)" vpn.data profile=karlsen.fr
+  services.plasma-nm-ts.enable = true;
 }
