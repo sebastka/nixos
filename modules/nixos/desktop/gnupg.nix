@@ -38,6 +38,26 @@
           defaultCacheTtl = 36000;
           maxCacheTtl = 36000;
         };
+        # GnuPG 2.4 sends the data to sign to scdaemon in one line, so the agent refuses more than ~476 bytes
+        # ("General error", "agent refused operation" in ssh). SSH signs the server's host key too (publickey-
+        # hostbound): an SSH certificate (*.home.karlsen.fr) is too large. Fixed in GnuPG 2.5, not in nixpkgs:
+        # its two commits here, for the gpg and gpg-agent of the user only (patching pkgs.gnupg rebuilds a lot).
+        # Remove once pkgs.gnupg is 2.5 or later.
+        programs.gpg.package = pkgs.gnupg.overrideAttrs (old: {
+          patches = (old.patches or [ ]) ++ [
+            # agent: Use SETDATA --apend for larger data to communicate scdaemon.
+            (pkgs.fetchpatch {
+              url = "https://github.com/gpg/gnupg/commit/fe147645d.patch";
+              hash = "sha256-Kwlv9JRYEuJCZIs2k87L56PyMNNc4biF5yyujzPDDlA=";
+            })
+            # agent: Clean up for the refactoring.
+            (pkgs.fetchpatch {
+              url = "https://github.com/gpg/gnupg/commit/893e5e7c6.patch";
+              hash = "sha256-zeVVcevRYpDfbvvVW5lLMDJGUS3HlOYOIcYACpJYs7A=";
+            })
+          ];
+        });
+
         # For the whole session (graphical apps too), not only interactive shells (enableSshSupport)
         home.sessionVariablesExtra = ''
           export SSH_AUTH_SOCK="$(${config.programs.gpg.package}/bin/gpgconf --list-dirs agent-ssh-socket)"
