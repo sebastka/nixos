@@ -17,9 +17,12 @@
 
     # Talk to the Yubikeys through pcscd (services.pcscd), instead of scdaemon's own USB driver,
     # and don't lock the card: other tools (ykman) can use it at the same time.
+    # Only the OpenPGP application: otherwise the card's authentication key for SSH was the PIV one (slot 9a),
+    # which gpg-agent hands to ssh in a format it can't read ("error fetching identities: invalid format").
     scdaemonSettings = {
       disable-ccid = true;
       pcsc-shared = true;
+      disable-application = "piv";
     };
   };
 }
