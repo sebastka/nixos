@@ -11,6 +11,7 @@ Yubikeys for disk unlocking, SSH and signing.
 | Host | Hardware | Role | Status |
 |---|---|---|---|
 | `geras` | Dell XPS 15 7590 (x86_64) | Desktop (KDE Plasma) | Installed |
+| `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (KDE Plasma), dual boot with Windows | Not installed yet (Linux Mint) |
 | `boreas` | MacBook Pro M1 2021 (aarch64, Asahi) | Desktop (KDE Plasma) | Not migrated yet (Fedora Asahi) |
 | `hermes` | Raspberry Pi 4 (aarch64) | Server | Not migrated yet |
 
@@ -94,6 +95,25 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
    stages the Secure Boot keys and reboots, then systemd-boot enrolls them (with Microsoft's keys, needed by the NVIDIA
    option ROM). Check with `bootctl status` (`Secure Boot: enabled (user)`) or `sudo sbctl status`.
 5. **User session:** run `gpg --card-status` once per Yubikey (links the GnuPG subkeys to the cards, SSH included).
+
+### `zeus` (dual boot with Windows)
+
+NixOS takes the Samsung 970 EVO Plus 500 GB (Linux Mint before, wiped with its exFAT partition), with its own ESP. The
+Windows disks (980 PRO 500 GB with Windows' ESP, 980 PRO 2 TB) are never touched. Differences from the steps above:
+
+- **Before, in Windows:** save the BitLocker recovery keys of both drives (`manage-bde -protectors -get C:`), then
+  suspend BitLocker on `C:` (`Suspend-BitLocker -MountPoint C: -RebootCount 0`, as administrator). Enrolling our
+  Secure Boot keys changes what the TPM measures, so Windows would otherwise ask for the recovery key.
+- **Firmware (Gigabyte):** CSM disabled. Secure Boot mode Custom, then in key management delete only the **PK**
+  (Setup Mode). Keep `dbx`.
+- **Live ISO:** `lsblk` must show the 970 EVO Plus (serial `S4EVNS0N905239P`, `hosts/zeus/disko.nix`) as the disk with
+  Mint's partitions: it's the only disk disko wipes.
+- **Disk unlock:** the passphrase by default (no waiting for a Yubikey). The Yubikey enrolled by `scripts/install.sh`
+  still works when plugged in at boot (PIN and touch).
+- **Windows:** NixOS is the default boot entry. Windows is picked in the firmware boot menu (F12), or from NixOS
+  with `sudo efibootmgr --bootnext <number of "Windows Boot Manager">` and a reboot. Our Secure Boot keys include
+  Microsoft's, so Windows still boots. Once it did, resume BitLocker (`Resume-BitLocker -MountPoint C:`).
+- **Cleanup:** Mint left `\EFI\ubuntu` on Windows' ESP and an "Ubuntu" boot entry: `sudo efibootmgr -b <number> -B`.
 
 ## Secrets (sops-nix)
 

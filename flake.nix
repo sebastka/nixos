@@ -106,6 +106,25 @@
         ];
       };
 
+      # Tower PC: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT. Dual boot with Windows.
+      nixosConfigurations.zeus = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit
+            self
+            nixos-hardware
+            home-manager
+            sops-nix
+            disko
+            lanzaboote
+            ;
+          pkgs-unstable = mkPkgsUnstable "x86_64-linux";
+        };
+        modules = [
+          ./hosts/zeus
+          ./users/sebastian
+        ];
+      };
+
       # Raspberry Pi 4 Model b Rev 1.4 (2020)
       nixosConfigurations.hermes = nixpkgs.lib.nixosSystem {
         specialArgs = {

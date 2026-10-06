@@ -5,7 +5,7 @@
     nixos-hardware.nixosModules.dell-xps-15-7590
     ./hardware-configuration.nix
     ./disko.nix
-    ./secure-boot.nix
+    ../../modules/nixos/secure-boot.nix
     # ./impermanence.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
@@ -16,7 +16,7 @@
   # systemd-based initrd: unit-based stage 1, enables TPM2/FIDO2 LUKS unlock via systemd-cryptenroll.
   boot.initrd.systemd.enable = true;
   boot.initrd.verbose = false; # Less initrd chatter around the LUKS prompt
-  boot.consoleLogLevel = 3;    # Hide kernel errors like i915's lspcon probe; critical messages still show
+  boot.consoleLogLevel = 3; # Hide kernel errors like i915's lspcon probe; critical messages still show
 
   # NVIDIA GTX 1650 dGPU: unused, powered off by the kernel's runtime PM (see the udev rule below),
   # instead of bbswitch (hardware.nvidiaOptimus.disable, unmaintained out-of-tree module).
@@ -47,9 +47,6 @@
     "kernel.nmi_watchdog" = 0;
     "vm.dirty_writeback_centisecs" = 1500; # VM writeback timeout: 15s
   };
-
-  # Uncomment to build aarch64 (e.g. hermes) on geras via QEMU emulation.
-  # boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   services.tailscale.enable = true;
   services.tailscale.extraSetFlags = [ "--operator=sebastian" ];

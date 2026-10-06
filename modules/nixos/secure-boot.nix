@@ -8,12 +8,12 @@
 
   boot.lanzaboote = {
     enable = true;
-    # Pre-generated keys (secrets/geras-secure-boot.sops.yaml), restored by scripts/install.sh.
+    # Pre-generated keys (secrets/<host>-secure-boot.sops.yaml), restored by scripts/install.sh.
     pkiBundle = "/var/lib/sbctl";
 
     # On first boot, stage the keys on the ESP and reboot: systemd-boot then enrolls them,
-    # provided the firmware is in Setup Mode. Microsoft keys are included by default,
-    # which the NVIDIA dGPU option ROM needs.
+    # provided the firmware is in Setup Mode. Microsoft keys are included by default, which GPU option ROMs
+    # (geras: NVIDIA, zeus: AMD) and Windows (zeus) need.
     autoEnrollKeys = {
       enable = true;
       autoReboot = true;

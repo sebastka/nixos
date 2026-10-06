@@ -6,6 +6,10 @@
     hostNames = [ "geras" "geras.home.karlsen.fr" ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5F4tGsBn04q+EMOlVyawiG+bn5+hL83bv6aOXfdsxf";
   };
+  programs.ssh.knownHosts.zeus = {
+    hostNames = [ "zeus" "zeus.home.karlsen.fr" ];
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH6Tk9DVEvUXDG1oqQMakL9wd5FCUgcfXQ1TQtBIs8OL";
+  };
 
   services.openssh = {
     enable = true;
