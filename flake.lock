@@ -260,11 +260,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791322823,
-        "narHash": "sha256-28Ue0GdSw7XCP2YddPU501ay9SJYmj74z8URxAXHyQY=",
+        "lastModified": 1791328019,
+        "narHash": "sha256-oeLJrcFRV1s4SZTncewBGt/Uf6Q2/peb3ynKFQzE964=",
         "owner": "sebastka",
         "repo": "plasma-nm-ts",
-        "rev": "451198c853b0b54a9c1bd9788fa7099ee983e8c5",
+        "rev": "a88dae79eed1b1171c86ac2739fc78a115368db9",
         "type": "github"
       },
       "original": {
