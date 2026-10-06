@@ -33,6 +33,9 @@
         # Workbench
         "workbench.startupEditor" = "none";
 
+        # Extensions: installed from Nix (above), no recommendations
+        "extensions.ignoreRecommendations" = true;
+
         # Git
         "git.autofetch" = true;
         "git.confirmSync" = false;
@@ -43,6 +46,22 @@
         # Nix
         "nix.formatterPath" = "nixfmt";
       };
+
+      # Terminal copy and paste: Ctrl+Shift+C copies only with a selection and the terminal focused, Ctrl+Shift+V
+      # pastes only with the terminal focused.
+      keybindings = [
+        # Otherwise, Ctrl+Shift+C opened an external terminal (Konsole)
+        {
+          key = "ctrl+shift+c";
+          command = "-workbench.action.terminal.openNativeConsole";
+        }
+        # Ctrl+V pastes in the terminal too (as on Windows and macOS): the shell no longer gets it (zsh: quoted-insert)
+        {
+          key = "ctrl+v";
+          command = "workbench.action.terminal.paste";
+          when = "terminalFocus";
+        }
+      ];
     };
   };
 }
