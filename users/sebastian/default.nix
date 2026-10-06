@@ -31,8 +31,8 @@ in
     description = "Sebastian Karlsen";
     extraGroups = [ "wheel" ] ++ lib.optional config.services.xserver.enable "networkmanager";
     shell = pkgs.zsh;
-    # Personal Yubikey's PIV key (used through the agent, see modules/home/programs/ssh)
-    openssh.authorizedKeys.keyFiles = [ ./keys/private.id_ed25519_piv.pub ];
+    # Personal Yubikey's OpenPGP authentication subkey (used through gpg-agent, see modules/nixos/desktop/gnupg.nix)
+    openssh.authorizedKeys.keyFiles = [ ./keys/private.id_ed25519_gpg.pub ];
     hashedPasswordFile = config.sops.secrets."sebastian-password".path;
     webfinger = "sebastian@karlsen.fr"; # Email and picture on desktops (modules/nixos/common/webfinger-accounts.nix)
   };

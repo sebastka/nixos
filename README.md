@@ -93,8 +93,7 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
 4. **First boot:** unlock the disk with the Yubikey (PIN and touch; the LUKS passphrase is the fallback). Lanzaboote
    stages the Secure Boot keys and reboots, then systemd-boot enrolls them (with Microsoft's keys, needed by the NVIDIA
    option ROM). Check with `bootctl status` (`Secure Boot: enabled (user)`) or `sudo sbctl status`.
-5. **User session:** run `gpg --card-status` once per Yubikey (links the GnuPG subkeys to the cards), then
-   `ssh-add-yubikey`.
+5. **User session:** run `gpg --card-status` once per Yubikey (links the GnuPG subkeys to the cards, SSH included).
 
 ## Secrets (sops-nix)
 
@@ -129,11 +128,11 @@ Two Yubikeys: personal (`private`) and work (`inboxcom`).
 | Use | Yubikey application | Details |
 |---|---|---|
 | Disk unlock (LUKS) | FIDO2 | PIN and touch at boot, passphrase as fallback (`crypttabExtraOpts`) |
-| SSH | PIV (slot 9a, Ed25519) | `ssh-add-yubikey` once per session (PIN), then no PIN nor touch. Public keys in `users/sebastian/keys/*.id_ed25519_piv.pub` |
+| SSH | OpenPGP (authentication subkey) | Through gpg-agent (`SSH_AUTH_SOCK`), PIN once. Public keys in `users/sebastian/keys/*.id_ed25519_gpg.pub` |
 | Commit signing, sops | OpenPGP | Personal key by default, work key in `~/Dev/Work/` (`users/sebastian/home.nix`) |
 
-`ssh-add-yubikey` also reloads the keys after unplugging and replugging a Yubikey. SSH, GnuPG and `ykman` share the
-cards through pcscd.
+SSH, commit signing and sops all use the OpenPGP applet through gpg-agent and scdaemon: one PIN, no applet switching
+(which would log the card out). GnuPG and `ykman` share the cards through pcscd.
 
 ## Per-project environment (`.envrc`)
 

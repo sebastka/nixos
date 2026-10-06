@@ -30,16 +30,16 @@
         contents = {
           user.email = "sebastian@corp.inbox.com";
           user.signingKey = "6908E0776A37F2BAAC4E192FE361F48DB812586F";
-          core.sshCommand = "ssh -i ~/.ssh/key/inboxcom.id_ed25519_piv.pub";
+          core.sshCommand = "ssh -i ~/.ssh/key/inboxcom.id_ed25519_gpg.pub";
         };
       }
     ];
   };
 
-  # SSH keys in the Yubikeys' PIV slot 9a (private keys never leave the Yubikeys).
-  # Used through the agent after `ssh-add-yubikey` (no PIN, no touch), see modules/home/programs/ssh.
-  home.file.".ssh/key/private.id_ed25519_piv.pub".source = ./keys/private.id_ed25519_piv.pub;
-  home.file.".ssh/key/inboxcom.id_ed25519_piv.pub".source = ./keys/inboxcom.id_ed25519_piv.pub;
+  # SSH keys: the OpenPGP authentication subkeys on the Yubikeys (private keys never leave the Yubikeys), exported
+  # with `gpg --export-ssh-key <subkey>!`. Used through gpg-agent, see modules/nixos/desktop/gnupg.nix.
+  home.file.".ssh/key/private.id_ed25519_gpg.pub".source = ./keys/private.id_ed25519_gpg.pub;
+  home.file.".ssh/key/inboxcom.id_ed25519_gpg.pub".source = ./keys/inboxcom.id_ed25519_gpg.pub;
 
   # Personal SSH hosts (./ssh/config.d/*.conf; work hosts: a secret, see ./desktop.nix). Read before the blocks
   # below: the first value set for an option wins.
@@ -56,9 +56,9 @@
 
   programs.ssh.settings = {
     # Work servers: inboxcom Yubikey
-    "*.fjordmail.no".IdentityFile = "~/.ssh/key/inboxcom.id_ed25519_piv.pub";
+    "*.fjordmail.no".IdentityFile = "~/.ssh/key/inboxcom.id_ed25519_gpg.pub";
     # Everything else: personal Yubikey
-    "*".IdentityFile = "~/.ssh/key/private.id_ed25519_piv.pub";
+    "*".IdentityFile = "~/.ssh/key/private.id_ed25519_gpg.pub";
     # Writable file first: ssh saves new host keys there (the others are read-only, missing ones are skipped)
     "*".UserKnownHostsFile = lib.concatMapStringsSep " " (f: "~/.ssh/${f}") [
       "known_hosts"
