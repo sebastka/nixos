@@ -48,9 +48,6 @@
     "vm.dirty_writeback_centisecs" = 1500; # VM writeback timeout: 15s
   };
 
-  services.tailscale.enable = true;
-  services.tailscale.extraSetFlags = [ "--operator=sebastian" ];
-
   console.keyMap = "no";
   services.xserver.xkb = {
     layout = "no";

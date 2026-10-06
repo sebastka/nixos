@@ -69,9 +69,6 @@
     };
   };
 
-  services.tailscale.enable = true;
-  services.tailscale.extraSetFlags = [ "--operator=sebastian" ];
-
   console.keyMap = "no";
   services.xserver.xkb = {
     layout = "no";

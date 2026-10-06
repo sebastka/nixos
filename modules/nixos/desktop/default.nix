@@ -7,6 +7,7 @@
     ./gnupg.nix
     ./networkmanager.nix
     ./plasma.nix
+    ./tailscale.nix
   ];
 
   services.printing.enable = true;

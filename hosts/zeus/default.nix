@@ -37,9 +37,6 @@
   boot.initrd.verbose = false; # Less initrd chatter around the LUKS prompt
   boot.consoleLogLevel = 3;
 
-  services.tailscale.enable = true;
-  services.tailscale.extraSetFlags = [ "--operator=sebastian" ];
-
   # US HHKB (Happy Hacking Keyboard): Control and the Fn layer are in the keyboard itself, nothing to remap.
   # Also the layout of the LUKS passphrase prompt (initrd).
   console.keyMap = "us";

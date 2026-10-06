@@ -1,10 +1,8 @@
 { pkgs, config, lib, self, ... }:
 
-let
-  hostFile = ./hosts/${config.networking.hostName}.nix;
-in
 {
-  imports = [ ./tern.nix ]; # Desktops only
+  # Desktops only: tern.nix applies itself only with a desktop (a NixOS import can't depend on the configuration)
+  imports = [ ./tern.nix ];
 
   sops.secrets = lib.mkMerge [
     { "sebastian-password".neededForUsers = true; }
@@ -40,7 +38,6 @@ in
   home-manager.users.sebastian = {
     imports =
       [ ./home.nix ]
-      ++ lib.optional config.services.xserver.enable ./desktop.nix
-      ++ lib.optional (builtins.pathExists hostFile) hostFile;
+      ++ lib.optional config.services.xserver.enable ./desktop.nix;
   };
 }
