@@ -1,25 +1,14 @@
-{
-  pkgs,
-  config,
-  lib,
-  self,
-  ...
-}:
+{ pkgs, config, ... }:
 
 {
-  # Desktops only: tern.nix and work.nix apply themselves only with a desktop (a NixOS import can't depend on the
-  # configuration)
-  imports = [
-    ./tern.nix
-    ./work.nix
-  ];
+  imports = [ ./desktop.nix ]; # Desktop-only parts, Tern and work included
 
   sops.secrets."sebastian-password".neededForUsers = true;
 
   users.users."sebastian" = {
     isNormalUser = true;
     description = "Sebastian Karlsen";
-    extraGroups = [ "wheel" ] ++ lib.optional config.services.xserver.enable "networkmanager";
+    extraGroups = [ "wheel" ]; # On desktops also networkmanager (./desktop.nix)
     shell = pkgs.zsh;
     # Personal Yubikey's OpenPGP authentication subkey (used through gpg-agent, see modules/nixos/desktop/gnupg.nix)
     openssh.authorizedKeys.keyFiles = [ ./keys/private.id_ed25519_gpg.pub ];
@@ -28,6 +17,6 @@
   };
 
   home-manager.users.sebastian = {
-    imports = [ ./home.nix ] ++ lib.optional config.services.xserver.enable ./desktop.nix;
+    imports = [ ./home.nix ]; # Every host (desktops: ./desktop.nix)
   };
 }

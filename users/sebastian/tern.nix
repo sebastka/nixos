@@ -1,6 +1,6 @@
 # Tern mail client (https://github.com/sebastka/tern): sebastian's configuration. Tern itself is installed on every
 # desktop (modules/nixos/desktop/tern.nix).
-# NixOS module, applied on desktops (services.xserver.enable): they must be recipients of
+# NixOS module (imported by ./desktop.nix), applied on desktops (services.xserver.enable): they must be recipients of
 # secrets/tern.sops.yaml (.sops.yaml).
 {
   config,

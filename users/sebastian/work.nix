@@ -1,5 +1,5 @@
-# Work (inboxcom): sebastian's work setup, on desktops only. NixOS module, as it declares secrets: desktops must be
-# recipients of secrets/ssh-work.sops.yaml and secrets/desktop.sops.yaml (.sops.yaml).
+# Work (inboxcom): sebastian's work setup, on desktops only (imported by ./desktop.nix). NixOS module, as it declares
+# secrets: desktops must be recipients of secrets/ssh-work.sops.yaml and secrets/desktop.sops.yaml (.sops.yaml).
 {
   config,
   lib,
