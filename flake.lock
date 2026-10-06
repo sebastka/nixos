@@ -337,11 +337,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791287620,
-        "narHash": "sha256-+cqX7ZMJOpQFEdzx0d3DY8Vd5tFPhrJVL0HNbEAYtj0=",
+        "lastModified": 1791290740,
+        "narHash": "sha256-M69jEm1qPr7EnbcJtri3QgvDIELsYoaJxIwXoaMPHlw=",
         "owner": "sebastka",
         "repo": "tern",
-        "rev": "14781767999ad7690873fe37cf04a95f188992b3",
+        "rev": "6330428542790a3db77b5bfaab2dac6663ca1e71",
         "type": "github"
       },
       "original": {
