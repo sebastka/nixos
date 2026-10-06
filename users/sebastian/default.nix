@@ -1,28 +1,20 @@
-{ pkgs, config, lib, self, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  self,
+  ...
+}:
 
 {
-  # Desktops only: tern.nix applies itself only with a desktop (a NixOS import can't depend on the configuration)
-  imports = [ ./tern.nix ];
-
-  sops.secrets = lib.mkMerge [
-    { "sebastian-password".neededForUsers = true; }
-
-    # Config files, linked under ~/.config by ./desktop.nix.
-    (lib.mkIf config.services.xserver.enable (
-      lib.genAttrs [ "bws-inboxcom-config" ] (_: {
-        sopsFile = "${self}/secrets/desktop.sops.yaml";
-        owner = "sebastian";
-      })
-    ))
-
-    # Work (inboxcom) SSH hosts and their keys (company infrastructure: encrypted), linked under ~/.ssh by ./desktop.nix
-    (lib.mkIf config.services.xserver.enable (
-      lib.genAttrs [ "ssh-work-config" "ssh-work-known-hosts" ] (_: {
-        sopsFile = "${self}/secrets/ssh-work.sops.yaml";
-        owner = "sebastian";
-      })
-    ))
+  # Desktops only: tern.nix and work.nix apply themselves only with a desktop (a NixOS import can't depend on the
+  # configuration)
+  imports = [
+    ./tern.nix
+    ./work.nix
   ];
+
+  sops.secrets."sebastian-password".neededForUsers = true;
 
   users.users."sebastian" = {
     isNormalUser = true;
@@ -32,12 +24,10 @@
     # Personal Yubikey's OpenPGP authentication subkey (used through gpg-agent, see modules/nixos/desktop/gnupg.nix)
     openssh.authorizedKeys.keyFiles = [ ./keys/private.id_ed25519_gpg.pub ];
     hashedPasswordFile = config.sops.secrets."sebastian-password".path;
-    webfinger = "sebastian@karlsen.fr"; # Email and picture on desktops (modules/nixos/common/webfinger-accounts.nix)
+    email = "sebastian@karlsen.fr"; # And picture (WebFinger), on desktops: modules/nixos/common/user-email.nix
   };
 
   home-manager.users.sebastian = {
-    imports =
-      [ ./home.nix ]
-      ++ lib.optional config.services.xserver.enable ./desktop.nix;
+    imports = [ ./home.nix ] ++ lib.optional config.services.xserver.enable ./desktop.nix;
   };
 }

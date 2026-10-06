@@ -12,4 +12,10 @@
   # No Flatpak: Discover only installs Flatpaks and firmware here (its Flatpak backend creates
   # ~/.local/share/flatpak). Firmware updates stay available with fwupdmgr.
   environment.plasma6.excludePackages = [ pkgs.kdePackages.discover ];
+  # Nor Plasma Browser Integration's Flatpak integrator, which writes its host into ~/.var/app/<browser> of known
+  # Flatpak browsers at every login. A default for every user (/etc/xdg is in KDE's config path).
+  environment.etc."xdg/kded6rc".text = ''
+    [Module-browserintegrationflatpakintegrator]
+    autoload=false
+  '';
 }

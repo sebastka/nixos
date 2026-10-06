@@ -1,4 +1,5 @@
-# Tern mail client (https://github.com/sebastka/tern) for sebastian.
+# Tern mail client (https://github.com/sebastka/tern): sebastian's configuration. Tern itself is installed on every
+# desktop (modules/nixos/desktop/tern.nix).
 # NixOS module, applied on desktops (services.xserver.enable): they must be recipients of
 # secrets/tern.sops.yaml (.sops.yaml).
 {
@@ -29,50 +30,8 @@ in
     home-manager.users.${user} =
       { config, lib, ... }: # home-manager's lib (lib.hm)
       {
-        home.packages = [
-          self.inputs.tern.packages.${pkgs.stdenv.hostPlatform.system}.default
-          pkgs.libsecret # secret-tool: store the account passwords (password.keyring) in the keyring
-        ];
-
         # Tern never writes its configuration: read-only files are fine
-        xdg.configFile."tern/tern.toml".text = ''
-          default_profile = "private"
-          ask_on_startup = true
-          sent_folder = "Sent"
-
-          [ui]
-          threaded = false
-          prefer_plain_text = false
-
-          [ui.message_list]
-          # Left to right: flag, subject, from, to, correspondent, date, attachment, size.
-          # "correspondent" is From, or To in Sent and Drafts folders.
-          columns = ["flag", "subject", "from", "to", "date", "attachment", "size"]   # not empty, no duplicates
-          sort_by = "date"       # any of the above; it doesn't have to be shown
-          sort_order = "asc"     # asc | desc
-          group_by_date = true
-
-          [gpg]
-          program = "gpg"
-          wkd_lookup = true
-
-          [avatars]
-          lookup = "trusted"
-          sources = ["webfinger", "libravatar"]
-
-          [compose]
-          format = "plain"   # default editor: plain | markdown | html (no signature here)
-
-          [memory]
-          message_cache_mb = 64      # rendered messages kept in memory, attachments included
-          spare_renderer = true      # keep a spare Chromium renderer ready (faster, ~30 MiB more)
-
-          [notifications]
-          enabled = true
-          sound = true
-          folders = ["*"]
-          # exclude_folders = []
-        '';
+        xdg.configFile."tern/tern.toml".source = ./assets/tern.toml;
 
         # Write the secret files into ~/.config/tern (mode 600) when switching. The paths written are
         # recorded, so files removed from the secret are deleted at the next switch.

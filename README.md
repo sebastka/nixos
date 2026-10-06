@@ -150,7 +150,7 @@ Two Yubikeys: personal (`private`) and work (`inboxcom`).
 |---|---|---|
 | Disk unlock (LUKS) | FIDO2 | PIN and touch at boot, passphrase as fallback (`crypttabExtraOpts`) |
 | SSH | OpenPGP (authentication subkey) | Through gpg-agent (`SSH_AUTH_SOCK`), PIN once. Public keys in `users/sebastian/keys/*.id_ed25519_gpg.pub` |
-| Commit signing, sops | OpenPGP | Personal key by default, work key in `~/Dev/Work/` (`users/sebastian/home.nix`) |
+| Commit signing, sops | OpenPGP | Personal key by default, work key in `~/Dev/Work/` (`users/sebastian/work.nix`, desktops) |
 
 SSH, commit signing and sops all use the OpenPGP applet through gpg-agent and scdaemon: one PIN, no applet switching
 (which would log the card out). GnuPG and `ykman` share the cards through pcscd.
@@ -162,7 +162,7 @@ creating or changing it). The variables below switch tools from their default ac
 
 ### Bitwarden
 
-Two password manager (`bw`) accounts are configured (`bitwardenProfiles` in `users/sebastian/desktop.nix`), and one
+Two password manager (`bw`) accounts are configured (`users/sebastian/desktop.nix`, work: `users/sebastian/work.nix`), and one
 Secrets Manager (`bws`) account:
 
 | Account | Server | `bw` | `bws` |

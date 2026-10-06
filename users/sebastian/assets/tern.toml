@@ -1,0 +1,36 @@
+default_profile = "private"
+ask_on_startup = true
+sent_folder = "Sent"
+
+[ui]
+threaded = false
+prefer_plain_text = false
+
+[ui.message_list]
+# Left to right: flag, subject, from, to, correspondent, date, attachment, size.
+# "correspondent" is From, or To in Sent and Drafts folders.
+columns = ["flag", "subject", "from", "to", "date", "attachment", "size"]   # not empty, no duplicates
+sort_by = "date"       # any of the above; it doesn't have to be shown
+sort_order = "asc"     # asc | desc
+group_by_date = true
+
+[gpg]
+program = "gpg"
+wkd_lookup = true
+
+[avatars]
+lookup = "trusted"
+sources = ["webfinger", "libravatar"]
+
+[compose]
+format = "plain"   # default editor: plain | markdown | html (no signature here)
+
+[memory]
+message_cache_mb = 64      # rendered messages kept in memory, attachments included
+spare_renderer = true      # keep a spare Chromium renderer ready (faster, ~30 MiB more)
+
+[notifications]
+enabled = true
+sound = true
+folders = ["*"]
+# exclude_folders = []

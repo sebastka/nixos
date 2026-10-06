@@ -21,6 +21,7 @@
     (import ../../../modules/home/programs/git)
     (import ../../../modules/home/programs/gpg)
     (import ../../../modules/home/programs/vim)
+    (import ../../../modules/home/programs/web-apps)
     (import ../../../modules/home/programs/zsh)
     (import ../../../modules/home/xdg)
   ];
