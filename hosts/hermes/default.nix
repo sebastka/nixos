@@ -29,6 +29,7 @@
     nixos-hardware.nixosModules.raspberry-pi-4
     "${modulesPath}/installer/sd-card/sd-image.nix" # system.build.sdImage, and / and /boot/firmware by label
     ./hardware-configuration.nix
+    ./firewall.nix
     ../../modules/nixos/common
     ../../modules/nixos/server
   ];

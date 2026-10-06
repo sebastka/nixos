@@ -14,6 +14,10 @@
     hostNames = [ "hermes" "hermes.home.karlsen.fr" ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYQQyFqk1fufzZs+aHqCmf7G5xpGleYwQ80IQXWO6tf";
   };
+  programs.ssh.knownHosts.helios = {
+    hostNames = [ "helios" "helios.home.karlsen.fr" ];
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsMO6PBpFvZSZ1NE2kmhZYqBDigMKldEVJjWpVsAsrP";
+  };
   programs.ssh.knownHosts.boreas = {
     hostNames = [ "boreas" "boreas.home.karlsen.fr" ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMnVxwP96K/Q4WPvol3vwaMZAvzXX6vgrh8aRza1VEjD";

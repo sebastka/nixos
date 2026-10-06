@@ -1,6 +1,6 @@
 { ... }:
 
-# Firewall of the servers, from the former Ansible role (/etc/nftables.conf on Debian), without Tailscale.
+# Firewall of hermes, from the former Ansible role (/etc/nftables.conf on Debian), without Tailscale.
 # The NixOS firewall is replaced by these tables: nothing is opened implicitly (e.g. by services' openFirewall).
 let
   lanPhysicalDevices = "192.168.0.0/24";

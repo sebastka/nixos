@@ -125,6 +125,23 @@
         ];
       };
 
+      # Protectli FW6: the router
+      nixosConfigurations.helios = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit
+            self
+            home-manager
+            sops-nix
+            disko
+            lanzaboote
+            ;
+        };
+        modules = [
+          ./hosts/helios
+          ./users/sebastian
+        ];
+      };
+
       # Raspberry Pi 4 Model b Rev 1.4 (2020)
       nixosConfigurations.hermes = nixpkgs.lib.nixosSystem {
         specialArgs = {

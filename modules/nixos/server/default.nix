@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ./firewall.nix
     ./zabbix-agent.nix
   ];
 

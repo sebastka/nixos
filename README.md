@@ -14,6 +14,7 @@ Yubikeys for disk unlocking, SSH and signing.
 | `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (KDE Plasma), dual boot with Windows | Not installed yet (Linux Mint) |
 | `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Not installed yet (Fedora Asahi Remix) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
+| `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall, DHCP (Kea), DNS (Unbound, NSD) | Not installed yet (Debian 13, Ansible) |
 
 Each host's install steps are at the top of its `hosts/<host>/default.nix`.
 

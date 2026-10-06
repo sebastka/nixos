@@ -4,7 +4,7 @@
 # The classic agent: the NixOS module runs zabbix_agentd (Debian had agent 2, its built-in plugins aren't used).
 # 7.0 LTS like Debian 13 (pkgs.zabbix is 6.0).
 let
-  zabbixServer = "192.168.2.12"; # Zabbix server VIP, also allowed in ./firewall.nix
+  zabbixServer = "192.168.2.12"; # Zabbix server VIP, to allow in the host's firewall
 in
 {
   services.zabbixAgent = {
