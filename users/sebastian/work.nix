@@ -11,7 +11,6 @@
 let
   user = "sebastian";
   nixosConfig = config;
-  bitwarden-cli = pkgs.callPackage ../../pkgs/bitwarden-cli { };
 
   bitwarden = account: profile: {
     name = "Bitwarden (${account})";
@@ -90,30 +89,20 @@ in
         home.file.".ssh/known_hosts.d/inboxcom".source =
           config.lib.file.mkOutOfStoreSymlink nixosConfig.sops.secrets.ssh-work-known-hosts.path;
 
-        # Bitwarden Secrets Manager (bws): its servers by profile (BWS_PROFILE selects one: inboxcom in ~/Dev/Work). The
-        # token isn't there: ~/Dev/Work reads it from the keyring (below).
-        home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/config.toml";
-        xdg.configFile."bws/config.toml".source = (pkgs.formats.toml { }).generate "bws-config.toml" {
-          profiles.inboxcom.server_base = "https://vault.bitwarden.eu";
-        };
-
-        # Bitwarden CLI (bw): the inboxcom account's data directory (the private one is the default, ./desktop.nix).
-        # bw keeps its server URL in its data file (with the login session), which it rewrites itself:
-        # set the server once, only when the data directory doesn't exist yet.
-        home.activation.bitwardenCliInboxcom = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          dir="${config.xdg.dataHome}/bitwarden-cli/inboxcom"
-          if [ ! -e "$dir/data.json" ]; then
-            BITWARDENCLI_APPDATA_DIR="$dir" run ${lib.getExe bitwarden-cli} config server https://vault.bitwarden.eu > /dev/null 2>&1
-          fi
-        '';
-
         home.activation.createDevWork = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           run mkdir -p ${config.home.homeDirectory}/Dev/Work
         '';
 
+        # Bitwarden CLI (bw, modules/home/programs/bw)
+        programs.bw.accounts.inboxcom.server = "https://vault.bitwarden.eu";
+        # programs.bw.defaultAccount = ""; # Set in desktop.nix
+
+        # Bitwarden Secrets Manager (bws, modules/home/programs/bws)
+        programs.bws.profiles.inboxcom.server_base = "https://vault.bitwarden.eu";
+
         # Work accounts in ~/Dev/Work:
         programs.direnv.directoryEnv."Dev/Work" = {
-          BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
+          BITWARDENCLI_APPDATA_DIR = config.programs.bw.accounts.inboxcom.dataDir;
           BWS_PROFILE = "inboxcom";
           # The machine account's token, from the desktop's keyring (never in this repository), stored once per desktop:
           #   secret-tool store --label='bws (inboxcom)' service bws account inboxcom
@@ -123,7 +112,7 @@ in
         };
 
         # Env vars unset, since private are default
-        # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
+        # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "" # Set by programs.bw.defaultAccount
         # home.sessionVariables.BWS_PROFILE = "inboxcom";
         # home.sessionVariables.BWS_ACCESS_TOKEN = "${pkgs.libsecret}/bin/secret-tool lookup service bws account inboxcom";
         # home.sessionVariables.DIGITALOCEAN_CONTEXT = "inboxcom";

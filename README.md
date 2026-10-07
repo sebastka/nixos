@@ -180,7 +180,7 @@ and one Secrets Manager (`bws`) account:
 
 | Variable | Tool | Value | Default |
 |---|---|---|---|
-| `BITWARDENCLI_APPDATA_DIR` | `bw` | `$XDG_DATA_HOME/bitwarden-cli/<account>` | `private` |
+| `BITWARDENCLI_APPDATA_DIR` | `bw` | `$XDG_STATE_HOME/bitwarden-cli/<account>` | `private` |
 | `BWS_CONFIG_FILE` | `bws` | `$XDG_CONFIG_HOME/bws/config.toml` (its servers, by profile) | that file |
 | `BWS_PROFILE` | `bws` | profile in that file | none (`~/Dev/Work`: `inboxcom`) |
 | `BWS_ACCESS_TOKEN` | `bws` | machine account access token | none (`~/Dev/Work`: from the keyring): **secret** |
@@ -199,11 +199,15 @@ source_env_if_exists .envrc.local
 
 Notes:
 
+- `bw` accounts are declared with `programs.bw` (`modules/home/programs/bw`, for every user): a private data
+  directory each, in `~/.local/state/bitwarden-cli`, with its server set on creation.
 - Each `bw` account keeps its own login: run `bw login` once per account (with its `BITWARDENCLI_APPDATA_DIR`), then
   `export BW_SESSION="$(bw unlock --raw)"` in the shell when needed. A session only unlocks the account it was
   created for.
-- `~/.config/bws/config.toml` is generated (`users/sebastian/work.nix`): the servers, by profile (`inboxcom`:
-  `vault.bitwarden.eu`). The token comes from the desktop's keyring (KWallet), stored once per desktop with
+- `~/.config/bws/config.toml` is generated for every user (`modules/home/programs/bws`, profiles from
+  `programs.bws.profiles`): the servers, by profile (`inboxcom`: `vault.bitwarden.eu`, `users/sebastian/work.nix`)
+  and their login cache (`~/.local/state/bws`, a private directory). The token comes from the desktop's keyring
+  (KWallet), stored once per desktop with
   `secret-tool store --label='bws (inboxcom)' service bws account inboxcom`, and read by `~/Dev/Work/.envrc`.
   Outside `~/Dev/Work`, `bws` has no account. A project can use another machine account (`.envrc.local`).
 - Work credentials (`BWS_ACCESS_TOKEN`, `MAILCORE_API_KEY`...) are never in this repository, not even encrypted: it is

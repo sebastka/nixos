@@ -19,9 +19,16 @@
           run mkdir -p ${config.home.homeDirectory}/Dev/Private
         '';
 
+        # Bitwarden CLI (bw, modules/home/programs/bw): the private account (bitwarden.com), the default one
+        programs.bw.accounts.karlsenfr.server = "https://vault.bitwarden.com";
+        programs.bw.defaultAccount = "karlsenfr";
+
+        # Bitwarden Secrets Manager (bws, modules/home/programs/bws)
+        # programs.bws.profiles.karlsenfr.server_base = "https://vault.bitwarden.com";
+
         # Private accounts in ~/Dev/Private:
         programs.direnv.directoryEnv."Dev/Private" = {
-          BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/karlsenfr";
+          BITWARDENCLI_APPDATA_DIR = config.programs.bw.accounts.karlsenfr.dataDir;
           # BWS_PROFILE = "karlsenfr"; # No private bws account (its server would go in bws/config.toml: ./work.nix)
           # BWS_ACCESS_TOKEN.command = "${pkgs.libsecret}/bin/secret-tool lookup service bws account karlsenfr"; # No private bws account
           DIGITALOCEAN_CONTEXT = "karlsenfr";
@@ -30,7 +37,7 @@
 
         # Env vars
         home.sessionVariables.BROWSER = "firefox";
-        home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/karlsenfr";
+        # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "" # Set by programs.bw.defaultAccount
         # home.sessionVariables.BWS_PROFILE = "karlsenfr"; # No private bws
         # home.sessionVariables.BWS_ACCESS_TOKEN = "${pkgs.libsecret}/bin/secret-tool lookup service bws account karlsenfr"; # No private bws
         home.sessionVariables.DIGITALOCEAN_CONTEXT = "karlsenfr";
