@@ -20,7 +20,7 @@
         '';
 
         # Private accounts in ~/Dev/Private:
-        home.file."Dev/Work/.envrc".text = ''
+        home.file."Dev/Private/.envrc".text = ''
           export BITWARDENCLI_APPDATA_DIR="${config.xdg.dataHome}/bitwarden-cli/private"
           export DIGITALOCEAN_CONTEXT=karlsenfr
         '';
