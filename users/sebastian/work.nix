@@ -82,6 +82,21 @@ in
           fi
         '';
 
+        home.activation.createDevWork = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          run mkdir -p ${config.home.homeDirectory}/Dev/Work
+        '';
+
+        # Work accounts in ~/Dev/Work:
+        home.file."Dev/Work/.envrc".text = ''
+          export BITWARDENCLI_APPDATA_DIR="${config.xdg.dataHome}/bitwarden-cli/inboxcom"
+          export DIGITALOCEAN_CONTEXT=inboxcom
+        '';
+        programs.direnv.config.whitelist.exact = [ "${config.home.homeDirectory}/Dev/Work/.envrc" ];
+
+        # Env vars unset, since private are default
+        # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
+        # home.sessionVariables.DIGITALOCEAN_CONTEXT = "inboxcom";
+
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {
           bitwarden-inboxcom = bitwarden "sebastian@corp.inbox.com" "bitwarden-work-sebastian.corp.inbox.com";

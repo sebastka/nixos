@@ -12,17 +12,26 @@
     users.users.sebastian.extraGroups = [ "networkmanager" ];
 
     home-manager.users.sebastian =
-      { config, ... }:
+      { config, lib, ... }: # home-manager's lib (lib.hm)
       {
-        # Browser opened by command-line tools (gh, git web--browse, Python's webbrowser...)
+        # Projects: ~/Dev/Private (private), ~/Dev/Work (./work.nix)
+        home.activation.createDevPrivate = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          run mkdir -p ${config.home.homeDirectory}/Dev/Private
+        '';
+
+        # Private accounts in ~/Dev/Private:
+        home.file."Dev/Work/.envrc".text = ''
+          export BITWARDENCLI_APPDATA_DIR="${config.xdg.dataHome}/bitwarden-cli/private"
+          export DIGITALOCEAN_CONTEXT=karlsenfr
+        '';
+        programs.direnv.config.whitelist.exact = [ "${config.home.homeDirectory}/Dev/Private/.envrc" ];
+
+        # Env vars
         home.sessionVariables.BROWSER = "firefox";
-
-        # Bitwarden CLI (bw): one data directory per account, the private one (bitwarden.com) by default. The inboxcom
-        # one (./work.nix), e.g. in a project's .envrc (see README.md):
-        #   export BITWARDENCLI_APPDATA_DIR="$XDG_DATA_HOME/bitwarden-cli/inboxcom"
         home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/private";
+        home.sessionVariables.DIGITALOCEAN_CONTEXT = "karlsenfr";
 
-        # Web apps (modules/home/programs/web-apps); the work ones: ./work.nix
+        # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {
           bitwarden-private = {
             name = "Bitwarden (sebastian@karlsen.fr)";
