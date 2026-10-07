@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+let
+  vscode-opentofu = pkgs.callPackage ../../../../pkgs/vscode-opentofu { };
+in
 {
   programs.vscode = {
     enable = true;
@@ -9,6 +12,7 @@
         ms-python.python
         ms-azuretools.vscode-docker
         anthropic.claude-code
+        vscode-opentofu # Not in nixpkgs: pkgs/vscode-opentofu
       ];
       userSettings = {
         # Editor
