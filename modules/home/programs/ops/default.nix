@@ -53,7 +53,6 @@ in
 
     # Infrastructure as code
     pkgs-unstable.opentofu
-    pkgs-unstable.tofu-ls # Its language server (editors)
 
     # Configuration management
     pkgs.ansible
@@ -82,13 +81,6 @@ in
     bitwarden-cli # bw: Bitwarden password manager
     bws # Bitwarden Secrets Manager
   ];
-
-  # The OpenTofu VS Code extension (modules/home/programs/vscode) runs our tofu-ls and tofu instead of its bundled
-  # language server (as the coding agents' extensions, modules/home/programs/coding-agents)
-  programs.vscode.profiles.default.userSettings = lib.mkIf config.programs.vscode.enable {
-    "opentofu.languageServer.path" = lib.getExe pkgs-unstable.tofu-ls;
-    "opentofu.languageServer.tofu.path" = lib.getExe pkgs-unstable.opentofu;
-  };
 
   # zsh completions not provided by the packages themselves (pkgs/ generate theirs at build time)
   programs.zsh.initContent = ''

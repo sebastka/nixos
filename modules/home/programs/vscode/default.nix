@@ -1,22 +1,14 @@
-{ pkgs, pkgs-unstable, ... }:
+{ pkgs, ... }:
 
-let
-  vscode-opentofu = pkgs.callPackage ../../../../pkgs/vscode-opentofu { };
-in
 {
   programs.vscode = {
     enable = true;
     profiles.default = {
-      # Versions from Nix only (updated with flake.lock): VS Code's own updates install Marketplace copies beside them
-      # and mark them obsolete, and the copies are lost whenever this list changes (home-manager then has VS Code
-      # rebuild its extensions.json), dropping those extensions.
-      enableExtensionUpdateCheck = false;
       extensions = with pkgs.vscode-extensions; [
-        pkgs-unstable.vscode-extensions.jnoortheen.nix-ide # Follows nixd/nixfmt closely
+        jnoortheen.nix-ide
         ms-python.python
         ms-azuretools.vscode-docker
-        pkgs-unstable.vscode-extensions.anthropic.claude-code # Moves fast, as its CLI (modules/home/programs/coding-agents)
-        vscode-opentofu # Not in nixpkgs: pkgs/vscode-opentofu
+        anthropic.claude-code
       ];
       userSettings = {
         # Editor
@@ -41,8 +33,7 @@ in
         # Workbench
         "workbench.startupEditor" = "none";
 
-        # Extensions: installed from Nix (above), no updates (enableExtensionUpdateCheck above) nor recommendations
-        "extensions.autoUpdate" = false;
+        # Extensions: installed from Nix (above), no recommendations
         "extensions.ignoreRecommendations" = true;
 
         # Git
