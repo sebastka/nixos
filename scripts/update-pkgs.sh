@@ -73,19 +73,25 @@ for entry in "${packages[@]}"; do
     echo "${pkg}: ${current} -> ${latest}" >&2
     sed -i -E "s|^( *version = \")[^\"]*(\";)|\1${latest}\2|" "${file}"
 
-    sed -n 's|^ *\([a-z0-9_]*-linux\) *= *{.*|\1|p' "${file}" | while read -r system; do
+    # Release binaries: one entry per system (`<system> = {`, then its own `hash = "...";` line, then `};`, as nixfmt
+    # lays them out), each hash prefetched from its URL
+    systems="$(sed -n 's|^ *\([a-z0-9_]*-linux\) *= *{ *$|\1|p' "${file}")"
+    for system in ${systems}; do
         url="$(src_url "${pkg}" "${system}")"
         hash="$(${nix} store prefetch-file --json --hash-type sha256 "${url}" | sed -n 's|.*"hash":"\([^"]*\)".*|\1|p')"
-        sed -i -E "s|^( *${system} *=.*hash = \")[^\"]*(\".*)|\1${hash}\2|" "${file}"
+        sed -i -E "/^ *${system} *= *\{ *$/,/^ *\};/ s|^( *hash = \")[^\"]*(\";)|\1${hash}\2|" "${file}"
     done
 
-    # Built from source: emptied, each hash is reported by the build (source first, then dependencies)
-    for attr in hash vendorHash; do
-        grep -qE "^ *${attr} = \"" "${file}" || continue
-        sed -i -E "s|^( *${attr} = \")[^\"]*(\";)|\1\2|" "${file}"
-        hash="$(build_hash_mismatch "${pkg}")"
-        sed -i -E "s|^( *${attr} = \")[^\"]*(\";)|\1${hash}\2|" "${file}"
-    done
+    # Built from source (no per-system entries): emptied, each hash is reported by the build (source first, then
+    # dependencies)
+    if [ -z "${systems}" ]; then
+        for attr in hash vendorHash; do
+            grep -qE "^ *${attr} = \"" "${file}" || continue
+            sed -i -E "s|^( *${attr} = \")[^\"]*(\";)|\1\2|" "${file}"
+            hash="$(build_hash_mismatch "${pkg}")"
+            sed -i -E "s|^( *${attr} = \")[^\"]*(\";)|\1${hash}\2|" "${file}"
+        done
+    fi
 
     echo "- \`${pkg}\`: ${current} → ${latest} ([releases](https://github.com/${repo}/releases))"
 done
