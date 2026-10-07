@@ -30,7 +30,4 @@
     kdePackages.kate
     chromium # Also runs the web apps (modules/home/programs/web-apps)
   ];
-
-  programs.nix-ld.enable = true; # Allow dynamically-linked binaries from outside nixpkgs (e.g. VS Code extension bundled binaries)
-  # programs.nix-ld.libraries = with pkgs; [ stdenv.cc.cc.lib zlib openssl ];
 }

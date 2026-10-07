@@ -140,6 +140,7 @@
             disko
             lanzaboote
             ;
+          pkgs-unstable = mkPkgsUnstable "x86_64-linux";
         };
         modules = [
           ./hosts/helios
@@ -156,6 +157,7 @@
             home-manager
             sops-nix
             ;
+          pkgs-unstable = mkPkgsUnstable "aarch64-linux";
         };
         modules = [
           ./hosts/hermes

@@ -1,5 +1,6 @@
 {
   pkgs,
+  pkgs-unstable,
   lib,
   config,
   self,
@@ -106,7 +107,19 @@
     jq
     yq-go
     dig
+    pkgs-unstable.python3 # Bare interpreter: scripts and REPL (projects: uv)
+    pkgs-unstable.uv # Python projects (.venv, uv.lock): the same, recent version on every host (its lock format)
   ];
+
+  # uv builds venvs on its own Python builds (downloaded to ~/.local/share/uv/python), never on the Nix one: wheels
+  # with native code (numpy...) need libraries (libstdc++...) that the Nix Python can't find, while uv's Python runs
+  # through nix-ld (below), which provides them.
+  environment.variables.UV_PYTHON_PREFERENCE = "only-managed";
+
+  # Dynamically-linked binaries from outside nixpkgs: VS Code extensions' bundled binaries, uv's Python (and its
+  # wheels), bw (pkgs/bitwarden-cli)...
+  programs.nix-ld.enable = true;
+  # programs.nix-ld.libraries = with pkgs; [ stdenv.cc.cc.lib zlib openssl ]; # If one misses a library
 
   programs.screen.enable = true; # Not just the package: also its PAM service, for locking (C-a x)
 }
