@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Kubeconfigs of DigitalOcean Kubernetes clusters, in KUBECONFIG_DIR:
-# - config.<name>.yaml: one per cluster, its context named <name>
+# - config.k8s-<name>-cluster.yaml: one per cluster, its context named <name>
 # - config.yaml: all of them merged
 #
 # Set by users/sebastian/work.nix:
@@ -24,9 +24,10 @@ while read -r name cluster; do
     KUBECONFIG="${tmp}/${name}.yaml" doctl --context "${DOCTL_CONTEXT}" kubernetes cluster kubeconfig save "${cluster}" >&2
     KUBECONFIG="${tmp}/${name}.yaml" kubectl config rename-context \
         "$(KUBECONFIG="${tmp}/${name}.yaml" kubectl config current-context)" "${name}" > /dev/null
-    install -m 600 "${tmp}/${name}.yaml" "${KUBECONFIG_DIR}/config.${name}.yaml"
-    files+=("${KUBECONFIG_DIR}/config.${name}.yaml")
-    echo "${name}: ${KUBECONFIG_DIR}/config.${name}.yaml" >&2
+    file="${KUBECONFIG_DIR}/config.k8s-${name}-cluster.yaml"
+    install -m 600 "${tmp}/${name}.yaml" "${file}"
+    files+=("${file}")
+    echo "${name}: ${file}" >&2
 done < "${CLUSTERS_FILE}"
 
 if [ "${#files[@]}" -eq 0 ]; then
