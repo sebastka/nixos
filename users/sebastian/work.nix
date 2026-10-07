@@ -44,6 +44,11 @@ in
         sopsFile = "${self}/secrets/work.sops.yaml";
         owner = user;
       };
+      inboxcom-default-context = {
+        sopsFile = "${self}/secrets/work.sops.yaml";
+        key = "default-context";
+        owner = user;
+      };
     };
 
     home-manager.users.${user} =
@@ -59,6 +64,7 @@ in
             ];
             runtimeEnv = {
               CLUSTERS_FILE = nixosConfig.sops.secrets.inboxcom-clusters.path;
+              DEFAULT_CONTEXT_FILE = nixosConfig.sops.secrets.inboxcom-default-context.path;
               DOCTL_CONTEXT = "inboxcom";
               KUBECONFIG_DIR = "${config.xdg.configHome}/kube/inboxcom";
             };

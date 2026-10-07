@@ -4,6 +4,7 @@
 #
 # Set by users/sebastian/work.nix:
 # - CLUSTERS_FILE: one "<name> <cluster>" per line (a secret)
+# - DEFAULT_CONTEXT_FILE: the <name> to use as the merged file's current context (a secret)
 # - DOCTL_CONTEXT: the doctl context holding the account's token (doctl auth init --context <context>)
 # - KUBECONFIG_DIR
 # Re-run when a cluster changes.
@@ -32,13 +33,15 @@ if [ "${#files[@]}" -eq 0 ]; then
     exit 1
 fi
 
-# Merged: keep the current context if it still exists, otherwise none (pick one with kubectl config use-context)
+# Merged, with the default context as current one (none if it isn't one of the clusters)
 merged="${KUBECONFIG_DIR}/config.yaml"
-previous="$(KUBECONFIG="${merged}" kubectl config current-context 2> /dev/null || true)"
+default="$(tr -d '[:space:]' < "${DEFAULT_CONTEXT_FILE}")"
 KUBECONFIG="$(IFS=:; echo "${files[*]}")" kubectl config view --flatten > "${tmp}/config.yaml"
 KUBECONFIG="${tmp}/config.yaml" kubectl config unset current-context > /dev/null
-if [ -n "${previous}" ] && KUBECONFIG="${tmp}/config.yaml" kubectl config get-contexts "${previous}" > /dev/null 2>&1; then
-    KUBECONFIG="${tmp}/config.yaml" kubectl config use-context "${previous}" > /dev/null
+if KUBECONFIG="${tmp}/config.yaml" kubectl config get-contexts "${default}" > /dev/null 2>&1; then
+    KUBECONFIG="${tmp}/config.yaml" kubectl config use-context "${default}" > /dev/null
+else
+    echo "Default context \"${default}\" is not one of the clusters: no current context" >&2
 fi
 install -m 600 "${tmp}/config.yaml" "${merged}"
-echo "Merged: ${merged} ($(KUBECONFIG="${merged}" kubectl config get-contexts -o name | tr '\n' ' '))" >&2
+echo "Merged: ${merged} ($(KUBECONFIG="${merged}" kubectl config get-contexts -o name | paste -sd ' '), current: $(KUBECONFIG="${merged}" kubectl config current-context 2> /dev/null || echo none))" >&2
