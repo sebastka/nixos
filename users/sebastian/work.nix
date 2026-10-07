@@ -115,13 +115,12 @@ in
         '';
 
         # Work accounts in ~/Dev/Work:
-        home.file."Dev/Work/.envrc".text = ''
-          export BITWARDENCLI_APPDATA_DIR="${config.xdg.dataHome}/bitwarden-cli/inboxcom"
-          export BWS_CONFIG_FILE="${config.xdg.configHome}/bws/inboxcom.config"
-          export DIGITALOCEAN_CONTEXT=inboxcom
-          export KUBECONFIG="${config.xdg.configHome}/kube/inboxcom/config.yaml" # All clusters: inboxcom_kubeconfig
-        '';
-        programs.direnv.config.whitelist.exact = [ "${config.home.homeDirectory}/Dev/Work/.envrc" ];
+        programs.direnv.directoryEnv."Dev/Work" = {
+          BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
+          BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/inboxcom.config";
+          DIGITALOCEAN_CONTEXT = "inboxcom";
+          KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml"; # All clusters: inboxcom_kubeconfig
+        };
 
         # Env vars unset, since private are default
         # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
