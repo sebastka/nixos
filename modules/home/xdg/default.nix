@@ -43,6 +43,15 @@
   # Docker CLI: config.json (registry logins) instead of ~/.docker
   home.sessionVariables.DOCKER_CONFIG = "${config.xdg.configHome}/docker";
 
+  # VS Code: only its user data follows XDG (~/.config/Code). The rest can't move (yet), checked in VS Code 1.119:
+  # - ~/.vscode/extensions: home-manager links the extensions there (programs.vscode, by product.json's
+  #   dataFolderName), so VS Code would stop finding them.
+  # home.sessionVariables.VSCODE_EXTENSIONS = "${config.xdg.dataHome}/vscode/extensions";
+  # - ~/.vscode-shared: only the --shared-data-dir flag moves it, no variable (it would need a wrapped launcher).
+  # - ~/.vscode/argv.json and ~/.vscode/cli: only VSCODE_PORTABLE moves them, but it moves everything, the user data
+  #   too: VS Code would then ignore ~/.config/Code, where home-manager writes settings.json and keybindings.json.
+  # home.sessionVariables.VSCODE_PORTABLE = "${config.xdg.dataHome}/vscode";
+
   # wget: its HSTS database instead of ~/.wget-hsts (no env variable for it: set through wgetrc)
   home.sessionVariables.WGETRC = "${config.xdg.configHome}/wget/wgetrc";
   xdg.configFile."wget/wgetrc".text = ''
