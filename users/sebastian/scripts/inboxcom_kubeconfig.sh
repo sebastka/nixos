@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Kubeconfigs of DigitalOcean Kubernetes clusters, in KUBECONFIG_DIR:
 # - config.<name>.yaml: one per cluster, its context named <name>
 # - config.yaml: all of them merged
