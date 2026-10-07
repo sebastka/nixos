@@ -22,14 +22,18 @@
         # Private accounts in ~/Dev/Private:
         home.file."Dev/Private/.envrc".text = ''
           export BITWARDENCLI_APPDATA_DIR="${config.xdg.dataHome}/bitwarden-cli/private"
+          # export BWS_CONFIG_FILE="${config.xdg.configHome}/bws/karlsenfr.config"
           export DIGITALOCEAN_CONTEXT=karlsenfr
+          export KUBECONFIG="${config.xdg.configHome}/kube/talmox/config.yaml"
         '';
         programs.direnv.config.whitelist.exact = [ "${config.home.homeDirectory}/Dev/Private/.envrc" ];
 
         # Env vars
         home.sessionVariables.BROWSER = "firefox";
         home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/private";
+        # home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/karlsenfr.config";
         home.sessionVariables.DIGITALOCEAN_CONTEXT = "karlsenfr";
+        home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml"; # One private cluster: talmox
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {

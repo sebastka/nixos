@@ -89,13 +89,17 @@ in
         # Work accounts in ~/Dev/Work:
         home.file."Dev/Work/.envrc".text = ''
           export BITWARDENCLI_APPDATA_DIR="${config.xdg.dataHome}/bitwarden-cli/inboxcom"
+          export BWS_CONFIG_FILE="${config.xdg.configHome}/bws/inboxcom.config"
           export DIGITALOCEAN_CONTEXT=inboxcom
+          export KUBECONFIG="${config.xdg.configHome}/kube/do-infra/config.yaml"
         '';
         programs.direnv.config.whitelist.exact = [ "${config.home.homeDirectory}/Dev/Work/.envrc" ];
 
         # Env vars unset, since private are default
         # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
+        # home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/inboxcom.config";
         # home.sessionVariables.DIGITALOCEAN_CONTEXT = "inboxcom";
+        # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/do-infra/config.yaml"; # One work cluster: do-infra
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {
