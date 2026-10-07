@@ -26,12 +26,12 @@ in
 {
   home.packages = [
     # Kubernetes
-    pkgs.kubectl
+    pkgs-unstable.kubectl
     helm
     pkgs.k9s
     argocd
-    pkgs.kustomize
-    pkgs.kubecolor
+    pkgs-unstable.kustomize
+    pkgs-unstable.kubecolor
     kubeseal
     kube-capacity
     pkgs.velero
@@ -79,7 +79,7 @@ in
     pkgs.sops
     pkgs.age
     bitwarden-cli # bw: Bitwarden password manager
-    bws           # Bitwarden Secrets Manager
+    bws # Bitwarden Secrets Manager
   ];
 
   # zsh completions not provided by the packages themselves (pkgs/ generate theirs at build time)
