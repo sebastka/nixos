@@ -8,7 +8,10 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-partuuid/609c77fe-7078-4725-862f-0a776aeae96e";
     fsType = "vfat";
-    options = [ "fmask=0077" "dmask=0077" ];
+    options = [
+      "fmask=0077"
+      "dmask=0077"
+    ];
   };
 
   # LUKS, BTRFS and swap are generated from ./disko.nix.

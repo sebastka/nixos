@@ -64,9 +64,9 @@
       # (CI builds them natively on x86_64 and aarch64)
       packages = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (
         system:
-        nixpkgs.lib.mapAttrs (
-          name: _: nixpkgs.legacyPackages.${system}.callPackage ./pkgs/${name} { }
-        ) (builtins.readDir ./pkgs)
+        nixpkgs.lib.mapAttrs (name: _: nixpkgs.legacyPackages.${system}.callPackage ./pkgs/${name} { }) (
+          builtins.readDir ./pkgs
+        )
       );
       checks = self.packages;
 
@@ -80,9 +80,9 @@
         {
           default = pkgs.mkShell {
             packages = with pkgs; [
-              sops       # Secrets (secrets/*.sops.yaml)
+              sops # Secrets (secrets/*.sops.yaml)
               ssh-to-age # Host SSH key -> age recipient (.sops.yaml)
-              sbctl      # Secure Boot keys (secrets/*-secure-boot.sops.yaml)
+              sbctl # Secure Boot keys (secrets/*-secure-boot.sops.yaml)
               nixfmt
               shellcheck
               yamllint

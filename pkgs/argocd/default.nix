@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, installShellFiles }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  installShellFiles,
+}:
 
 let
   version = "3.5.4";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-nNjLn494U1evRBqVRMwcY6K42brUXr6IUDq44xXGSuM="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-/nxzeskS4oH6E9wnsr5mlWNLn+SD1ShG8+fmUGexHBI="; };
+    x86_64-linux = {
+      arch = "amd64";
+      hash = "sha256-nNjLn494U1evRBqVRMwcY6K42brUXr6IUDq44xXGSuM=";
+    };
+    aarch64-linux = {
+      arch = "arm64";
+      hash = "sha256-/nxzeskS4oH6E9wnsr5mlWNLn+SD1ShG8+fmUGexHBI=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "argocd: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "argocd: unsupported platform ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "argocd";

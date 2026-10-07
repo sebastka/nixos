@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, unzip }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  unzip,
+}:
 
 let
   version = "2.37.10";
   assets = {
-    x86_64-linux  = { arch = "x86_64";  hash = "sha256-Gq7RQstjKU5B73BDH+nGAtu4afiiG2uPydX/1TtckjU="; };
-    aarch64-linux = { arch = "aarch64"; hash = "sha256-iRuylLoLjn4b1ym3goZKOxDKl1TufuHGUKCjBhSUhMc="; };
+    x86_64-linux = {
+      arch = "x86_64";
+      hash = "sha256-Gq7RQstjKU5B73BDH+nGAtu4afiiG2uPydX/1TtckjU=";
+    };
+    aarch64-linux = {
+      arch = "aarch64";
+      hash = "sha256-iRuylLoLjn4b1ym3goZKOxDKl1TufuHGUKCjBhSUhMc=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "awscli2: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "awscli2: unsupported platform ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "awscli2";

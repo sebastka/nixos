@@ -18,7 +18,10 @@
             type = "filesystem";
             format = "vfat";
             mountpoint = "/boot";
-            mountOptions = [ "fmask=0077" "dmask=0077" ];
+            mountOptions = [
+              "fmask=0077"
+              "dmask=0077"
+            ];
           };
         };
         luks = {
@@ -30,7 +33,10 @@
               allowDiscards = true;
               # Unlock with the Yubikey (FIDO2 + PIN + touch), enrolled by scripts/install.sh.
               # Falls back to the passphrase prompt if the Yubikey is not plugged in within 10s.
-              crypttabExtraOpts = [ "fido2-device=auto" "token-timeout=10" ];
+              crypttabExtraOpts = [
+                "fido2-device=auto"
+                "token-timeout=10"
+              ];
             };
             content = {
               type = "btrfs";
@@ -38,19 +44,31 @@
               subvolumes = {
                 "@root" = {
                   mountpoint = "/";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@home" = {
                   mountpoint = "/home";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@nix" = {
                   mountpoint = "/nix";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@persist" = {
                   mountpoint = "/persist";
-                  mountOptions = [ "compress=zstd" "noatime" ];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                 };
                 "@swap" = {
                   mountpoint = "/.swapvol";

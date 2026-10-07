@@ -1,4 +1,10 @@
-{ php84, lib, fetchurl, installShellFiles, makeWrapper }:
+{
+  php84,
+  lib,
+  fetchurl,
+  installShellFiles,
+  makeWrapper,
+}:
 
 # mailcore CLI, built with the lock of the (private) Fjordmail/mailcore-sdk monorepo: each release of the
 # public Fjordmail/mailcore-cli has a mailcore-sdk-<version>.tar.gz with its composer.json, composer.lock and packages/.
@@ -11,7 +17,10 @@ php84.buildComposerProject2 (finalAttrs: {
     hash = "sha256-KXZHChsPffIWqrrG+QX3Q26YYyRDL391v8EVaUpGUW4=";
   };
   vendorHash = "sha256-/l7scqMrfQ2kH0mcLmeTP1Qogn9vAF8mi+nqecI4XbU=";
-  nativeBuildInputs = [ installShellFiles makeWrapper ];
+  nativeBuildInputs = [
+    installShellFiles
+    makeWrapper
+  ];
   postInstall = ''
     # Run the CLI with nixpkgs' PHP (its shebang is `#!/usr/bin/env php`)
     makeWrapper ${lib.getExe php84} $out/bin/mailcore \

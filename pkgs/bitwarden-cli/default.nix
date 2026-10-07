@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, unzip }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  unzip,
+}:
 
 let
   version = "2026.9.1";
   assets = {
-    x86_64-linux  = { arch = "linux";       hash = "sha256-hCier1nWkfBCQmBREvIbAOjbplrN7bxg3eABooYPIJc="; };
-    aarch64-linux = { arch = "linux-arm64"; hash = "sha256-xFHHczeKbx8EHqJlaKiXsoWoZWvuFqFuSRTOnkD7fHk="; };
+    x86_64-linux = {
+      arch = "linux";
+      hash = "sha256-hCier1nWkfBCQmBREvIbAOjbplrN7bxg3eABooYPIJc=";
+    };
+    aarch64-linux = {
+      arch = "linux-arm64";
+      hash = "sha256-xFHHczeKbx8EHqJlaKiXsoWoZWvuFqFuSRTOnkD7fHk=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "bitwarden-cli: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "bitwarden-cli: unsupported platform ${stdenv.hostPlatform.system}");
 in
 # bw is a Node.js app packed with `pkg`: the application is appended to the binary, at an offset
 # recorded inside it. Patching the ELF (autoPatchelf) moves the content of the x86_64 binary (not

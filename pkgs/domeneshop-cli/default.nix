@@ -1,4 +1,10 @@
-{ php84, lib, fetchFromGitHub, installShellFiles, makeWrapper }:
+{
+  php84,
+  lib,
+  fetchFromGitHub,
+  installShellFiles,
+  makeWrapper,
+}:
 
 # domeneshop CLI with the dashboard:* commands (sebastka/domeneshop-dashboard, picked up when installed).
 # Built from the monorepo the packages are split from: its root composer.lock pins every dependency.
@@ -13,7 +19,10 @@ php84.buildComposerProject2 (finalAttrs: {
     hash = "sha256-eNtTsH2DLk5NubKuin5BzSC38nuHZwEKXXfy+WJclKA=";
   };
   vendorHash = "sha256-lnF6L9nd6S2YkSLP6Zuiz5qIliMG/tMSfXhwQItynWw=";
-  nativeBuildInputs = [ installShellFiles makeWrapper ];
+  nativeBuildInputs = [
+    installShellFiles
+    makeWrapper
+  ];
   postInstall = ''
     # Run the CLI with nixpkgs' PHP (its shebang is `#!/usr/bin/env php`)
     makeWrapper ${lib.getExe php84} $out/bin/domeneshop \

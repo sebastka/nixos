@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, installShellFiles }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  installShellFiles,
+}:
 
 let
   version = "0.6.1";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-bzmeUny4WIsC19KOrpphxJaA9M1egtmL56XFAByA00E="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-XnCYFTygatVXe09dXNOAsd59e2VQW9iqFgyRgaKxAcU="; };
+    x86_64-linux = {
+      arch = "amd64";
+      hash = "sha256-bzmeUny4WIsC19KOrpphxJaA9M1egtmL56XFAByA00E=";
+    };
+    aarch64-linux = {
+      arch = "arm64";
+      hash = "sha256-XnCYFTygatVXe09dXNOAsd59e2VQW9iqFgyRgaKxAcU=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "topf: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "topf: unsupported platform ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "topf";

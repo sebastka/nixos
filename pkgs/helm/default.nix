@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, installShellFiles }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  installShellFiles,
+}:
 
 let
   version = "4.3.0";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-hlhKVN73NXBVj2b1ERzFPf7VZoljeuMsEgEgXUlPVPs="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-McV5TdVcZqUea30uKsehFK6LHeQf8dm6UXSKyXOwagg="; };
+    x86_64-linux = {
+      arch = "amd64";
+      hash = "sha256-hlhKVN73NXBVj2b1ERzFPf7VZoljeuMsEgEgXUlPVPs=";
+    };
+    aarch64-linux = {
+      arch = "arm64";
+      hash = "sha256-McV5TdVcZqUea30uKsehFK6LHeQf8dm6UXSKyXOwagg=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "helm: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "helm: unsupported platform ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "helm";

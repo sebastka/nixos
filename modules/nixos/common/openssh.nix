@@ -3,23 +3,38 @@
 {
   # Pre-generated host keys (see secrets/*-ssh-host-key.sops.yaml), trusted on every host.
   programs.ssh.knownHosts.geras = {
-    hostNames = [ "geras" "geras.home.karlsen.fr" ];
+    hostNames = [
+      "geras"
+      "geras.home.karlsen.fr"
+    ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5F4tGsBn04q+EMOlVyawiG+bn5+hL83bv6aOXfdsxf";
   };
   programs.ssh.knownHosts.zeus = {
-    hostNames = [ "zeus" "zeus.home.karlsen.fr" ];
+    hostNames = [
+      "zeus"
+      "zeus.home.karlsen.fr"
+    ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH6Tk9DVEvUXDG1oqQMakL9wd5FCUgcfXQ1TQtBIs8OL";
   };
   programs.ssh.knownHosts.hermes = {
-    hostNames = [ "hermes" "hermes.home.karlsen.fr" ];
+    hostNames = [
+      "hermes"
+      "hermes.home.karlsen.fr"
+    ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYQQyFqk1fufzZs+aHqCmf7G5xpGleYwQ80IQXWO6tf";
   };
   programs.ssh.knownHosts.helios = {
-    hostNames = [ "helios" "helios.home.karlsen.fr" ];
+    hostNames = [
+      "helios"
+      "helios.home.karlsen.fr"
+    ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsMO6PBpFvZSZ1NE2kmhZYqBDigMKldEVJjWpVsAsrP";
   };
   programs.ssh.knownHosts.boreas = {
-    hostNames = [ "boreas" "boreas.home.karlsen.fr" ];
+    hostNames = [
+      "boreas"
+      "boreas.home.karlsen.fr"
+    ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMnVxwP96K/Q4WPvol3vwaMZAvzXX6vgrh8aRza1VEjD";
   };
 

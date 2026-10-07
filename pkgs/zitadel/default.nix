@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, installShellFiles }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  installShellFiles,
+}:
 
 let
   version = "4.19.4";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-1h+rITPFRiYeqQzUPS97SliQvE+bVAeTDaGXNibEdCM="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-730f8fJjLNDK25xtTLDCsZBF9FmSYaXQ30plT1F16Yk="; };
+    x86_64-linux = {
+      arch = "amd64";
+      hash = "sha256-1h+rITPFRiYeqQzUPS97SliQvE+bVAeTDaGXNibEdCM=";
+    };
+    aarch64-linux = {
+      arch = "arm64";
+      hash = "sha256-730f8fJjLNDK25xtTLDCsZBF9FmSYaXQ30plT1F16Yk=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "zitadel: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "zitadel: unsupported platform ${stdenv.hostPlatform.system}");
 in
 # nixpkgs' zitadel is still 2.x
 stdenv.mkDerivation {

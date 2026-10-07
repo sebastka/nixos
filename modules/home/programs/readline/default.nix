@@ -6,10 +6,10 @@
   programs.readline = {
     enable = true;
     variables = {
-      completion-ignore-case = true;     # Tab completion ignores case
-      show-all-if-ambiguous = true;      # List all matches on the first Tab
-      colored-stats = true;              # Color completion candidates like `ls`
-      colored-completion-prefix = true;  # Highlight the already typed part of each candidate
+      completion-ignore-case = true; # Tab completion ignores case
+      show-all-if-ambiguous = true; # List all matches on the first Tab
+      colored-stats = true; # Color completion candidates like `ls`
+      colored-completion-prefix = true; # Highlight the already typed part of each candidate
       mark-symlinked-directories = true; # Add / to completed symlinks to directories
       bell-style = "none";
     };

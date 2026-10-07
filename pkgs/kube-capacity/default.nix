@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, installShellFiles }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  installShellFiles,
+}:
 
 let
   version = "0.8.0";
   assets = {
-    x86_64-linux  = { arch = "x86_64"; hash = "sha256-YQzm5df1KN8cYNO14nfQCsQ839nOTTbwsxMrto/BLPM="; };
-    aarch64-linux = { arch = "arm64";  hash = "sha256-70ugxDtX1u/ARyzkZfaaYQK97rFlQRIOoaUQotL5hGU="; };
+    x86_64-linux = {
+      arch = "x86_64";
+      hash = "sha256-YQzm5df1KN8cYNO14nfQCsQ839nOTTbwsxMrto/BLPM=";
+    };
+    aarch64-linux = {
+      arch = "arm64";
+      hash = "sha256-70ugxDtX1u/ARyzkZfaaYQK97rFlQRIOoaUQotL5hGU=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "kube-capacity: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "kube-capacity: unsupported platform ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "kube-capacity";

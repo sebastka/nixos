@@ -1,13 +1,25 @@
-{ fetchurl, stdenv, lib, installShellFiles }:
+{
+  fetchurl,
+  stdenv,
+  lib,
+  installShellFiles,
+}:
 
 let
   version = "1.13.0";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-I1TsG5/wWPpLfheEUdNEWVnNS2QGMX13eLY38DFOEFE="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-RMICRMlFHrUiFnt6E2jn1NqHnnRosxolUhzDkEAigQM="; };
+    x86_64-linux = {
+      arch = "amd64";
+      hash = "sha256-I1TsG5/wWPpLfheEUdNEWVnNS2QGMX13eLY38DFOEFE=";
+    };
+    aarch64-linux = {
+      arch = "arm64";
+      hash = "sha256-RMICRMlFHrUiFnt6E2jn1NqHnnRosxolUhzDkEAigQM=";
+    };
   };
-  asset = assets.${stdenv.hostPlatform.system}
-    or (throw "longhorn-cli: unsupported platform ${stdenv.hostPlatform.system}");
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "longhorn-cli: unsupported platform ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "longhorn-cli";
