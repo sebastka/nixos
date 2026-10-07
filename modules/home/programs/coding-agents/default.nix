@@ -22,6 +22,9 @@
         shift
         exec ${lib.getExe config.programs.claude-code.finalPackage} "$@"
       '').outPath;
+    # Claude in an editor tab ("Panel (New Tab)"; the other choice is the right sidebar). The extension also saves
+    # it whenever Claude is opened elsewhere: set here, settings.json being read-only.
+    "claudeCode.preferredLocation" = "panel";
     # Replaces the bundled binary's path (extension openai.chatgpt, from the marketplace)
     "chatgpt.cliExecutable" = lib.getExe config.programs.codex.package;
   };
