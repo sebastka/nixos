@@ -1,14 +1,23 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 
+let
+  vscode-opentofu = pkgs.callPackage ../../../../pkgs/vscode-opentofu { };
+in
 {
   programs.vscode = {
     enable = true;
+    # Extensions from Nix only (updated with flake.lock): ~/.vscode/extensions is a read-only store directory, with
+    # its own extensions.json. A mutable one mixes VS Code's own state with them (its Marketplace updates, marking
+    # ours obsolete, and an extensions.json rebuilt whenever this list changes), which broke extensions.
+    mutableExtensionsDir = false;
     profiles.default = {
+      enableExtensionUpdateCheck = false; # Nothing to update (extensions.autoCheckUpdates)
       extensions = with pkgs.vscode-extensions; [
-        jnoortheen.nix-ide
+        pkgs-unstable.vscode-extensions.jnoortheen.nix-ide
         ms-python.python
         ms-azuretools.vscode-docker
-        anthropic.claude-code
+        pkgs-unstable.vscode-extensions.anthropic.claude-code # Moves fast, as its CLI (modules/home/programs/coding-agents)
+        vscode-opentofu # Not in nixpkgs: pkgs/vscode-opentofu
       ];
       userSettings = {
         # Editor
@@ -33,7 +42,8 @@
         # Workbench
         "workbench.startupEditor" = "none";
 
-        # Extensions: installed from Nix (above), no recommendations
+        # Extensions: installed from Nix (above), no updates nor recommendations
+        "extensions.autoUpdate" = false;
         "extensions.ignoreRecommendations" = true;
 
         # Git
