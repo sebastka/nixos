@@ -33,7 +33,7 @@
         home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/private";
         # home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/karlsenfr.config";
         home.sessionVariables.DIGITALOCEAN_CONTEXT = "karlsenfr";
-        home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml"; # One private cluster: talmox
+        # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml"; # Leave .config/kube/config.yaml as default
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {

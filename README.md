@@ -184,13 +184,13 @@ and one Secrets Manager (`bws`) account:
 | `BWS_ACCESS_TOKEN` | `bws` | machine account access token | none: **secret** |
 | `BW_SESSION` | `bw` | output of `bw unlock --raw` | none: **secret** |
 
-Example `.envrc` for a work project:
+The accounts are selected by directory: `~/Dev/Private/.envrc` and `~/Dev/Work/.envrc` are generated
+(`users/sebastian/desktop.nix`, `users/sebastian/work.nix`) and trusted without `direnv allow`, and direnv loads the
+nearest one above a project before the project's own `.envrc` (`modules/home/programs/direnv`). Under `~/Dev/Work`:
+`bw` and `bws` use the inboxcom account, doctl the `inboxcom` context (elsewhere: `karlsenfr`). A work project's own
+`.envrc` only needs its secrets:
 
 ```sh
-# Bitwarden: inboxcom account
-export BITWARDENCLI_APPDATA_DIR="$XDG_DATA_HOME/bitwarden-cli/inboxcom"
-export BWS_CONFIG_FILE="$XDG_CONFIG_HOME/bws/inboxcom.config"
-
 # Secrets (BWS_ACCESS_TOKEN...) never go in .envrc: keep them in an untracked file (in the project's .gitignore)
 source_env_if_exists .envrc.local
 ```
