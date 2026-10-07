@@ -111,10 +111,11 @@ jobs:
           title: "chore: Update flake.lock and pkgs"
           body-path: ${{ runner.temp }}/update/body.md
 
-      # Already checked on both systems by the check job
+      # Already checked on both systems by the check job. The branch is deleted: squashed, its commit isn't on master,
+      # and the next run makes it again.
       - name: Merge
         if: contains(fromJSON('["created", "updated"]'), steps.pr.outputs.pull-request-operation)
-        run: gh pr merge --squash "${PR_NUMBER}"
+        run: gh pr merge --squash --delete-branch "${PR_NUMBER}"
         env:
           PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
