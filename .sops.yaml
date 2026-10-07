@@ -20,4 +20,5 @@ creation_rules:
   - {path_regex: 'secrets/\.?desktop\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
   - {path_regex: 'secrets/\.?tern\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
   - {path_regex: 'secrets/\.?ssh-work\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
+  - {path_regex: 'secrets/\.?work\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
   - {path_regex: 'secrets/\.?helios\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*helios]}]}

@@ -1,5 +1,6 @@
 # Work (inboxcom): sebastian's work setup, on desktops only (imported by ./desktop.nix). NixOS module, as it declares
-# secrets: desktops must be recipients of secrets/ssh-work.sops.yaml and secrets/desktop.sops.yaml (.sops.yaml).
+# secrets: desktops must be recipients of secrets/ssh-work.sops.yaml, secrets/work.sops.yaml and secrets/desktop.sops.yaml
+# (.sops.yaml).
 {
   config,
   lib,
@@ -39,11 +40,32 @@ in
         sopsFile = "${self}/secrets/desktop.sops.yaml";
         owner = user;
       };
+      inboxcom-clusters = {
+        sopsFile = "${self}/secrets/work.sops.yaml";
+        owner = user;
+      };
     };
 
     home-manager.users.${user} =
       { config, lib, ... }: # home-manager's (lib.hm)
       {
+        # Kubeconfigs of inboxcom's clusters, in ~/.config/kube/inboxcom (./scripts/inboxcom_kubeconfig.sh)
+        home.packages = [
+          (pkgs.writeShellApplication {
+            name = "inboxcom_kubeconfig";
+            runtimeInputs = [
+              pkgs.doctl
+              pkgs.kubectl
+            ];
+            runtimeEnv = {
+              CLUSTERS_FILE = nixosConfig.sops.secrets.inboxcom-clusters.path;
+              DOCTL_CONTEXT = "inboxcom";
+              KUBECONFIG_DIR = "${config.xdg.configHome}/kube/inboxcom";
+            };
+            text = builtins.readFile ./scripts/inboxcom_kubeconfig.sh;
+          })
+        ];
+
         # Work repositories: inboxcom identity, signing key and SSH key for GitHub
         # (same host as personal repos, GitHub picks the account from the SSH key).
         programs.git.includes = [
@@ -91,7 +113,7 @@ in
           export BITWARDENCLI_APPDATA_DIR="${config.xdg.dataHome}/bitwarden-cli/inboxcom"
           export BWS_CONFIG_FILE="${config.xdg.configHome}/bws/inboxcom.config"
           export DIGITALOCEAN_CONTEXT=inboxcom
-          export KUBECONFIG="${config.xdg.configHome}/kube/do-infra/config.yaml"
+          export KUBECONFIG="${config.xdg.configHome}/kube/inboxcom/config.yaml" # All clusters: inboxcom_kubeconfig
         '';
         programs.direnv.config.whitelist.exact = [ "${config.home.homeDirectory}/Dev/Work/.envrc" ];
 
@@ -99,7 +121,7 @@ in
         # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
         # home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/inboxcom.config";
         # home.sessionVariables.DIGITALOCEAN_CONTEXT = "inboxcom";
-        # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/do-infra/config.yaml"; # One work cluster: do-infra
+        # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml";
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {
