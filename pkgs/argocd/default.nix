@@ -1,10 +1,10 @@
 { fetchurl, stdenv, lib, installShellFiles }:
 
 let
-  version = "3.5.3";
+  version = "3.5.4";
   assets = {
-    x86_64-linux  = { arch = "amd64"; hash = "sha256-uGD3P1fL3dmTzURvUjbXl8GxrIVUhXsmg9JmnxfnZbQ="; };
-    aarch64-linux = { arch = "arm64"; hash = "sha256-uzfl1i34l+oWEPfGR/3Hhleg46ko3CGJP6979mpGRss="; };
+    x86_64-linux  = { arch = "amd64"; hash = "sha256-nNjLn494U1evRBqVRMwcY6K42brUXr6IUDq44xXGSuM="; };
+    aarch64-linux = { arch = "arm64"; hash = "sha256-/nxzeskS4oH6E9wnsr5mlWNLn+SD1ShG8+fmUGexHBI="; };
   };
   asset = assets.${stdenv.hostPlatform.system}
     or (throw "argocd: unsupported platform ${stdenv.hostPlatform.system}");
