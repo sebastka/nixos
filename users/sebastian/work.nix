@@ -1,6 +1,5 @@
 # Work (inboxcom): sebastian's work setup, on desktops only (imported by ./desktop.nix). NixOS module, as it declares
-# secrets: desktops must be recipients of secrets/ssh-work.sops.yaml, secrets/work.sops.yaml and secrets/desktop.sops.yaml
-# (.sops.yaml).
+# secrets: desktops must be recipients of secrets/ssh-work.sops.yaml and secrets/work.sops.yaml (.sops.yaml).
 {
   config,
   lib,
@@ -33,11 +32,6 @@ in
       };
       ssh-work-known-hosts = {
         sopsFile = "${self}/secrets/ssh-work.sops.yaml";
-        owner = user;
-      };
-      # Bitwarden Secrets Manager config, linked under ~/.config
-      bws-inboxcom-config = {
-        sopsFile = "${self}/secrets/desktop.sops.yaml";
         owner = user;
       };
       inboxcom-clusters = {
@@ -96,9 +90,12 @@ in
         home.file.".ssh/known_hosts.d/inboxcom".source =
           config.lib.file.mkOutOfStoreSymlink nixosConfig.sops.secrets.ssh-work-known-hosts.path;
 
-        # Bitwarden Secrets Manager (bws): inboxcom account only, selected with BWS_CONFIG_FILE (see README.md).
-        xdg.configFile."bws/inboxcom.config".source =
-          config.lib.file.mkOutOfStoreSymlink nixosConfig.sops.secrets.bws-inboxcom-config.path;
+        # Bitwarden Secrets Manager (bws): its servers by profile (BWS_PROFILE selects one: inboxcom in ~/Dev/Work). The
+        # token isn't there: ~/Dev/Work reads it from the keyring (below).
+        home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/config.toml";
+        xdg.configFile."bws/config.toml".source = (pkgs.formats.toml { }).generate "bws-config.toml" {
+          profiles.inboxcom.server_base = "https://vault.bitwarden.eu";
+        };
 
         # Bitwarden CLI (bw): the inboxcom account's data directory (the private one is the default, ./desktop.nix).
         # bw keeps its server URL in its data file (with the login session), which it rewrites itself:
@@ -117,14 +114,18 @@ in
         # Work accounts in ~/Dev/Work:
         programs.direnv.directoryEnv."Dev/Work" = {
           BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
-          BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/inboxcom.config";
+          BWS_PROFILE = "inboxcom";
+          # The machine account's token, from the desktop's keyring (never in this repository), stored once per desktop:
+          #   secret-tool store --label='bws (inboxcom)' service bws account inboxcom
+          BWS_ACCESS_TOKEN.command = "${pkgs.libsecret}/bin/secret-tool lookup service bws account inboxcom";
           DIGITALOCEAN_CONTEXT = "inboxcom";
           KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml"; # All clusters: inboxcom_kubeconfig
         };
 
         # Env vars unset, since private are default
         # home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/inboxcom";
-        # home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/inboxcom.config";
+        # home.sessionVariables.BWS_PROFILE = "inboxcom";
+        # home.sessionVariables.BWS_ACCESS_TOKEN = "${pkgs.libsecret}/bin/secret-tool lookup service bws account inboxcom";
         # home.sessionVariables.DIGITALOCEAN_CONTEXT = "inboxcom";
         # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml";
 

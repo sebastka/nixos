@@ -127,8 +127,9 @@ Windows disks (980 PRO 500 GB with Windows' ESP, 980 PRO 2 TB) are never touched
 | File | Content | Encrypted for |
 |---|---|---|
 | `secrets/common.sops.yaml` | User password hashes | GnuPG key, every host |
-| `secrets/desktop.sops.yaml` | NetworkManager Wi-Fi PSKs (`nm-wifi-env`), bws inboxcom config (`bws-inboxcom-config`) | GnuPG key, desktops |
+| `secrets/desktop.sops.yaml` | NetworkManager Wi-Fi PSKs (`nm-wifi-env`) | GnuPG key, desktops |
 | `secrets/ssh-work.sops.yaml` | Work SSH hosts (`ssh-work-config`, linked as `~/.ssh/config.d/work.conf`) and their keys (`ssh-work-known-hosts`, `~/.ssh/known_hosts.d/inboxcom`) | GnuPG key, desktops |
+| `secrets/work.sops.yaml` | Work (inboxcom): Kubernetes clusters and default context (`inboxcom-clusters`, `default-context`, for `inboxcom_kubeconfig`) | GnuPG key, desktops |
 | `secrets/tern.sops.yaml` | Tern account files and signatures, names included: a `files` list of `path`/`content` (`users/sebastian/tern.nix`) | GnuPG key, desktops |
 | `secrets/helios.sops.yaml` | Cloudflare API token (certificates, dynamic DNS), DNSSEC private keys of the local zones (`hosts/helios`) | GnuPG key, helios |
 | `secrets/<host>-ssh-host-key.sops.yaml` | The host's SSH host key (also its age identity) | GnuPG key only |
@@ -180,8 +181,9 @@ and one Secrets Manager (`bws`) account:
 | Variable | Tool | Value | Default |
 |---|---|---|---|
 | `BITWARDENCLI_APPDATA_DIR` | `bw` | `$XDG_DATA_HOME/bitwarden-cli/<account>` | `private` |
-| `BWS_CONFIG_FILE` | `bws` | `$XDG_CONFIG_HOME/bws/inboxcom.config` | none: set it |
-| `BWS_ACCESS_TOKEN` | `bws` | machine account access token | none: **secret** |
+| `BWS_CONFIG_FILE` | `bws` | `$XDG_CONFIG_HOME/bws/config.toml` (its servers, by profile) | that file |
+| `BWS_PROFILE` | `bws` | profile in that file | none (`~/Dev/Work`: `inboxcom`) |
+| `BWS_ACCESS_TOKEN` | `bws` | machine account access token | none (`~/Dev/Work`: from the keyring): **secret** |
 | `BW_SESSION` | `bw` | output of `bw unlock --raw` | none: **secret** |
 
 The accounts are selected by directory: `~/Dev/Private/.envrc` and `~/Dev/Work/.envrc` are generated
@@ -200,8 +202,10 @@ Notes:
 - Each `bw` account keeps its own login: run `bw login` once per account (with its `BITWARDENCLI_APPDATA_DIR`), then
   `export BW_SESSION="$(bw unlock --raw)"` in the shell when needed. A session only unlocks the account it was
   created for.
-- `bws/inboxcom.config` is a sops secret (`bws-inboxcom-config` in `secrets/desktop.sops.yaml`); the token is always
-  read from `BWS_ACCESS_TOKEN`.
+- `~/.config/bws/config.toml` is generated (`users/sebastian/work.nix`): the servers, by profile (`inboxcom`:
+  `vault.bitwarden.eu`). The token comes from the desktop's keyring (KWallet), stored once per desktop with
+  `secret-tool store --label='bws (inboxcom)' service bws account inboxcom`, and read by `~/Dev/Work/.envrc`.
+  Outside `~/Dev/Work`, `bws` has no account. A project can use another machine account (`.envrc.local`).
 - Work credentials (`BWS_ACCESS_TOKEN`, `MAILCORE_API_KEY`...) are never in this repository, not even encrypted: it is
   public. They stay in the inboxcom vault, e.g. in `.envrc.local`, with the inboxcom `BITWARDENCLI_APPDATA_DIR` and
   an unlocked session (`BW_SESSION`): `export BWS_ACCESS_TOKEN="$(bw get password <item>)"`.

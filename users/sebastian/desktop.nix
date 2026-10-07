@@ -21,16 +21,18 @@
 
         # Private accounts in ~/Dev/Private:
         programs.direnv.directoryEnv."Dev/Private" = {
-          BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/private";
-          # BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/karlsenfr.config";
+          BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/karlsenfr";
+          # BWS_PROFILE = "karlsenfr"; # No private bws account (its server would go in bws/config.toml: ./work.nix)
+          # BWS_ACCESS_TOKEN.command = "${pkgs.libsecret}/bin/secret-tool lookup service bws account karlsenfr"; # No private bws account
           DIGITALOCEAN_CONTEXT = "karlsenfr";
           KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml";
         };
 
         # Env vars
         home.sessionVariables.BROWSER = "firefox";
-        home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/private";
-        # home.sessionVariables.BWS_CONFIG_FILE = "${config.xdg.configHome}/bws/karlsenfr.config"; # No private bws
+        home.sessionVariables.BITWARDENCLI_APPDATA_DIR = "${config.xdg.dataHome}/bitwarden-cli/karlsenfr";
+        # home.sessionVariables.BWS_PROFILE = "karlsenfr"; # No private bws
+        # home.sessionVariables.BWS_ACCESS_TOKEN = "${pkgs.libsecret}/bin/secret-tool lookup service bws account karlsenfr"; # No private bws
         home.sessionVariables.DIGITALOCEAN_CONTEXT = "karlsenfr";
         # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml"; # Leave .config/kube/config.yaml as default
 
