@@ -23,7 +23,6 @@ packages=(
     "mailcore-cli   Fjordmail/mailcore-cli      v"
     "stripe-cli     stripe/stripe-cli           v"
     "topf           postfinance/topf            v"
-    "vscode-opentofu opentofu/vscode-opentofu   v"
     "zitadel        zitadel/zitadel             v"
 )
 
