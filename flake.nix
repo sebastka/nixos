@@ -68,9 +68,11 @@
       # (CI builds them natively on x86_64 and aarch64)
       packages = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (
         system:
-        nixpkgs.lib.mapAttrs (name: _: nixpkgs.legacyPackages.${system}.callPackage ./pkgs/${name} { }) (
-          builtins.readDir ./pkgs
-        )
+        let
+          # pkgs-unstable too, for packages built on unstable's (pkgs/ansible-lint)
+          callPackage = nixpkgs.legacyPackages.${system}.newScope { pkgs-unstable = mkPkgsUnstable system; };
+        in
+        nixpkgs.lib.mapAttrs (name: _: callPackage ./pkgs/${name} { }) (builtins.readDir ./pkgs)
       );
       checks = self.packages;
 

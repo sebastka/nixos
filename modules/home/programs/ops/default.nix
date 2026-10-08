@@ -21,6 +21,11 @@ let
   bws = pkgs.callPackage ../../../../pkgs/bws { };
   topf = pkgs.callPackage ../../../../pkgs/topf { };
   zitadel = pkgs.callPackage ../../../../pkgs/zitadel { };
+  ansible-lint = pkgs.callPackage ../../../../pkgs/ansible-lint { inherit pkgs-unstable; };
+  # A Python package (ansible-lint uses it): its command only
+  yamllint = pkgs-unstable.python3Packages.toPythonApplication (
+    pkgs.callPackage ../../../../pkgs/yamllint { inherit pkgs-unstable; }
+  );
 in
 
 {
@@ -56,7 +61,7 @@ in
     pkgs-unstable.tofu-ls # Its language server (editors)
 
     # Configuration management
-    pkgs.ansible
+    pkgs-unstable.ansible # ansible-core and its collections bundle (community.general...): recent, as ansible-lint
 
     # Cloud
     awscli2
@@ -70,8 +75,8 @@ in
 
     # Linting
     pkgs.shellcheck
-    pkgs.yamllint
-    pkgs.ansible-lint
+    yamllint # Its latest release (pkgs/yamllint)
+    ansible-lint # Its latest release (pkgs/ansible-lint), on unstable's Ansible (above)
 
     # DNS
     pkgs.drill

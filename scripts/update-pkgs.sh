@@ -10,6 +10,7 @@ nix="nix --extra-experimental-features nix-command --extra-experimental-features
 
 # Package directory, upstream Git repository, tag prefix
 packages=(
+    "ansible-lint   ansible/ansible-lint        v"
     "argocd         argoproj/argo-cd            v"
     "awscli2        aws/aws-cli                 -"
     "bitwarden-cli  bitwarden/clients           cli-v"
@@ -24,6 +25,7 @@ packages=(
     "stripe-cli     stripe/stripe-cli           v"
     "topf           postfinance/topf            v"
     "vscode-opentofu opentofu/vscode-opentofu   v"
+    "yamllint       adrienverge/yamllint        v"
     "zitadel        zitadel/zitadel             v"
 )
 
