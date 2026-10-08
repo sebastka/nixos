@@ -13,13 +13,14 @@
   # ~/.local/share/flatpak). Firmware updates stay available with fwupdmgr.
   environment.plasma6.excludePackages = [ pkgs.kdePackages.discover ];
   # Nor Plasma Browser Integration's Flatpak integrator, which writes its host into ~/.var/app/<browser> of known
-  # Flatpak browsers at every login. A default for every user (/etc/xdg is in KDE's config path).
-  environment.etc."xdg/kded6rc".text = ''
+  # Flatpak browsers at every login. A default for every user (/etc/xdg is in KDE's config path). kded5rc, even for
+  # KF6's kded (it reads no kded6rc).
+  environment.etc."xdg/kded5rc".text = ''
     [Module-browserintegrationflatpakintegrator]
     autoload=false
   '';
 
-  # No file indexing (Baloo, part of Plasma): indexing off by default for every user (/etc/xdg, as kded6rc above),
+  # No file indexing (Baloo, part of Plasma): indexing off by default for every user (/etc/xdg, as kded5rc above),
   # its service masked, and file search off in KRunner and the launcher (they would query an empty index)
   environment.etc."xdg/baloofilerc".text = ''
     [Basic Settings]
