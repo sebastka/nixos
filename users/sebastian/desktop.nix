@@ -4,7 +4,7 @@
 {
   # They apply themselves only with a desktop too: a NixOS import can't depend on the configuration
   imports = [
-    ./tern.nix
+    # ./tern.nix # Disabled (as modules/nixos/desktop/tern.nix)
     ./work.nix
   ];
 
