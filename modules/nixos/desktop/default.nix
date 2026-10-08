@@ -3,6 +3,7 @@
 {
   imports = [
     ./audio.nix
+    ./docker.nix
     ./fonts.nix
     ./gnupg.nix
     ./networkmanager.nix
