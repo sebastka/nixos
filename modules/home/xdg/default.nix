@@ -28,6 +28,7 @@
   home.sessionVariables.ANSIBLE_HOME = "${config.xdg.dataHome}/ansible";
   home.sessionVariables.ANSIBLE_CONFIG = "${config.xdg.configHome}/ansible/ansible.cfg";
   home.sessionVariables.ANSIBLE_GALAXY_CACHE_DIR = "${config.xdg.cacheHome}/ansible/galaxy";
+  home.sessionVariables.ANSIBLE_SSH_CONTROL_PATH_DIR = "$XDG_RUNTIME_DIR/ansible/cp"; # SSH connection sharing sockets: the ssh plugin's default is ~/.ansible/cp (not under ANSIBLE_HOME)
 
   # kubectl
   home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/config.yaml";
