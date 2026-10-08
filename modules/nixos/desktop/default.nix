@@ -22,6 +22,10 @@
   # Norwegian keyboard by default, as the console (modules/nixos/common)
   services.xserver.xkb.layout = lib.mkDefault "no";
 
+  # /etc/hosts as a file, not a link to the store: temporary entries with `sudo -e /etc/hosts`, effective at once,
+  # until the next switch or boot rewrites it from networking.hosts (lasting entries go there).
+  environment.etc.hosts.mode = "0644";
+
   services.printing.enable = true;
 
   programs.firefox.enable = true;
