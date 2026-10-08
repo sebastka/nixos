@@ -11,6 +11,7 @@
 {
   imports = [
     ../home-manager
+    ./htop.nix
     ./openssh.nix
     ./user-email.nix
     sops-nix.nixosModules.sops
@@ -100,7 +101,6 @@
   environment.systemPackages = with pkgs; [
     wget
     git
-    htop
     duf
     lm_sensors
     nixfmt
