@@ -14,28 +14,28 @@
       "zeus"
       "zeus.home.karlsen.fr"
     ];
-    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH6Tk9DVEvUXDG1oqQMakL9wd5FCUgcfXQ1TQtBIs8OL";
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG9psu/NezOCO5wKx9C/BFkedhU0NC0u2NvguQPMc1ot";
   };
   programs.ssh.knownHosts.hermes = {
     hostNames = [
       "hermes"
       "hermes.home.karlsen.fr"
     ];
-    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIYQQyFqk1fufzZs+aHqCmf7G5xpGleYwQ80IQXWO6tf";
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOC9u+1htkH9v4sUdAddhzGj/b8GtQSiht+cLnAW8+mP";
   };
   programs.ssh.knownHosts.helios = {
     hostNames = [
       "helios"
       "helios.home.karlsen.fr"
     ];
-    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsMO6PBpFvZSZ1NE2kmhZYqBDigMKldEVJjWpVsAsrP";
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIUIgquR5rOTZdnTKZXoU+ekiKRpoigpC61w5oXTeuT8";
   };
   programs.ssh.knownHosts.boreas = {
     hostNames = [
       "boreas"
       "boreas.home.karlsen.fr"
     ];
-    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMnVxwP96K/Q4WPvol3vwaMZAvzXX6vgrh8aRza1VEjD";
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvkfWlIPiHCpZ4hOcWiI0ZAu+IE+rQFcpJBzpRrcQ4F";
   };
 
   services.openssh = {

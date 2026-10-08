@@ -8,11 +8,11 @@ keys:
 
   # Host age keys (derived from SSH host keys) used by each host to decrypt at activation
   # To add a new host: $ cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
-  - &helios age1dlwueszt5ajwygc2tf468f3a4c9fxkysmxgpaflnh9pv93mjmg6qzl7882
+  - &helios age18vs7mlzppnv3400sp62puhtv07myjmra6k44lx27e07xcpw3c4csnddd4y
   - &geras age1q7nfvyrnh4cjt8yuzecvn9lhpfwpkw29anfctltu8e7qww75ssfqpnynva
-  - &zeus age1qhx39d2vurl082udf4r9mwr29yr8gr86czp8qvcv5jnh7fgj3adqdyvktm
-  - &hermes age1d5vr8uawrgpgr2y0arkcxt567dtmv2nkfs8gugm43zzvjky26qqqzr2hk9
-  - &boreas age1wm5xu5tq2rv3ch76pgezw4c6a5j7qvr3rmw7cck3s70233spj38ql034cr
+  - &zeus age1s7un05umqftr0p49skvjuvzwvuc4amtt6u4hy8f56flk34pnjsrslxsf76
+  - &hermes age1q98mdl6dv8j75nhtvensqfq4l8942utenxuc8ptscqxru5uwn3xqgc9qmj
+  - &boreas age1pz30l5agzdnhc23vvmsc836d9h7d9ys4kz9k9n33r3wyhzks4yus8vnrmc
 
 creation_rules:
   - {path_regex: 'secrets/\.?[^/]*-(ssh-host-key|secure-boot)\.sops\.yaml$', key_groups: [{pgp: [*sebastian]}]}
