@@ -29,6 +29,7 @@
     # 100.120.159.240  controller.do.fjordmail.no
     # 100.119.119.227  sandbox.do.fjordmail.no
     # 100.104.98.178   web.do.fjordmail.no
+    # 129.212.170.25   whoami-public.controller.do.fjordmail.no
     # 68.183.243.94    whoami-public.web.do.fjordmail.no
   '';
 
