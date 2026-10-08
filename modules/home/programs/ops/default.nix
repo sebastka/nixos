@@ -68,6 +68,11 @@ in
     pkgs.gh
     pkgs.act
 
+    # Linting
+    pkgs.shellcheck
+    pkgs.yamllint
+    pkgs.ansible-lint
+
     # DNS
     pkgs.drill
     pkgs.cli53
