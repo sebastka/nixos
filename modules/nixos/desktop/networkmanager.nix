@@ -1,7 +1,15 @@
-{ config, self, ... }:
+{
+  config,
+  lib,
+  self,
+  ...
+}:
 
 {
   networking.networkmanager.enable = true;
+  # No mobile broadband modem (4G/5G) on our desktops: a host with one sets it back to true. Above NetworkManager's
+  # mkDefault true, below a host's plain value.
+  networking.modemmanager.enable = lib.mkOverride 900 false;
 
   # Env file with NM_<NETWORK>_PSK=... lines, desktop-only secrets (not readable by servers).
   sops.secrets."nm-wifi-env".sopsFile = "${self}/secrets/desktop.sops.yaml";
