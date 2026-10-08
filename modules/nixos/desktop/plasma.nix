@@ -18,4 +18,9 @@
     [Module-browserintegrationflatpakintegrator]
     autoload=false
   '';
+
+  # No screen reader (Orca, on with Plasma), nor speech synthesis (speech-dispatcher, which Orca requires): unused.
+  # Started by Firefox listing voices, speech-dispatcher left a zombie per speech engine it probed without having it.
+  services.orca.enable = false;
+  services.speechd.enable = false;
 }
