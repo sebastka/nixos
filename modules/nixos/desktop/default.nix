@@ -1,9 +1,4 @@
-{
-  lib,
-  pkgs,
-  pkgs-unstable,
-  ...
-}:
+{ lib, pkgs, ... }:
 
 {
   imports = [
@@ -21,7 +16,6 @@
     ../../home/programs/coding-agents
     ../../home/programs/ops
     ../../home/programs/vscode
-    { programs.webApps.package = pkgs-unstable.chromium; } # The one installed below
   ];
 
   # Norwegian keyboard by default, as the console (modules/nixos/common)
@@ -30,14 +24,11 @@
   services.printing.enable = true;
 
   programs.firefox.enable = true;
-  programs.thunderbird = {
-    enable = true;
-    package = pkgs-unstable.thunderbird;
-  };
+  programs.thunderbird.enable = true;
 
   environment.systemPackages = with pkgs; [
     kdePackages.kate
     libsecret # secret-tool: secrets in the keyring
-    pkgs-unstable.chromium # Also runs the web apps (modules/home/programs/web-apps)
+    chromium # Also runs the web apps (modules/home/programs/web-apps)
   ];
 }
