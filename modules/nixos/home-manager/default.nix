@@ -1,11 +1,15 @@
-{ home-manager, ... }:
+{ home-manager, pkgs, ... }:
 
 {
   imports = [ home-manager.nixosModules.home-manager ];
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
-  home-manager.backupCommand = "f=$1; mv -- \"$f\" \"$f.$(date +%Y%m%dT%H%M%S).bak\"";
+  # A file in the way of a link is moved aside, to <file>.<date>.bak. A script: home-manager runs the command
+  # unquoted (`$command "$file"`), so shell code in it (f=$1; ...) would be word-split, and fail.
+  home-manager.backupCommand = pkgs.writeShellScript "home-manager-backup" ''
+    mv -- "$1" "$1.$(date +%Y%m%dT%H%M%S).bak"
+  '';
   home-manager.sharedModules = [
     {
       programs.home-manager.enable = true;
