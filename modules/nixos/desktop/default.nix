@@ -43,5 +43,7 @@
     kdePackages.kate
     libsecret # secret-tool: secrets in the keyring
     chromium # Also runs the web apps (modules/home/programs/web-apps)
+    php # The CLI (php), with its default extensions
+    php.packages.composer # Built on the php above
   ];
 }
