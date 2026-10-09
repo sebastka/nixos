@@ -33,7 +33,7 @@
           # BWS_ACCESS_TOKEN.command = "${pkgs.libsecret}/bin/secret-tool lookup service bws account karlsenfr";
           DIGITALOCEAN_CONTEXT = "karlsenfr";
           KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml";
-          ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/karlsenfr";
+          ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/karlsenfr.yaml";
         };
 
         # Env vars
@@ -43,7 +43,7 @@
         # home.sessionVariables.BWS_ACCESS_TOKEN = ""; # No private bws
         home.sessionVariables.DIGITALOCEAN_CONTEXT = "karlsenfr";
         # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml"; # Leave .config/kube/config.yaml as default
-        home.sessionVariables.ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/karlsenfr";
+        home.sessionVariables.ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/karlsenfr.yaml";
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {

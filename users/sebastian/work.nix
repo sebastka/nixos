@@ -109,7 +109,7 @@ in
           BWS_ACCESS_TOKEN.command = "${pkgs.libsecret}/bin/secret-tool lookup service bws account inboxcom";
           DIGITALOCEAN_CONTEXT = "inboxcom";
           KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml"; # All clusters: inboxcom_kubeconfig
-          ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/inboxcom";
+          ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/inboxcom.yaml";
         };
 
         # Env vars unset, since private are default
@@ -118,7 +118,7 @@ in
         # home.sessionVariables.BWS_ACCESS_TOKEN = "${pkgs.libsecret}/bin/secret-tool lookup service bws account inboxcom";
         # home.sessionVariables.DIGITALOCEAN_CONTEXT = "inboxcom";
         # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml";
-        # home.sessionVariables.ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/inboxcom";
+        # home.sessionVariables.ARGOCD_OPTS = "--config ${config.xdg.configHome}/argocd/inboxcom.yaml";
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {
