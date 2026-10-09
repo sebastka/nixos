@@ -26,7 +26,6 @@ packages=(
     "topf           postfinance/topf            v"
     "vscode-opentofu opentofu/vscode-opentofu   v"
     "yamllint       adrienverge/yamllint        v"
-    "zitadel        zitadel/zitadel             v"
 )
 
 # Latest stable (X.Y.Z, no pre-release) tag of a GitHub repository, without its prefix.

@@ -20,7 +20,6 @@ let
   bitwarden-cli = pkgs.callPackage ../../../../pkgs/bitwarden-cli { };
   bws = pkgs.callPackage ../../../../pkgs/bws { };
   topf = pkgs.callPackage ../../../../pkgs/topf { };
-  zitadel = pkgs.callPackage ../../../../pkgs/zitadel { };
   ansible-lint = pkgs.callPackage ../../../../pkgs/ansible-lint { inherit pkgs-unstable; };
   # A Python package (ansible-lint uses it): its command only
   yamllint = pkgs-unstable.python3Packages.toPythonApplication (
@@ -84,7 +83,6 @@ in
     domeneshop-cli
 
     # Identity
-    zitadel
     pkgs-unstable.zitadel-tools
 
     # Secrets & encryption
