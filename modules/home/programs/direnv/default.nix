@@ -51,6 +51,16 @@ in
       ) cfg.directoryEnv;
     };
 
+    # direnv's hook also runs on each directory change, but not during completion: some completions cd in a subshell
+    # (ssh hosts: `$(cd ~/.ssh; …)`), and its "direnv: unloading" would break the line being edited. Before each
+    # prompt, and on `cd dir && command`, as before.
+    programs.zsh.initContent = lib.mkIf cfg.enableZshIntegration (
+      lib.mkAfter ''
+        _direnv_chpwd() { [[ -n $WIDGET ]] || _direnv_hook; }
+        chpwd_functions=(''${chpwd_functions:#_direnv_hook} _direnv_chpwd)
+      ''
+    );
+
     home.file = lib.mapAttrs' (
       directory: variables:
       lib.nameValuePair "${directory}/.envrc" {
