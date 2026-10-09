@@ -85,6 +85,7 @@ in
 
     # Identity
     zitadel
+    pkgs-unstable.zitadel-tools
 
     # Secrets & encryption
     pkgs.sops
