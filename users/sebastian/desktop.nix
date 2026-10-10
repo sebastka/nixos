@@ -19,6 +19,11 @@
           run mkdir -p ${config.home.homeDirectory}/Dev/Private
         '';
 
+        # Rootless Docker (modules/nixos/desktop/docker.nix: not started by default) started at login, as
+        # `systemctl --user enable` would (it can't: the unit has no [Install] section)
+        xdg.configFile."systemd/user/default.target.wants/docker.service".source =
+          config.lib.file.mkOutOfStoreSymlink "/etc/systemd/user/docker.service";
+
         # Bitwarden CLI (bw, modules/home/programs/bw): the private account (bitwarden.com), the default one
         programs.bw.accounts.karlsenfr.server = "https://vault.bitwarden.com";
         programs.bw.defaultAccount = "karlsenfr";
