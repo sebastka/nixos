@@ -36,6 +36,19 @@ in
         "files.insertFinalNewline" = true;
         "files.autoSave" = "onFocusChange";
 
+        # JSON with comments (jsonc): also HuJSON (Tailscale's policy file...). Trailing commas allowed in both, as
+        # HuJSON does (jsonc warns about them by default).
+        "files.associations"."*.hujson" = "jsonc";
+        "json.schemas" = [
+          {
+            fileMatch = [
+              "*.jsonc"
+              "*.hujson"
+            ];
+            schema.allowTrailingCommas = true;
+          }
+        ];
+
         # Terminal
         "terminal.integrated.defaultProfile.linux" = "zsh";
 
