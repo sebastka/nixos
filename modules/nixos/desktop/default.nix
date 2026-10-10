@@ -3,6 +3,7 @@
 {
   imports = [
     ./audio.nix
+    ./battery.nix
     ./docker.nix
     ./fonts.nix
     ./gnupg.nix
