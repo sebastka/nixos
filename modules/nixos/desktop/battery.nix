@@ -1,6 +1,6 @@
 # Battery lifespan on laptops: kept between 20 and 80 %. Desktops without a battery (zeus) match nothing here.
 {
-  # Charging stops at 80 % and resumes below 75 %, set in the battery's firmware at boot, where its driver supports it
+  # Charging stops at 80 % and resumes below 70 %, set in the battery's firmware at boot, where its driver supports it
   # (geras: dell-laptop). The end first: the firmware keeps start below end. Dell's thresholds only apply in its
   # Custom mode (Adaptive by default).
   services.udev.extraRules = ''
