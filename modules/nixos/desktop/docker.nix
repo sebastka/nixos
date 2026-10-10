@@ -3,7 +3,7 @@
 let
   # The host as containers see it (host.docker.internal), for host services they may reach: only those bound to it.
   # The host's 127.0.0.1 stays closed to containers (rootless Docker's default: --disable-host-loopback), its services
-  # unexposed. Link-local, on lo: never routed off the host, and the firewall drops it from the network.
+  # unexposed. Link-local: never routed off the host, and the firewall drops it from the network.
   hostAddress = "169.254.1.2";
 in
 
@@ -23,11 +23,21 @@ in
       daemon.settings.host-gateway-ips = [ hostAddress ];
     };
   };
-  networking.interfaces.lo.ipv4.addresses = [
-    {
-      address = hostAddress;
-      prefixLength = 32;
-    }
-  ];
+  # hostAddress on its own interface, from NetworkManager (networking.interfaces.lo is never applied: nothing starts
+  # its service)
+  networking.networkmanager.ensureProfiles.profiles.docker-host = {
+    connection = {
+      id = "docker-host";
+      uuid = "c8f8e215-7b99-4598-9f0e-893f760d790e";
+      type = "dummy";
+      interface-name = "docker-host";
+    };
+    ipv4 = {
+      method = "manual";
+      address1 = "${hostAddress}/32";
+      never-default = true;
+    };
+    ipv6.method = "disabled";
+  };
   systemd.user.services.docker.wantedBy = lib.mkForce [ ];
 }
