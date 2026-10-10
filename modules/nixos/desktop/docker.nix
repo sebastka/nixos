@@ -25,21 +25,20 @@ in
   };
   # For scripts and compose files: `--host ${CONTAINER_HOST_ADDRESS:-127.0.0.1}` (the fallback where it's unset)
   environment.sessionVariables.CONTAINER_HOST_ADDRESS = hostAddress;
-  # hostAddress on its own interface, from NetworkManager (networking.interfaces.lo is never applied: nothing starts
-  # its service)
-  networking.networkmanager.ensureProfiles.profiles.docker-host = {
+  # hostAddress on lo, from NetworkManager: a loopback profile, which keeps 127.0.0.1 and ::1 and isn't listed in
+  # Plasma's network applet (networking.interfaces.lo is never applied: nothing starts its service). Not named "lo":
+  # NetworkManager's own lo.nmconnection, for lo without a profile, is in the same directory.
+  networking.networkmanager.ensureProfiles.profiles.loopback = {
     connection = {
-      id = "docker-host";
-      uuid = "c8f8e215-7b99-4598-9f0e-893f760d790e";
-      type = "dummy";
-      interface-name = "docker-host";
+      id = "loopback";
+      uuid = "9b6a46d8-0fff-4b28-b750-1822b5d5fe00";
+      type = "loopback";
+      interface-name = "lo";
     };
     ipv4 = {
       method = "manual";
       address1 = "${hostAddress}/32";
-      never-default = true;
     };
-    ipv6.method = "disabled";
   };
   systemd.user.services.docker.wantedBy = lib.mkForce [ ];
 }
