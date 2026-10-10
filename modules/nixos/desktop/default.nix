@@ -15,6 +15,7 @@
   # User configuration for every user on desktops (home-manager)
   home-manager.sharedModules = [
     ../../home/programs/coding-agents
+    ../../home/programs/node
     ../../home/programs/ops
     ../../home/programs/vscode
   ];

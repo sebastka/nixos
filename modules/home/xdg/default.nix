@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 
 {
   # Home-manager modules that support it (dircolors, npm, readline, kubecolor...) write their files
@@ -68,7 +68,8 @@
   home.sessionVariables.CARGO_HOME = "${config.xdg.dataHome}/cargo";
 
   # npm: user config, cache and logs instead of ~/.npmrc, ~/.npm
-  home.sessionVariables.NPM_CONFIG_USERCONFIG = "${config.xdg.configHome}/npm/npmrc";
+  # (programs.npm, on desktops, sets the same file: it writes it)
+  home.sessionVariables.NPM_CONFIG_USERCONFIG = lib.mkDefault "${config.xdg.configHome}/npm/npmrc";
   home.sessionVariables.NPM_CONFIG_CACHE = "${config.xdg.cacheHome}/npm";
   home.sessionVariables.NPM_CONFIG_LOGS_DIR = "${config.xdg.stateHome}/npm/logs";
 
