@@ -23,6 +23,8 @@ in
       daemon.settings.host-gateway-ips = [ hostAddress ];
     };
   };
+  # For scripts and compose files: `--host ${CONTAINER_HOST_ADDRESS:-127.0.0.1}` (the fallback where it's unset)
+  environment.sessionVariables.CONTAINER_HOST_ADDRESS = hostAddress;
   # hostAddress on its own interface, from NetworkManager (networking.interfaces.lo is never applied: nothing starts
   # its service)
   networking.networkmanager.ensureProfiles.profiles.docker-host = {
