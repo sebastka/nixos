@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Deploy the hosts' NixOS configurations, as they are in the code on origin/master. Never changes the code:
 # - Update dependencies with scripts/update.sh (or the "Update dependencies" workflow)
 # - Check everything with `nix flake check`
-set -eux
+set -euxo pipefail
 cd "$(dirname "$0")/.." # Repo root
 
 # Use what is on origin/master (fast-forward only: stops if local commits diverge)
@@ -12,14 +12,25 @@ else
     echo "Not on master: skipping git pull" >&2
 fi
 
+# nixos-rebuild, its build shown by nom (nix-output-monitor, in the dev shell: what downloads and builds, and how
+# long) when available
+rebuild() {
+    if command -v nom >/dev/null; then
+        sudo -v # Asks for the password now, not under nom's display
+        sudo nixos-rebuild "$@" --log-format internal-json -v |& nom --json
+    else
+        sudo nixos-rebuild "$@"
+    fi
+}
+
 find hosts -mindepth 1 -maxdepth 1 -type d | cut -d'/' -f2 | while read -r host; do
     [ "${host}" = geras ] || continue  # Temp: Only build geras for now
 
     # --no-update-lock-file: fail instead of writing flake.lock (e.g. new input in flake.nix)
     if hostname | grep -qx "${host}"; then
-        sudo nixos-rebuild switch --flake ".#${host}" --no-update-lock-file
+        rebuild switch --flake ".#${host}" --no-update-lock-file
     else
-        sudo nixos-rebuild switch --flake ".#${host}" --no-update-lock-file \
+        rebuild switch --flake ".#${host}" --no-update-lock-file \
             --target-host "sebastian@${host}.home.karlsen.fr" \
             --use-remote-sudo
     fi

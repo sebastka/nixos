@@ -92,6 +92,7 @@
               nixfmt
               shellcheck
               yamllint
+              nix-output-monitor # nom: build progress in scripts/build.sh
             ];
           };
         }
