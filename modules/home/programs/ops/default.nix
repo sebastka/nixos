@@ -65,6 +65,7 @@ in
     # Cloud
     awscli2
     pkgs.doctl
+    pkgs.rclone # Cloud storage (S3, Drive...): sync, copy, mount
     stripe-cli
     mailcore-cli
 
