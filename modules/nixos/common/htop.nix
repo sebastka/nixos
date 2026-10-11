@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 # htop's settings for every user and root (sudo htop): /etc/htoprc, which users' and root's ~/.config/htop/htoprc link
 # to (modules/home/programs/htop, and below). Linked rather than absent: htop would save a copy of its own on exit,
@@ -30,15 +30,18 @@
       degree_fahrenheit = false;
       detailed_cpu_time = true;
 
-      # Header layout: two equal columns
+      # Header: two equal columns (header_layout, below)
       header_margin = true;
-      header_layout = "two_50_50";
       column_meters_0 = "AllCPUs2 CPU";
       column_meter_modes_0 = "1 1";
       column_meters_1 = "Hostname System Uptime DateTime Blank LoadAverage LoadAverage Battery Blank MemorySwap MemorySwap Blank DiskIO DiskIO Blank NetworkIO NetworkIO";
       column_meter_modes_1 = "2 2 2 2 2 1 2 2 2 1 2 2 1 2 2 1 2";
     };
   };
+
+  # The header layout before its meters: htop clears the meters read so far when it reads the layout, and settings are
+  # written in alphabetical order (column_meters_* first)
+  environment.etc."htoprc".text = lib.mkBefore "header_layout=two_50_50";
 
   # root's (no home-manager)
   systemd.tmpfiles.rules = [
