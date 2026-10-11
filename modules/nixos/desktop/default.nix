@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  pkgs-unstable,
+  ...
+}:
 
 {
   imports = [
@@ -45,6 +50,7 @@
     kdePackages.kate
     libsecret # secret-tool: secrets in the keyring
     chromium # Also runs the web apps (modules/home/programs/web-apps)
+    pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
     php # The CLI (php), with its default extensions
     php.packages.composer # Built on the php above
   ];
