@@ -51,6 +51,9 @@ in
 
         # Terminal
         "terminal.integrated.defaultProfile.linux" = "zsh";
+        # Without the kitty keyboard protocol (on by default): with it, Shift+number on a non-US layout (Norwegian)
+        # reached programs using it (Neovim) as Shift+1... instead of "!", "#"..., and typed nothing
+        "terminal.integrated.enableKittyKeyboardProtocol" = false;
 
         # Workbench
         "workbench.startupEditor" = "none";
