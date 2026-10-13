@@ -133,7 +133,7 @@ in
           };
           zoom = {
             name = "Zoom";
-            url = "https://zoom.us";
+            url = "https://zoom.us/join";
             icon = ./icons/zoom.svg; # From the Papirus icon theme (GPL-3.0)
             genericName = "Meetings";
             comment = "Video Conferencing, Meetings, Calling";
