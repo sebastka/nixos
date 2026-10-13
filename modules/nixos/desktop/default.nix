@@ -48,12 +48,18 @@
   programs.firefox.enable = true;
   programs.thunderbird.enable = true;
 
-  environment.systemPackages = with pkgs; [
-    kdePackages.kate
-    libsecret # secret-tool: secrets in the keyring
-    chromium # Also runs the web apps (modules/home/programs/web-apps)
-    pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
-    php # The CLI (php), with its default extensions
-    php.packages.composer # Built on the php above
-  ];
+  environment.systemPackages =
+    with pkgs;
+    [
+      kdePackages.kate
+      libsecret # secret-tool: secrets in the keyring
+      chromium # Also runs the web apps (modules/home/programs/web-apps)
+      pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
+      php # The CLI (php), with its default extensions
+      php.packages.composer # Built on the php above
+    ]
+    # Its latest release (nixpkgs lags behind). x86_64 only for now: its arm64 build (boreas) isn't packaged yet.
+    ++ lib.optional pkgs.stdenv.hostPlatform.isx86_64 (
+      pkgs.callPackage ../../../pkgs/onlyoffice-desktopeditors { }
+    );
 }

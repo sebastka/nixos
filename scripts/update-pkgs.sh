@@ -22,6 +22,7 @@ packages=(
     "kubeseal       bitnami-labs/sealed-secrets v"
     "longhorn-cli   longhorn/cli                v"
     "mailcore-cli   Fjordmail/mailcore-cli      v"
+    "onlyoffice-desktopeditors ONLYOFFICE/DesktopEditors v"
     "stripe-cli     stripe/stripe-cli           v"
     "topf           postfinance/topf            v"
     "vscode-opentofu opentofu/vscode-opentofu   v"
