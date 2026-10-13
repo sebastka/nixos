@@ -9,6 +9,7 @@
   imports = [
     ./audio.nix
     ./battery.nix
+    ./bluetooth.nix
     ./docker.nix
     ./fonts.nix
     ./gnupg.nix
