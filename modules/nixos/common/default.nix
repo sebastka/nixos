@@ -108,6 +108,7 @@
     yq-go
     dig
     gettext # GNU envsubst
+    unzip
     pkgs-unstable.python3 # Bare interpreter: scripts and REPL (projects: uv)
     pkgs-unstable.uv # Python projects (.venv, uv.lock): the same, recent version on every host (its lock format)
   ];
