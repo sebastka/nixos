@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   pkgs-unstable,
@@ -60,6 +61,6 @@
     ]
     # Its latest release (nixpkgs lags behind). x86_64 only for now: its arm64 build (boreas) isn't packaged yet.
     ++ lib.optional pkgs.stdenv.hostPlatform.isx86_64 (
-      pkgs.callPackage ../../../pkgs/onlyoffice-desktopeditors { }
+      pkgs.callPackage ../../../pkgs/onlyoffice-desktopeditors { fonts = config.fonts.packages; }
     );
 }

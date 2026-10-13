@@ -1,7 +1,13 @@
-# OnlyOffice Desktop Editors: nixpkgs' package (pkgs/by-name/on/onlyoffice-desktopeditors), unchanged but for its
-# version (nixpkgs lags several releases behind). Its .deb release, in a FHS environment (/usr/bin/curl for plugins,
-# fonts in /usr/share/fonts). Compare with nixpkgs' when it updates, or on a new major version.
+# OnlyOffice Desktop Editors: nixpkgs' package (pkgs/by-name/on/onlyoffice-desktopeditors), but for its version
+# (nixpkgs lags several releases behind) and `fonts`. Its .deb release, in a FHS environment (/usr/bin/curl for
+# plugins). Compare with nixpkgs' when it updates, or on a new major version.
+#
+# fonts: the font packages its documents can use (the system's: fonts.packages, modules/nixos/desktop). Its own font
+# list only takes real files in real directories (in /usr/share/fonts, ~/.local/share/fonts...), not the symlinks to
+# the store fonts come as: not even nixpkgs' (/usr/share/fonts here). Each one's share/fonts is mounted in an empty
+# /usr/share/fonts instead, where they appear as real directories.
 {
+  fonts ? [ ],
   stdenv,
   lib,
   fetchurl,
@@ -185,6 +191,15 @@ buildFHSEnv {
   ];
 
   runScript = "/bin/onlyoffice-desktopeditors";
+
+  # fonts (above), mounted after the environment's own (/usr)
+  extraBwrapArgs = lib.optionals (fonts != [ ]) (
+    [ "--tmpfs /usr/share/fonts" ]
+    ++ lib.concatMap (font: [
+      "--dir /usr/share/fonts/${baseNameOf font}"
+      "--ro-bind-try ${font}/share/fonts /usr/share/fonts/${baseNameOf font}"
+    ]) fonts
+  );
 
   extraInstallCommands = ''
     mkdir -p $out/share
