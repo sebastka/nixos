@@ -1,5 +1,15 @@
 # sebastian on desktops: everything desktop-only, from here. NixOS module (./tern.nix and ./work.nix declare secrets).
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  self,
+  ...
+}:
+
+let
+  nixosConfig = config;
+in
 
 {
   # They apply themselves only with a desktop too: a NixOS import can't depend on the configuration
@@ -11,9 +21,46 @@
   config = lib.mkIf config.services.xserver.enable {
     users.users.sebastian.extraGroups = [ "networkmanager" ];
 
+    # Claude Code's instructions (CLAUDE.md, below), without the date
+    sops.secrets.claude-md = {
+      sopsFile = "${self}/secrets/desktop.sops.yaml";
+      owner = "sebastian";
+    };
+
     home-manager.users.sebastian =
       { config, lib, ... }: # home-manager's lib (lib.hm)
       {
+        # Claude Code's instructions: "1. Current date: YYYY-MM-DD", then the secret's (claude-md, above). Written at
+        # login and each day (at midnight, or on waking after it): edit the secret, not the file.
+        systemd.user.services.claude-md = {
+          Unit.Description = "Claude Code's CLAUDE.md, with today's date";
+          Service = {
+            Type = "oneshot";
+            ExecStart = lib.getExe (
+              pkgs.writeShellApplication {
+                name = "claude-md";
+                runtimeInputs = [ pkgs.coreutils ];
+                text = ''
+                  dir=${lib.escapeShellArg config.programs.claude-code.configDir}
+                  install -d -m 700 "$dir"
+                  tmp="$(mktemp "$dir/.CLAUDE.md.XXXXXX")"
+                  { echo "1. Current date: $(date +%F)"; cat ${nixosConfig.sops.secrets.claude-md.path}; } > "$tmp"
+                  mv -f "$tmp" "$dir/CLAUDE.md"
+                '';
+              }
+            );
+          };
+          Install.WantedBy = [ "default.target" ];
+        };
+        systemd.user.timers.claude-md = {
+          Unit.Description = "Claude Code's CLAUDE.md, with today's date, each day";
+          Timer = {
+            OnCalendar = "daily";
+            Persistent = true;
+          };
+          Install.WantedBy = [ "timers.target" ];
+        };
+
         # Projects: ~/Dev/Private (private), ~/Dev/Work (./work.nix)
         home.activation.createDevPrivate = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           run mkdir -p ${config.home.homeDirectory}/Dev/Private
