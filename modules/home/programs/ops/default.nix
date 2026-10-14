@@ -122,7 +122,7 @@ in
     apiVersion: kubectl.config.k8s.io/v1beta1
     kind: Preference
     credentialPluginPolicy: Allowlist
-    credentialPluginAllowlist: [{command: kubectl-oidc_login},{command: doctl}]
+    credentialPluginAllowlist: [{command: kubectl-oidc_login},{command: doctl},{command: topf-kube-credential}]
     defaults:
       - {command: apply,  options: [{name: server-side, default: 'true'}]}  # (1) default server-side apply
       # - {command: delete, options: [{name: interactive, default: 'true'}]}  # (2) default interactive deletion

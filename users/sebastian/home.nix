@@ -15,7 +15,19 @@
       [
         "to_paperless"
         "to_deluge"
-      ];
+      ]
+    ++ [
+      # kubectl credential plugin for topf's break-glass admin (allowlisted in modules/home/programs/ops's kuberc).
+      # topf and sops come from the profile, where that module installs them.
+      (pkgs.writeShellApplication {
+        name = "topf-kube-credential";
+        runtimeInputs = [
+          pkgs.yq-go
+          pkgs.jq
+        ];
+        text = builtins.readFile ./scripts/topf-kube-credential.sh;
+      })
+    ];
 
   # GnuPG keys live on Yubikeys (private primary keys are offline).
   # On a new machine, run `gpg --card-status` once per Yubikey to link the subkeys to the cards.
