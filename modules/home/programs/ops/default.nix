@@ -72,6 +72,7 @@ in
     # CI/CD
     pkgs.gh
     pkgs.act
+    pkgs-unstable.renovate # Also renovate-config-validator (renovate.json). Released daily: unstable is the closest
 
     # Linting
     pkgs.shellcheck
