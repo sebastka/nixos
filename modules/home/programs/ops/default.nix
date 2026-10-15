@@ -87,6 +87,9 @@ in
     # Identity
     pkgs-unstable.zitadel-tools
 
+    # Security
+    pkgs-unstable.crowdsec
+
     # Secrets & encryption
     pkgs.sops
     pkgs.age
