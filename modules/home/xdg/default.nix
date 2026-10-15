@@ -76,6 +76,16 @@
   # Node.js REPL history instead of ~/.node_repl_history
   home.sessionVariables.NODE_REPL_HISTORY = "${config.xdg.stateHome}/node_repl_history";
 
+  # GNU screen (modules/nixos/common): its sessions' sockets instead of ~/.screen (no /run/screen on NixOS). State, not
+  # $XDG_RUNTIME_DIR: removed at logout, which would leave sessions detached over SSH impossible to reattach. Its
+  # config (if any) instead of ~/.screenrc.
+  home.sessionVariables.SCREENDIR = "${config.xdg.stateHome}/screen";
+  home.sessionVariables.SCREENRC = "${config.xdg.configHome}/screen/screenrc";
+  # screen doesn't create it, and requires it private
+  home.activation.screenDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    run install -d -m 700 ${lib.escapeShellArg "${config.xdg.stateHome}/screen"}
+  '';
+
   # Python 3.13+ REPL history instead of ~/.python_history
   home.sessionVariables.PYTHON_HISTORY = "${config.xdg.stateHome}/python_history";
 
