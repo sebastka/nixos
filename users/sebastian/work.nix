@@ -100,6 +100,10 @@ in
         # Bitwarden Secrets Manager (bws, modules/home/programs/bws)
         programs.bws.profiles.inboxcom.server_base = "https://vault.bitwarden.eu";
 
+        # CrowdSec CLI (cscli, modules/home/programs/cscli): its local API's credentials in
+        # ~/.config/crowdsec/inboxcom/local_api_credentials.yaml
+        programs.cscli.profiles.inboxcom = { };
+
         # Work accounts in ~/Dev/Work:
         programs.direnv.directoryEnv."Dev/Work" = {
           BITWARDENCLI_APPDATA_DIR = config.programs.bw.accounts.inboxcom.dataDir;
@@ -110,6 +114,7 @@ in
           DIGITALOCEAN_CONTEXT = "inboxcom";
           KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml"; # All clusters: inboxcom_kubeconfig
           ARGOCD_OPTS = "--core --config ${config.xdg.cacheHome}/argocd/inboxcom.yaml";
+          CSCLI_CONFIG = config.programs.cscli.profiles.inboxcom.configFile;
         };
 
         # Env vars unset, since private are default
@@ -119,6 +124,7 @@ in
         # home.sessionVariables.DIGITALOCEAN_CONTEXT = "inboxcom";
         # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/inboxcom/config.yaml";
         # home.sessionVariables.ARGOCD_OPTS = "--core --config ${config.xdg.cacheHome}/argocd/inboxcom.yaml";
+        # home.sessionVariables.CSCLI_CONFIG = config.programs.cscli.profiles.inboxcom.configFile;
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {

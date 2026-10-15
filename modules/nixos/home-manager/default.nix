@@ -18,6 +18,7 @@
     (import ../../../modules/home/environment)
     (import ../../../modules/home/programs/bw)
     (import ../../../modules/home/programs/bws)
+    (import ../../../modules/home/programs/cscli)
     (import ../../../modules/home/programs/direnv)
     (import ../../../modules/home/programs/htop)
     (import ../../../modules/home/programs/neovim)

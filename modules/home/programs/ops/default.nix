@@ -88,7 +88,7 @@ in
     pkgs-unstable.zitadel-tools
 
     # Security
-    pkgs-unstable.crowdsec
+    config.programs.cscli.package # cscli: its profiles (CSCLI_CONFIG), modules/home/programs/cscli
 
     # Secrets & encryption
     pkgs.sops

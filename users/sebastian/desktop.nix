@@ -78,6 +78,10 @@ in
         # Bitwarden Secrets Manager (bws, modules/home/programs/bws)
         # programs.bws.profiles.karlsenfr.server_base = "https://vault.bitwarden.com";
 
+        # CrowdSec CLI (cscli, modules/home/programs/cscli): its local API's credentials in
+        # ~/.config/crowdsec/karlsenfr/local_api_credentials.yaml
+        programs.cscli.profiles.karlsenfr = { };
+
         # Private accounts in ~/Dev/Private:
         programs.direnv.directoryEnv."Dev/Private" = {
           BITWARDENCLI_APPDATA_DIR = config.programs.bw.accounts.karlsenfr.dataDir;
@@ -86,6 +90,7 @@ in
           DIGITALOCEAN_CONTEXT = "karlsenfr";
           KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml";
           ARGOCD_OPTS = "--core --config ${config.xdg.cacheHome}/argocd/karlsenfr.yaml";
+          CSCLI_CONFIG = config.programs.cscli.profiles.karlsenfr.configFile;
         };
 
         # Env vars
@@ -96,6 +101,7 @@ in
         home.sessionVariables.DIGITALOCEAN_CONTEXT = "karlsenfr";
         # home.sessionVariables.KUBECONFIG = "${config.xdg.configHome}/kube/talmox/config.yaml"; # Leave .config/kube/config.yaml as default
         home.sessionVariables.ARGOCD_OPTS = "--core --config ${config.xdg.cacheHome}/argocd/karlsenfr.yaml";
+        home.sessionVariables.CSCLI_CONFIG = config.programs.cscli.profiles.karlsenfr.configFile;
 
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {
