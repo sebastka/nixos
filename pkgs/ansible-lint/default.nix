@@ -3,7 +3,7 @@
 # ansible-lint's latest release: nixpkgs' (even unstable's) lags behind. Unstable's package, with the newer source:
 # same Python libraries and Ansible as the ansible from nixpkgs-unstable (modules/home/programs/ops).
 let
-  version = "26.10.0";
+  version = "26.10.1";
   yamllint = import ../yamllint { inherit pkgs-unstable; }; # Requires a newer one too
 in
 pkgs-unstable.ansible-lint.overridePythonAttrs (old: {
@@ -11,7 +11,7 @@ pkgs-unstable.ansible-lint.overridePythonAttrs (old: {
   src = pkgs-unstable.fetchPypi {
     inherit version;
     pname = "ansible_lint";
-    hash = "sha256-iVkLhr9TzRMQCZWH0M6R4iOJUUo3FIz1CBVT5cJ4UX4=";
+    hash = "sha256-p0bG88tXGdHCArwU6VbvOw7KcEAl0aqScHon/HPtc+o=";
   };
   dependencies =
     map (dep: if dep.pname or "" == "yamllint" then yamllint else dep) old.dependencies
