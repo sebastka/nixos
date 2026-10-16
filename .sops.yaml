@@ -21,4 +21,9 @@ creation_rules:
   - {path_regex: 'secrets/\.?tern\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
   - {path_regex: 'secrets/\.?ssh-work\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
   - {path_regex: 'secrets/\.?work\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
+  # One host's own secrets (its Attic pull token...): readable by it alone
   - {path_regex: 'secrets/\.?helios\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*helios]}]}
+  - {path_regex: 'secrets/\.?geras\.sops\.yaml$',   key_groups: [{pgp: [*sebastian], age: [*geras]}]}
+  - {path_regex: 'secrets/\.?zeus\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*zeus]}]}
+  - {path_regex: 'secrets/\.?hermes\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*hermes]}]}
+  - {path_regex: 'secrets/\.?boreas\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*boreas]}]}

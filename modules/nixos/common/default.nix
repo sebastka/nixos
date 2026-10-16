@@ -12,6 +12,7 @@
   imports = [
     ../home-manager
     ./htop.nix
+    ./nix-cache.nix
     ./openssh.nix
     ./user-email.nix
     sops-nix.nixosModules.sops
