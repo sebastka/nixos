@@ -65,14 +65,18 @@
     in
     {
       # Packages from pkgs/, for both systems: used as `nix flake check` checks
-      # (CI builds them natively on x86_64 and aarch64)
+      # (CI builds them natively on x86_64 and aarch64). Each only on the systems its meta.platforms
+      # lists: evaluating one elsewhere throws (pkgs/onlyoffice-desktopeditors is x86_64 only).
       packages = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (
         system:
         let
+          pkgs = nixpkgs.legacyPackages.${system};
           # pkgs-unstable too, for packages built on unstable's (pkgs/ansible-lint)
-          callPackage = nixpkgs.legacyPackages.${system}.newScope { pkgs-unstable = mkPkgsUnstable system; };
+          callPackage = pkgs.newScope { pkgs-unstable = mkPkgsUnstable system; };
         in
-        nixpkgs.lib.mapAttrs (name: _: callPackage ./pkgs/${name} { }) (builtins.readDir ./pkgs)
+        nixpkgs.lib.filterAttrs (_: nixpkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform) (
+          nixpkgs.lib.mapAttrs (name: _: callPackage ./pkgs/${name} { }) (builtins.readDir ./pkgs)
+        )
       );
       checks = self.packages;
 
