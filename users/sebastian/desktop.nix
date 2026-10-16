@@ -3,7 +3,6 @@
   config,
   lib,
   pkgs,
-  self,
   ...
 }:
 
@@ -23,7 +22,7 @@ in
 
     # Claude Code's instructions (CLAUDE.md, below), without the date
     sops.secrets.claude-md = {
-      sopsFile = "${self}/secrets/desktop.sops.yaml";
+      sopsFile = ../../secrets/desktop.sops.yaml;
       owner = "sebastian";
     };
 

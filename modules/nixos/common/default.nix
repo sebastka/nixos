@@ -3,7 +3,6 @@
   pkgs-unstable,
   lib,
   config,
-  self,
   sops-nix,
   ...
 }:
@@ -18,7 +17,7 @@
     sops-nix.nixosModules.sops
   ];
 
-  sops.defaultSopsFile = "${self}/secrets/common.sops.yaml";
+  sops.defaultSopsFile = ../../../secrets/common.sops.yaml;
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
   users.mutableUsers = false;

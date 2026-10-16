@@ -1,9 +1,9 @@
-{ config, self, ... }:
+{ config, ... }:
 
 # Cloudflare: certificates (Let's Encrypt, DNS-01) and the public IP in DNS. They replace certbot and the
 # cf-update cron job of the former Ansible role. The API token is a secret (secrets/helios.sops.yaml).
 {
-  sops.secrets.cloudflare-api-token.sopsFile = "${self}/secrets/helios.sops.yaml";
+  sops.secrets.cloudflare-api-token.sopsFile = ../../secrets/helios.sops.yaml;
 
   # karlsen.fr, *.karlsen.fr and *.home.karlsen.fr: DNS over TLS (Unbound, ./dns.nix)
   security.acme = {

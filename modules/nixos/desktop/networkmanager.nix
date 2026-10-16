@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  self,
   ...
 }:
 
@@ -12,7 +11,7 @@
   networking.modemmanager.enable = lib.mkOverride 900 false;
 
   # Env file with NM_<NETWORK>_PSK=... lines, desktop-only secrets (not readable by servers).
-  sops.secrets."nm-wifi-env".sopsFile = "${self}/secrets/desktop.sops.yaml";
+  sops.secrets."nm-wifi-env".sopsFile = ../../../secrets/desktop.sops.yaml;
 
   networking.networkmanager.ensureProfiles = {
     environmentFiles = [ config.sops.secrets."nm-wifi-env".path ];

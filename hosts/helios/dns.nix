@@ -237,8 +237,7 @@ in
   sops.secrets = lib.listToAttrs (
     lib.concatMap (
       zone:
-      map
-        (role: lib.nameValuePair (secretName zone role) { sopsFile = "${self}/secrets/helios.sops.yaml"; })
+      map (role: lib.nameValuePair (secretName zone role) { sopsFile = ../../secrets/helios.sops.yaml; })
         [
           "ksk"
           "zsk"

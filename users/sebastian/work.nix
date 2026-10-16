@@ -4,7 +4,6 @@
   config,
   lib,
   pkgs,
-  self,
   ...
 }:
 
@@ -26,19 +25,19 @@ in
     sops.secrets = {
       # Work SSH hosts and their keys (company infrastructure: encrypted), linked under ~/.ssh
       ssh-work-config = {
-        sopsFile = "${self}/secrets/ssh-work.sops.yaml";
+        sopsFile = ../../secrets/ssh-work.sops.yaml;
         owner = user;
       };
       ssh-work-known-hosts = {
-        sopsFile = "${self}/secrets/ssh-work.sops.yaml";
+        sopsFile = ../../secrets/ssh-work.sops.yaml;
         owner = user;
       };
       inboxcom-clusters = {
-        sopsFile = "${self}/secrets/work.sops.yaml";
+        sopsFile = ../../secrets/work.sops.yaml;
         owner = user;
       };
       inboxcom-default-context = {
-        sopsFile = "${self}/secrets/work.sops.yaml";
+        sopsFile = ../../secrets/work.sops.yaml;
         key = "default-context";
         owner = user;
       };

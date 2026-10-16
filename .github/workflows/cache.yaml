@@ -21,6 +21,12 @@ name: Binary cache
 permissions:
   contents: read
 
+# Our Attic server, its cache and the cache's public key (as modules/nixos/common/nix-cache.nix)
+env:
+  ATTIC_URL: https://attic.karlsen.app
+  ATTIC_CACHE: pithos
+  ATTIC_PUBLIC_KEY: pithos:pir3vRe6RpQrNmkwB6M0F/ydWPDgQqe5v6mABkmCpYc=
+
 jobs:
   build:
     # The update must have succeeded (it merged), and only for this repository's own runs
@@ -50,17 +56,29 @@ jobs:
           ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
         run: |
           install -m 600 /dev/null "${RUNNER_TEMP}/netrc"
-          printf 'machine attic.karlsen.app\npassword %s\n' "${ATTIC_TOKEN}" > "${RUNNER_TEMP}/netrc"
+          printf 'machine %s\npassword %s\n' "${ATTIC_URL#https://}" "${ATTIC_TOKEN}" > "${RUNNER_TEMP}/netrc"
           {
             echo 'NIX_CONFIG<<EOF'
-            echo 'extra-substituters = https://attic.karlsen.app/pithos'
-            echo 'extra-trusted-public-keys = pithos:pir3vRe6RpQrNmkwB6M0F/ydWPDgQqe5v6mABkmCpYc='
+            echo "extra-substituters = ${ATTIC_URL}/${ATTIC_CACHE}"
+            echo "extra-trusted-public-keys = ${ATTIC_PUBLIC_KEY}"
             echo "netrc-file = ${RUNNER_TEMP}/netrc"
             echo 'EOF'
           } >> "${GITHUB_ENV}"
-          attic login karlsen https://attic.karlsen.app "${ATTIC_TOKEN}"
+          attic login karlsen "${ATTIC_URL}" "${ATTIC_TOKEN}"
+
+      # Unchanged system (its store path already in our cache, pushed by an earlier run: it's ours alone, never in
+      # cache.nixos.org): no build, which in this empty store would download all of it for nothing
+      - id: cached
+        name: Already cached?
+        run: |
+          out="$(nix eval --raw ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel.outPath")"
+          if nix path-info --store "${ATTIC_URL}/${ATTIC_CACHE}" "${out}" >/dev/null 2>&1; then
+            echo "${out}: already cached"
+            echo "cached=true" >> "${GITHUB_OUTPUT}"
+          fi
 
       - name: Build ${{ matrix.host }}
+        if: steps.cached.outputs.cached != 'true'
         run: >-
           nix build --print-build-logs --out-link result
           ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel"
@@ -68,4 +86,5 @@ jobs:
       # Its whole closure: what cache.nixos.org already has is skipped (the cache's upstream key). Two uploads at a time
       # per job: Attic chunks and compresses each in memory, and several jobs push at once (OOM-killed by the default).
       - name: Push ${{ matrix.host }}
-        run: attic push --jobs 2 karlsen:pithos result
+        if: steps.cached.outputs.cached != 'true'
+        run: attic push --jobs 2 "karlsen:${ATTIC_CACHE}" result

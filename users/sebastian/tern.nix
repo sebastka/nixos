@@ -6,7 +6,6 @@
   config,
   lib,
   pkgs,
-  self,
   ...
 }:
 
@@ -22,7 +21,7 @@ in
     # e.g. profiles/<profile>/profile.toml and profiles/<profile>/accounts/<id>.toml,
     # with both values encrypted. The host decrypts the whole file (readable by the user only).
     sops.secrets.tern-config = {
-      sopsFile = "${self}/secrets/tern.sops.yaml";
+      sopsFile = ../../secrets/tern.sops.yaml;
       key = ""; # Whole file
       owner = user;
     };

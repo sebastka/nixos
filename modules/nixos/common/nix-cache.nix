@@ -1,4 +1,4 @@
-{ config, self, ... }:
+{ config, ... }:
 
 # Our Nix binary cache: Attic (https://github.com/zhaofengli/attic) at https://attic.karlsen.app/ (sebastka/homelab:
 # k8s/applications/utils/attic), cache `pithos`, after cache.nixos.org (priority 41 vs 40): what it doesn't have, built
@@ -23,7 +23,8 @@
 #
 # Push by hand: attic push karlsen:pithos <store paths>
 {
-  sops.secrets.attic-pull-token.sopsFile = "${self}/secrets/${config.networking.hostName}.sops.yaml";
+  sops.secrets.attic-pull-token.sopsFile =
+    ../../../secrets + "/${config.networking.hostName}.sops.yaml";
   sops.templates."nix-netrc".content = ''
     machine attic.karlsen.app
     password ${config.sops.placeholder.attic-pull-token}
