@@ -65,6 +65,7 @@ jobs:
           nix build --print-build-logs --out-link result
           ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel"
 
-      # Its whole closure: what cache.nixos.org already has is skipped (the cache's upstream key)
+      # Its whole closure: what cache.nixos.org already has is skipped (the cache's upstream key). Two uploads at a time
+      # per job: Attic chunks and compresses each in memory, and several jobs push at once (OOM-killed by the default).
       - name: Push ${{ matrix.host }}
-        run: attic push karlsen:pithos result
+        run: attic push --jobs 2 karlsen:pithos result
