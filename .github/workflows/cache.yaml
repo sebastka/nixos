@@ -1,0 +1,70 @@
+---
+# Builds each x86_64 host's system on our runners (talmox-nix: ARC in sebastka/homelab, image
+# sebastka/nix-actions-runner) and pushes it to our binary cache (pithos, modules/nixos/common/nix-cache.nix): hosts
+# then download what cache.nixos.org lacks instead of building it. aarch64 hosts (hermes, boreas): not yet, no runners.
+#
+# Never on pull requests: the runners run jobs unsandboxed, in our cluster, and with ATTIC_TOKEN (a push token).
+name: Binary cache
+
+'on':
+  push:
+    branches:
+      - master
+  # After the nightly update: it merges with GITHUB_TOKEN, which triggers no push event. Before the servers' upgrade
+  # window (system.autoUpgrade, 04:00-06:00).
+  workflow_run:
+    workflows: [Update dependencies]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # The update must have succeeded (it merged), and only for this repository's own runs
+    if: >-
+      github.event_name != 'workflow_run'
+      || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request')
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [geras, zeus, helios]
+    runs-on: talmox-nix
+    timeout-minutes: 240
+    # The latest commit only: a newer run replaces a host's older one
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.host }}
+      cancel-in-progress: true
+    steps:
+      # master's head: a workflow_run event's own checkout would be the update workflow's commit, before its merge
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: master
+
+      # Our cache as a substituter too (a rebuild reuses what is already there): private, so the token in a netrc
+      # file, outside the workspace
+      - name: Configure the cache
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+        run: |
+          install -m 600 /dev/null "${RUNNER_TEMP}/netrc"
+          printf 'machine attic.karlsen.app\npassword %s\n' "${ATTIC_TOKEN}" > "${RUNNER_TEMP}/netrc"
+          {
+            echo 'NIX_CONFIG<<EOF'
+            echo 'extra-substituters = https://attic.karlsen.app/pithos'
+            echo 'extra-trusted-public-keys = pithos:pir3vRe6RpQrNmkwB6M0F/ydWPDgQqe5v6mABkmCpYc='
+            echo "netrc-file = ${RUNNER_TEMP}/netrc"
+            echo 'EOF'
+          } >> "${GITHUB_ENV}"
+          attic login karlsen https://attic.karlsen.app "${ATTIC_TOKEN}"
+
+      - name: Build ${{ matrix.host }}
+        run: >-
+          nix build --print-build-logs --out-link result
+          ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel"
+
+      # Its whole closure: what cache.nixos.org already has is skipped (the cache's upstream key)
+      - name: Push ${{ matrix.host }}
+        run: attic push karlsen:pithos result

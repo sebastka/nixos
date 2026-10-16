@@ -74,6 +74,7 @@ The repository includes a development shell with the tools to work on it (`sops`
 |---|---|---|
 | `ci.yaml` | Push to `master`, pull requests | yamllint and shellcheck (devShell tools), `nix flake check` on x86_64 and aarch64, host evaluation. Merges Dependabot pull requests once everything passed. |
 | `update.yaml` | Nightly (02:00 UTC), manually | `scripts/update.sh`, the same checks on both architectures, then opens a signed pull request and merges it. |
+| `cache.yaml` | Push to `master`, after `update.yaml`, manually (never pull requests) | Builds each x86_64 host on our runners (`talmox-nix`, ARC in sebastka/homelab) and pushes it to our binary cache (`modules/nixos/common/nix-cache.nix`). |
 | Dependabot | Weekly | Updates the actions (pinned by commit), only releases at least 7 days old. |
 
 Servers deploy what is merged on `master` by themselves (`system.autoUpgrade`, rebooting between 04:00 and 06:00 when

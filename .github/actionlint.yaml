@@ -1,0 +1,6 @@
+---
+# actionlint: runner labels it does not know (yet)
+self-hosted-runner:
+  labels:
+    - talmox-nix  # Our self-hosted runners (ARC scale set, sebastka/homelab)
+    - ubuntu-26.04-arm  # GitHub-hosted, newer than its built-in list
