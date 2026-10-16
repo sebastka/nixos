@@ -73,6 +73,7 @@ in
     pkgs.gh
     pkgs.act
     pkgs-unstable.renovate # Also renovate-config-validator (renovate.json). Released daily: unstable is the closest
+    pkgs-unstable.attic-client
 
     # Linting
     pkgs.shellcheck
