@@ -25,6 +25,7 @@ packages=(
     "onlyoffice-desktopeditors ONLYOFFICE/DesktopEditors v"
     "stripe-cli     stripe/stripe-cli           v"
     "topf           postfinance/topf            v"
+    "vscode-direnv-trusted sebastka/vscode-extensions direnv-trusted-v"
     "vscode-opentofu opentofu/vscode-opentofu   v"
     "yamllint       adrienverge/yamllint        v"
 )

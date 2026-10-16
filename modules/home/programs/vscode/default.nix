@@ -1,7 +1,14 @@
-{ pkgs, pkgs-unstable, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  pkgs-unstable,
+  ...
+}:
 
 let
   vscode-opentofu = pkgs.callPackage ../../../../pkgs/vscode-opentofu { };
+  vscode-direnv-trusted = pkgs.callPackage ../../../../pkgs/vscode-direnv-trusted { };
 in
 {
   programs.vscode = {
@@ -18,6 +25,7 @@ in
         ms-azuretools.vscode-docker
         pkgs-unstable.vscode-extensions.anthropic.claude-code # Moves fast, as its CLI (modules/home/programs/coding-agents)
         vscode-opentofu # Not in nixpkgs: pkgs/vscode-opentofu
+        vscode-direnv-trusted # Ours: pkgs/vscode-direnv-trusted
       ];
       userSettings = {
         # Editor
@@ -71,6 +79,9 @@ in
 
         # Nix
         "nix.formatterPath" = "nixfmt";
+
+        # direnv (direnv-trusted): the shell's, with its configuration (modules/home/programs/direnv)
+        "direnv-trusted.path" = lib.getExe config.programs.direnv.package;
       };
 
       # Terminal copy and paste: Ctrl+Shift+C copies only with a selection and the terminal focused, Ctrl+Shift+V
