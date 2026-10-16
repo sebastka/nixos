@@ -1,6 +1,6 @@
 # OnlyOffice Desktop Editors: nixpkgs' package (pkgs/by-name/on/onlyoffice-desktopeditors), but for its version
-# (nixpkgs lags several releases behind) and `fonts`. Its .deb release, in a FHS environment (/usr/bin/curl for
-# plugins). Compare with nixpkgs' when it updates, or on a new major version.
+# (nixpkgs lags several releases behind), its arm64 build (nixpkgs': x86_64 only) and `fonts`. Its .deb release, in a
+# FHS environment (/usr/bin/curl for plugins). Compare with nixpkgs' when it updates, or on a new major version.
 #
 # fonts: the font packages its documents can use (the system's: fonts.packages, modules/nixos/desktop). Its own font
 # list only takes real files in real directories (in /usr/share/fonts, ~/.local/share/fonts...), not the symlinks to
@@ -77,6 +77,21 @@ let
   # TODO: Find out which of these fonts we'd be allowed to distribute along
   #       with this package, or how to make this easier for users otherwise.
 
+  # Its .deb per architecture (nixpkgs': x86_64 only)
+  assets = {
+    x86_64-linux = {
+      arch = "amd64";
+      hash = "sha256-IZDttAIqKsL27uD3iBVSDw5Ozh6KEJfGRab5siXItZw=";
+    };
+    aarch64-linux = {
+      arch = "arm64";
+      hash = "sha256-4XYHfBeXfqL2nJPhCCE4ay9C+qW5I9X5vToS4ZzjsEA=";
+    };
+  };
+  asset =
+    assets.${stdenv.hostPlatform.system}
+      or (throw "onlyoffice-desktopeditors: unsupported platform ${stdenv.hostPlatform.system}");
+
   runtimeLibs = lib.makeLibraryPath [
     curl
     glibc
@@ -89,8 +104,8 @@ let
     pname = "onlyoffice-desktopeditors";
     version = "10.0.0";
     src = fetchurl {
-      url = "https://github.com/ONLYOFFICE/DesktopEditors/releases/download/v${version}/onlyoffice-desktopeditors_amd64.deb";
-      hash = "sha256-IZDttAIqKsL27uD3iBVSDw5Ozh6KEJfGRab5siXItZw=";
+      url = "https://github.com/ONLYOFFICE/DesktopEditors/releases/download/v${version}/onlyoffice-desktopeditors_${asset.arch}.deb";
+      inherit (asset) hash;
     };
 
     nativeBuildInputs = [
@@ -183,6 +198,8 @@ in
 # Fonts are also discovered by looking in /usr/share/fonts, so adding fonts to targetPkgs will include them
 buildFHSEnv {
   inherit (derivation) pname version;
+  # Its .deb, for scripts/update-pkgs.sh (src.url of each system)
+  passthru.src = derivation.src;
 
   targetPkgs = pkgs': [
     curl
@@ -214,7 +231,7 @@ buildFHSEnv {
     homepage = "https://www.onlyoffice.com/";
     downloadPage = "https://github.com/ONLYOFFICE/DesktopEditors/releases";
     changelog = "https://github.com/ONLYOFFICE/DesktopEditors/blob/master/CHANGELOG.md";
-    platforms = [ "x86_64-linux" ];
+    platforms = builtins.attrNames assets;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     license = lib.licenses.agpl3Plus;
   };
