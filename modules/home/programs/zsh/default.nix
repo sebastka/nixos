@@ -50,6 +50,9 @@
       k = "kubecolor";
       tf = "tofu";
     };
+    # Emacs key bindings (Ctrl+A, Ctrl+E, Ctrl+R...). Otherwise vi's: zsh picks them itself when $EDITOR or $VISUAL
+    # contains "vi" (nvim, modules/nixos/common).
+    defaultKeymap = "emacs";
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     history = {
