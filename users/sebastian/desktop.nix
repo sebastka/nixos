@@ -17,7 +17,8 @@ in
     ./work.nix
   ];
 
-  config = lib.mkIf config.services.xserver.enable {
+  # On desktops: set by every desktop environment (modules/nixos/plasma, modules/nixos/gnome), not by servers
+  config = lib.mkIf config.services.graphical-desktop.enable {
     users.users.sebastian.extraGroups = [ "networkmanager" ];
 
     # Syncthing (modules/nixos/desktop/syncthing.nix): ~/Documents and ~/Dev, synced between the desktops through the

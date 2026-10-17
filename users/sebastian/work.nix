@@ -21,7 +21,7 @@ let
   };
 in
 {
-  config = lib.mkIf nixosConfig.services.xserver.enable {
+  config = lib.mkIf nixosConfig.services.graphical-desktop.enable {
     sops.secrets = {
       # Work SSH hosts and their keys (company infrastructure: encrypted), linked under ~/.ssh
       ssh-work-config = {

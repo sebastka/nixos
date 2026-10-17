@@ -1,7 +1,7 @@
 # Tern mail client (https://github.com/sebastka/tern): sebastian's configuration. Tern itself is installed on every
 # desktop (modules/nixos/desktop/tern.nix).
-# NixOS module (imported by ./desktop.nix), applied on desktops (services.xserver.enable): they must be recipients of
-# secrets/tern.sops.yaml (.sops.yaml).
+# NixOS module (imported by ./desktop.nix), applied on desktops (services.graphical-desktop.enable): they must be
+# recipients of secrets/tern.sops.yaml (.sops.yaml).
 {
   config,
   lib,
@@ -14,7 +14,7 @@ let
   nixosConfig = config;
 in
 {
-  config = lib.mkIf nixosConfig.services.xserver.enable {
+  config = lib.mkIf nixosConfig.services.graphical-desktop.enable {
     # Profiles (found by Tern from their directories), account files and signatures are secrets, names
     # included: secrets/tern.sops.yaml holds
     #   files: [ { path: <relative to ~/.config/tern>, content: <file content> } ]
