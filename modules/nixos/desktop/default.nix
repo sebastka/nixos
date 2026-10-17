@@ -16,6 +16,7 @@
     ./gnupg.nix
     ./networkmanager.nix
     ./plasma.nix
+    ./syncthing.nix
     ./tailscale.nix
     # ./tern.nix # Disabled
   ];

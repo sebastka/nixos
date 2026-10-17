@@ -20,6 +20,25 @@ in
   config = lib.mkIf config.services.xserver.enable {
     users.users.sebastian.extraGroups = [ "networkmanager" ];
 
+    # Syncthing (modules/nixos/desktop/syncthing.nix): ~/Documents and ~/Dev, synced between the desktops through the
+    # homelab's server
+    services.syncthing = {
+      enable = true;
+      user = "sebastian";
+      group = "users";
+      dataDir = config.users.users.sebastian.home;
+      settings.folders = {
+        Documents = {
+          id = "documents";
+          path = "~/Documents";
+        };
+        Dev = {
+          id = "dev";
+          path = "~/Dev";
+        };
+      };
+    };
+
     # Claude Code's instructions (CLAUDE.md, below), without the date
     sops.secrets.claude-md = {
       sopsFile = ../../secrets/desktop.sops.yaml;
