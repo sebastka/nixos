@@ -49,14 +49,15 @@ The repository includes a development shell with the tools to work on it (`sops`
 
 | Task | Command | Changes the code |
 |---|---|---|
-| Deploy | `scripts/build.sh` | no |
+| Deploy | `scripts/build.sh [host]` | no |
 | Update dependencies | `scripts/update.sh` (also done nightly by CI) | yes |
 | Check | `nix flake check`, then evaluate the hosts (see CI) | no |
 | Install a host | `scripts/install.sh <host>` from the NixOS live ISO | no |
 
-- **`scripts/build.sh`** pulls `origin/master` (fast-forward only, on `master`), then runs `nixos-rebuild switch`
-  locally or over SSH (`--target-host`). It never writes `flake.lock` (`--no-update-lock-file`). For now it only
-  deploys `geras`.
+- **`scripts/build.sh [host]`** pulls `origin/master` (fast-forward only, on `master`), then runs
+  `nixos-rebuild switch` for one host: this one by default, or another one, built on itself and switched over SSH
+  once reachable (`--build-host`, `--target-host`, sudo's password asked once). It never writes `flake.lock`
+  (`--no-update-lock-file`).
 - **`scripts/update.sh`** runs `nix flake update`, `scripts/update-pkgs.sh` (latest release and hashes of each
   package in `pkgs/`, plus `vendorHash` for the PHP ones), and prints a Markdown summary. Locally on `master`, it pulls `origin/master` first.
 - **`nix flake check`** builds `pkgs/` for the current system. It doesn't fully evaluate the NixOS configurations, so
