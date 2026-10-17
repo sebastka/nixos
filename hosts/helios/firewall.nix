@@ -11,7 +11,7 @@ let
   lanVirtualMachines = "192.168.1.0/24";
   # Forced to use the local resolver. TODO: tvboks is 192.168.0.11 in DHCP (./lan.nix), Ansible had 192.168.0.5 here
   tvbox = "192.168.0.5";
-  inherit (lan.vips) gatewayDefault delugeTorrent theloungeIdentd;
+  inherit (lan.vips) gatewayDefault delugeTorrent theloungeIdentd syncthing;
 
   # New TCP connections must start with a bare SYN (also drops SYN+FIN, SYN+RST, null flags: scans, mid-stream pickup)
   conntrackFirst = ''
@@ -76,9 +76,11 @@ in
           iifname "${wan}" tcp dport { http, https, ssh } dnat to ${gatewayDefault}
           iifname "${wan}" meta l4proto { tcp, udp } th dport 6881 dnat to ${delugeTorrent}
           iifname "${wan}" tcp dport auth dnat to ${theloungeIdentd}
+          iifname "${wan}" meta l4proto { tcp, udp } th dport 22000 dnat to ${syncthing}
 
           # Hairpin NAT: LAN clients reaching our (dynamic) public IP get the same DNAT as the WAN
           iifname "br0" fib daddr type local ip daddr != 192.168.0.0/16 tcp dport { http, https, ssh } dnat to ${gatewayDefault}
+          iifname "br0" fib daddr type local ip daddr != 192.168.0.0/16 meta l4proto { tcp, udp } th dport 22000 dnat to ${syncthing}
         }
 
         chain postrouting {
@@ -100,6 +102,9 @@ in
 
         # Per-source rate of new WAN connections (token bucket per IP, forgotten after 1 minute idle)
         set wan_new4 { type ipv4_addr; flags dynamic, timeout; timeout 1m; size 65536; }
+        # Per-source rate of new WAN connections to Syncthing (stricter: a desktop opens one TCP and one QUIC flow,
+        # and retries every minute when disconnected; forgotten after 10 minutes idle)
+        set wan_syncthing4 { type ipv4_addr; flags dynamic, timeout; timeout 10m; size 65536; }
         # Per-source concurrent SSH connections from the WAN
         set wan_ssh4 { type ipv4_addr; flags dynamic; size 65536; }
 
@@ -132,11 +137,13 @@ in
           # WAN -> homelab: per-source limits first (drops: nft list chain ip filter forward)
           iifname "${wan}" ct state new update @wan_new4 { ip saddr limit rate over 50/second burst 100 packets } counter drop
           iifname "${wan}" ct state new tcp dport ssh add @wan_ssh4 { ip saddr ct count over 5 } counter drop
+          iifname "${wan}" ct state new ip daddr ${syncthing} meta l4proto { tcp, udp } th dport 22000 update @wan_syncthing4 { ip saddr limit rate over 10/minute burst 20 packets } counter drop
 
           # WAN -> homelab (port forwards above)
           iifname "${wan}" ip daddr ${gatewayDefault} tcp dport { http, https, ssh } accept
           iifname "${wan}" ip daddr ${delugeTorrent} meta l4proto { tcp, udp } th dport 6881 accept
           iifname "${wan}" ip daddr ${theloungeIdentd} tcp dport auth accept
+          iifname "${wan}" ip daddr ${syncthing} meta l4proto { tcp, udp } th dport 22000 accept
         }
 
         chain output {

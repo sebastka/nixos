@@ -51,6 +51,12 @@ let
   };
   fqdn = zone: name: if name == "" then "${zone}." else "${name}.${zone}.";
 
+  # Public names answered locally with a cluster service's own LoadBalancer rather than the ingress (their
+  # zones above are transparent: no local-zone of their own needed)
+  serviceOverrides = {
+    "sync.karlsen.fr" = lan.vips.syncthing; # Syncthing (TCP and QUIC 22000)
+  };
+
   # DNSSEC keys (ECDSAP256SHA256), public parts. The private parts are secrets (secrets/helios.sops.yaml).
   dnssecKeys = {
     "home.karlsen.fr" = {
@@ -176,11 +182,13 @@ in
           ''"${lan.domain}." nodefault''
           ''"168.192.in-addr.arpa." nodefault''
         ];
-        local-data = lib.concatLists (
-          lib.mapAttrsToList (
-            zone: o: map (name: ''"${fqdn zone name} IN A ${lan.vips.gatewayDefault}"'') o.names
-          ) localOverrides
-        );
+        local-data =
+          lib.concatLists (
+            lib.mapAttrsToList (
+              zone: o: map (name: ''"${fqdn zone name} IN A ${lan.vips.gatewayDefault}"'') o.names
+            ) localOverrides
+          )
+          ++ (lib.mapAttrsToList (name: ip: ''"${name}. IN A ${ip}"'') serviceOverrides);
 
         # The local zones are signed by NSD (below): their KSKs
         trust-anchor = map (zone: ''"${dnssecKeys.${zone}.ksk}"'') (lib.attrNames dnssecKeys);

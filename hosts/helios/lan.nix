@@ -111,5 +111,6 @@
     delugeTorrent = "192.168.2.10";
     theloungeIdentd = "192.168.2.11";
     zabbixServer = "192.168.2.12";
+    syncthing = "192.168.2.14"; # Sync connections (TCP and QUIC 22000), forwarded from the WAN
   };
 }
