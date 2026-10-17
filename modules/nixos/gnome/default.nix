@@ -3,9 +3,24 @@
 # GNOME, with GDM: a desktop environment, next to modules/nixos/desktop (one per host: this or modules/nixos/plasma).
 # Wayland only. Secrets: GNOME Keyring (libsecret), unlocked at login by GDM's PAM.
 # TODO: Tailscale in the network menu, as plasma-nm-ts in modules/nixos/plasma.
+let
+  # With GNOME Classic (upstream's classic_mode, which nixpkgs leaves out): its session, shell mode (classic.json:
+  # the window list, Applications and Places menus...) and settings, next to the extensions themselves
+  gnome-shell-extensions = pkgs.gnome-shell-extensions.overrideAttrs (old: {
+    mesonFlags = (old.mesonFlags or [ ]) ++ [ "-Dclassic_mode=true" ];
+    passthru = (old.passthru or { }) // {
+      providedSessions = [ "gnome-classic" ];
+    };
+  });
+in
 {
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+
+  # GNOME Classic, in GDM's session menu (the gear, bottom right, after choosing the user)
+  services.displayManager.sessionPackages = [ gnome-shell-extensions ];
+  services.desktopManager.gnome.sessionPath = [ gnome-shell-extensions ]; # Its extensions and settings
+  systemd.packages = [ gnome-shell-extensions ]; # Its gnome-session@gnome-classic.target drop-in
 
   # Not needed: Firefox is the browser (modules/nixos/desktop), and the tour on first login
   environment.gnome.excludePackages = [
