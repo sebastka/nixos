@@ -1,4 +1,9 @@
-{ nixos-hardware, pkgs-unstable, ... }:
+{
+  nixos-hardware,
+  pkgs,
+  pkgs-unstable,
+  ...
+}:
 
 # Installing zeus (Dual boot with Windows). See also README.md, "Installing a host".
 #
@@ -42,6 +47,7 @@
   # Dual boot: Windows is on its own disks (Samsung 980 PRO 500 GB and 2 TB; their nvme names change between boots)
   # with its own ESP, never touched here. This ESP (./disko.nix) only has NixOS, the default boot entry. Windows:
   # firmware boot menu (F12), or from NixOS `sudo efibootmgr --bootnext <Windows Boot Manager's number>` then reboot.
+  environment.systemPackages = [ pkgs.efibootmgr ];
 
   # Wake-on-LAN by magic packet, on both cards: the Aquantia AQC107 10 GbE (enp6s0, atlantic; the MAC in
   # hosts/helios/lan.nix, so `wake zeus` from helios) and the Intel I211 1 GbE (enp7s0, if the cable is there:
