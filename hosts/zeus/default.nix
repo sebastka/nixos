@@ -46,8 +46,21 @@
 
   # Dual boot: Windows is on its own disks (Samsung 980 PRO 500 GB and 2 TB; their nvme names change between boots)
   # with its own ESP, never touched here. This ESP (./disko.nix) only has NixOS, the default boot entry. Windows:
-  # firmware boot menu (F12), or from NixOS `sudo efibootmgr --bootnext <Windows Boot Manager's number>` then reboot.
-  environment.systemPackages = [ pkgs.efibootmgr ];
+  # firmware boot menu (F12), or from NixOS `boot-windows` then reboot: the next boot only, NixOS's afterwards.
+  environment.systemPackages = [
+    pkgs.efibootmgr
+    (pkgs.writeShellApplication {
+      name = "boot-windows";
+      runtimeInputs = [ pkgs.efibootmgr ];
+      text = ''
+        # Windows Boot Manager's entry, by its name: entry numbers change (firmware updates, new entries)
+        entry="$(efibootmgr | sed -n 's/^Boot\([0-9A-F]\{4\}\)\* Windows Boot Manager.*/\1/p')"
+        [ -n "$entry" ] || { echo "No Windows Boot Manager entry (efibootmgr)" >&2; exit 1; }
+        sudo efibootmgr --bootnext "$entry" > /dev/null
+        echo "Next boot only: Windows (Boot$entry). Reboot to start it."
+      '';
+    })
+  ];
 
   # Wake-on-LAN by magic packet, on both cards: the Aquantia AQC107 10 GbE (enp6s0, atlantic; the MAC in
   # hosts/helios/lan.nix, so `wake zeus` from helios) and the Intel I211 1 GbE (enp7s0, if the cable is there:
