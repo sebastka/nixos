@@ -38,6 +38,7 @@ let
     "**/base/charts" # kustomize helmCharts caches (not YAML/charts, the chart sources)
     "**/overlays/*/charts"
     "**/.terraform"
+    "**/.persist" # Containers' local state (local-stacks): files owned by their (rootless Docker) users, unreadable
   ];
 in
 {
