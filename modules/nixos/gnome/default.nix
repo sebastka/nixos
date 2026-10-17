@@ -24,6 +24,15 @@
   # SSH_AUTH_SOCK.
   services.gnome.gcr-ssh-agent.enable = false;
 
+  # Log Out in the system menu always, even for a single user without other sessions (GNOME hides it then). Locked:
+  # every user, whatever their own settings.
+  programs.dconf.profiles.user.databases = [
+    {
+      settings."org/gnome/shell".always-show-log-out = true;
+      locks = [ "/org/gnome/shell/always-show-log-out" ];
+    }
+  ];
+
   # gpg-agent's PIN prompt (modules/nixos/desktop/gnupg.nix), GTK
   home-manager.sharedModules = [ { services.gpg-agent.pinentry.package = pkgs.pinentry-gnome3; } ];
 }
