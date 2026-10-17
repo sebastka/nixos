@@ -1,4 +1,5 @@
 {
+  lib,
   nixos-hardware,
   pkgs,
   pkgs-unstable,
@@ -39,7 +40,7 @@
     ../../modules/nixos/secure-boot.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
-    ../../modules/nixos/gnome
+    ../../modules/nixos/cinnamon
   ];
 
   networking.hostName = "zeus";
@@ -68,11 +69,14 @@
   # input (./disko.nix).
   networking.interfaces.enp6s0.wakeOnLan.enable = true;
   networking.interfaces.enp7s0.wakeOnLan.enable = true;
-  # Nor back to sleep on its own while used over ssh (builds): no suspend when idle, neither at GDM's login screen nor
-  # in a GNOME session (a default for every user, changeable in Settings > Power).
-  services.displayManager.gdm.autoSuspend = false;
+  # Nor back to sleep on its own while used over ssh (builds): no suspend when idle in a Cinnamon session, already
+  # Cinnamon's default, kept whatever its next default (a default for every user, changeable in System Settings >
+  # Power Management). LightDM's greeter doesn't suspend.
   programs.dconf.profiles.user.databases = [
-    { settings."org/gnome/settings-daemon/plugins/power".sleep-inactive-ac-type = "nothing"; }
+    {
+      settings."org/cinnamon/settings-daemon/plugins/power".sleep-inactive-ac-timeout =
+        lib.gvariant.mkInt32 0;
+    }
   ];
 
   # systemd-based initrd: unit-based stage 1, enables TPM2 LUKS unlock via systemd-cryptenroll.

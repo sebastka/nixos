@@ -27,7 +27,7 @@
   # GnuPG agent, also the SSH agent: SSH keys are the OpenPGP authentication subkeys on the Yubikeys, so signing,
   # decryption and SSH all go through scdaemon (PIN once). From home-manager: its sockets follow the GnuPG home
   # (~/.local/share/gnupg, modules/home/programs/gpg), the NixOS ones only the default ~/.gnupg. Its pinentry comes
-  # with the desktop environment (modules/nixos/plasma, modules/nixos/gnome).
+  # with the desktop environment (modules/nixos/plasma, modules/nixos/gnome, modules/nixos/cinnamon).
   home-manager.sharedModules = [
     (
       { config, ... }:

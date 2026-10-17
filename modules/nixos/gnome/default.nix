@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
-# GNOME, with GDM: a desktop environment, next to modules/nixos/desktop (one per host: this or modules/nixos/plasma).
-# Wayland only. Secrets: GNOME Keyring (libsecret), unlocked at login by GDM's PAM.
+# GNOME, with GDM: a desktop environment, next to modules/nixos/desktop (one per host: this, modules/nixos/plasma or
+# modules/nixos/cinnamon). Wayland only. Secrets: GNOME Keyring (libsecret), unlocked at login by GDM's PAM.
 # TODO: Tailscale in the network menu, as plasma-nm-ts in modules/nixos/plasma.
 let
   # With GNOME Classic (upstream's classic_mode, which nixpkgs leaves out): its session, shell mode (classic.json:

@@ -1,7 +1,8 @@
 { self, pkgs, ... }:
 
-# KDE Plasma 6, with SDDM: a desktop environment, next to modules/nixos/desktop (one per host: this or
-# modules/nixos/gnome). Secrets: KWallet (also for libsecret), unlocked at login by SDDM's PAM.
+# KDE Plasma 6, with SDDM: a desktop environment, next to modules/nixos/desktop (one per host: this,
+# modules/nixos/gnome or modules/nixos/cinnamon). Secrets: KWallet (also for libsecret), unlocked at login by SDDM's
+# PAM.
 {
   imports = [ self.inputs.plasma-nm-ts.nixosModules.default ];
 

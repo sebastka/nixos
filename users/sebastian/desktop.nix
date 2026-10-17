@@ -17,7 +17,7 @@ in
     ./work.nix
   ];
 
-  # On desktops: set by every desktop environment (modules/nixos/plasma, modules/nixos/gnome), not by servers
+  # On desktops: set by every desktop environment (modules/nixos/plasma, gnome, cinnamon), not by servers
   config = lib.mkIf config.services.graphical-desktop.enable {
     users.users.sebastian.extraGroups = [ "networkmanager" ];
 
