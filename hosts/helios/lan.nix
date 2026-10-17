@@ -1,5 +1,6 @@
 # The LAN (192.168.0.0/16) as helios serves it: each host's DHCP reservation (./dhcp.nix, when it has a MAC
-# address), and its A and PTR records in home.karlsen.fr and 168.192.in-addr.arpa (./dns.nix).
+# address), and its A and PTR records in home.karlsen.fr and 168.192.in-addr.arpa (./dns.nix). wakeMacs: other network
+# cards of a host, without a reservation (one per IP), which `wake <host>` also wakes (./wake.nix).
 # Names are relative to home.karlsen.fr. Before NixOS, the VMs came from OpenTofu (Ansible's tofu.py inventory):
 # update them here when they change.
 {
@@ -22,7 +23,9 @@
     };
     zeus = {
       ip = "192.168.0.15";
-      mac = "18:c0:4d:85:cd:2f";
+      # mac = "18:c0:4d:85:cd:2f"; # Intel I211 1 GbE
+      mac = "18:c0:4d:85:cd:2e"; # Aquantia AQC107 10 GbE
+      wakeMacs = [ "18:c0:4d:85:cd:2f" ];
     };
     atlas = {
       ip = "192.168.0.20";

@@ -34,6 +34,7 @@
     ./dhcp.nix
     ./dns.nix
     ./acme.nix
+    ./wake.nix
     ../../modules/nixos/secure-boot.nix
     ../../modules/nixos/common
     ../../modules/nixos/server
