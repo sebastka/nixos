@@ -25,16 +25,18 @@ else
 fi
 
 # nixos-rebuild, its build shown by nom (nix-output-monitor, in the dev shell: what downloads and builds, and how
-# long) when available. Usage: rebuild <sudo|...> <nixos-rebuild arguments>: sudo for this host, as root; otherwise
-# as the user, whose SSH agent and known_hosts reach the other host.
+# long) when available. Usage: rebuild <sudo|user> <nixos-rebuild arguments>: sudo for this host, as root; otherwise
+# as the user, whose SSH agent and known_hosts reach the other host. Not under nom then: it would hide the other
+# host's sudo password prompt (--ask-sudo-password), and wait for it.
 rebuild() {
-    local sudo=()
+    local sudo=() nom=false
     if [ "$1" = sudo ]; then
         sudo -v # Asks for the password now, not under nom's display
         sudo=(sudo)
+        command -v nom >/dev/null && nom=true
     fi
     shift
-    if command -v nom >/dev/null; then
+    if "${nom}"; then
         "${sudo[@]}" nixos-rebuild "$@" --log-format internal-json -v |& nom --json
     else
         "${sudo[@]}" nixos-rebuild "$@"
