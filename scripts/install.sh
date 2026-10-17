@@ -7,6 +7,12 @@
 # 4. Install NixOS
 #
 # Usage: scripts/install.sh <host>   (as the live ISO user, Yubikey plugged in)
+#
+# Or from another machine, when the Yubikey can't be plugged into the host (zeus: no USB-C), over SSH:
+#   scripts/install.sh <host> nixos@<live ISO's IP>   (on the live ISO first: passwd, for SSH; ip a, for its IP)
+# The Yubikey decrypts the secrets here, copied into the live ISO's RAM (INSTALL_SECRETS there). Then this script runs
+# there, from a clone of the repo, in this terminal: its prompts (wipe, LUKS passphrase) as usual. No Yubikey there, so
+# no FIDO2 enrollment either: after the first boot, as printed.
 set -eu
 cd "$(dirname "$0")/.." # Repo root
 
@@ -17,7 +23,8 @@ else
     echo "Not on master: skipping git pull" >&2
 fi
 
-host="${1:?Usage: $0 <host>}"
+host="${1:?Usage: $0 <host> [user@live-iso]}"
+live_iso="${2:-}"
 root="/mnt"
 ssh_secrets="secrets/${host}-ssh-host-key.sops.yaml"
 sb_secrets="secrets/${host}-secure-boot.sops.yaml"
@@ -27,40 +34,77 @@ nix="nix --extra-experimental-features nix-command --extra-experimental-features
 test -f "hosts/${host}/disko.nix" || { echo "Missing hosts/${host}/disko.nix" >&2; exit 1; }
 test -f "${ssh_secrets}" || { echo "Missing ${ssh_secrets}" >&2; exit 1; }
 
-# 1. GnuPG and pcscd (with the CCID driver for the Yubikey)
 # Packages come from this flake's locked nixpkgs (--inputs-from .); ^out/^bin avoids extra outputs (man, lib...).
-gnupg="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#gnupg^out')"
 jq="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#jq^bin')"
 sops="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#sops^out')"
-pcscd="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#pcsclite^out')/bin/pcscd"
-ccid="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#ccid^out')"
-pinentry="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#pinentry-curses^out')/bin/pinentry-curses"
-export PATH="${gnupg}/bin:${jq}/bin:${sops}/bin:${PATH}"
-
-if ! pgrep -x pcscd > /dev/null; then
-    # Polkit on the live ISO does not know pcscd's actions, so it would deny the non-root user.
-    sudo env PCSCLITE_HP_DROPDIR="${ccid}/pcsc/drivers" "${pcscd}" --disable-polkit
-fi
-
-install -d -m 700 "${HOME}/.gnupg"
-grep -qx disable-ccid "${HOME}/.gnupg/scdaemon.conf" 2> /dev/null \
-    || echo disable-ccid >> "${HOME}/.gnupg/scdaemon.conf"  # Use pcscd, not scdaemon's own USB driver
-# The live ISO has no pinentry configured: use a terminal one to ask for the Yubikey PIN.
-sed -i '/^pinentry-program /d' "${HOME}/.gnupg/gpg-agent.conf" 2> /dev/null || true
-echo "pinentry-program ${pinentry}" >> "${HOME}/.gnupg/gpg-agent.conf"
-GPG_TTY="$(tty)"
-export GPG_TTY
-gpgconf --kill gpg-agent scdaemon
-gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "${gpg_key}"
-gpg --card-status > /dev/null  # Links the public key to the Yubikey's private keys
+export PATH="${jq}/bin:${sops}/bin:${PATH}"
 
 # Decrypt now (once per file), so a Yubikey/sops failure aborts before the disk is wiped.
 # The live ISO runs from RAM, so the temporary directory never touches a disk.
-tmp="$(mktemp -d)"
-trap 'rm -rf "${tmp}"' EXIT
-sops decrypt --output-type json "${ssh_secrets}" > "${tmp}/ssh.json"
-if test -f "${sb_secrets}"; then
-    sops decrypt --output-type json "${sb_secrets}" > "${tmp}/sb.json"
+# Usage: decrypt_secrets <directory>
+decrypt_secrets() {
+    sops decrypt --output-type json "${ssh_secrets}" > "$1/ssh.json"
+    if test -f "${sb_secrets}"; then
+        sops decrypt --output-type json "${sb_secrets}" > "$1/sb.json"
+    fi
+}
+
+# From another machine: decrypt here (its own GnuPG and Yubikey), then install there, over SSH
+if [ -n "${live_iso}" ]; then
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "${tmp}"' EXIT
+    decrypt_secrets "${tmp}"
+    # One SSH connection for all of them: the live ISO's password once
+    remote() {
+        ssh -o ControlMaster=auto -o ControlPath="${tmp}/ssh" -o ControlPersist=60 "$@"
+    }
+    remote_tmp="$(remote "${live_iso}" mktemp -d)"
+    for f in "${tmp}"/*.json; do
+        name="$(basename "${f}")"
+        # shellcheck disable=SC2029 # Expanded here, on purpose
+        remote "${live_iso}" "umask 077 && cat > '${remote_tmp}/${name}'" < "${f}"
+    done
+    # Over HTTPS: the public repo, no GitHub SSH key on the live ISO
+    # shellcheck disable=SC2029 # Expanded here, on purpose
+    remote -t "${live_iso}" "test -d nixos || git clone https://github.com/sebastka/nixos.git \
+        && INSTALL_SECRETS='${remote_tmp}' nixos/scripts/install.sh '${host}'"
+    remote -O exit "${live_iso}" 2> /dev/null || true
+    exit
+fi
+
+if [ -n "${INSTALL_SECRETS:-}" ]; then
+    # Decrypted by another machine (above), in RAM: removed at the end, as below
+    tmp="${INSTALL_SECRETS}"
+    trap 'rm -rf "${tmp}"' EXIT
+else
+    # 1. GnuPG and pcscd (with the CCID driver for the Yubikey)
+    gnupg="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#gnupg^out')"
+    pcscd="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#pcsclite^out')/bin/pcscd"
+    ccid="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#ccid^out')"
+    pinentry="$(${nix} build --no-link --print-out-paths --inputs-from . 'nixpkgs#pinentry-curses^out')"
+    pinentry="${pinentry}/bin/pinentry-curses"
+    export PATH="${gnupg}/bin:${PATH}"
+
+    if ! pgrep -x pcscd > /dev/null; then
+        # Polkit on the live ISO does not know pcscd's actions, so it would deny the non-root user.
+        sudo env PCSCLITE_HP_DROPDIR="${ccid}/pcsc/drivers" "${pcscd}" --disable-polkit
+    fi
+
+    install -d -m 700 "${HOME}/.gnupg"
+    grep -qx disable-ccid "${HOME}/.gnupg/scdaemon.conf" 2> /dev/null \
+        || echo disable-ccid >> "${HOME}/.gnupg/scdaemon.conf"  # Use pcscd, not scdaemon's own USB driver
+    # The live ISO has no pinentry configured: use a terminal one to ask for the Yubikey PIN.
+    sed -i '/^pinentry-program /d' "${HOME}/.gnupg/gpg-agent.conf" 2> /dev/null || true
+    echo "pinentry-program ${pinentry}" >> "${HOME}/.gnupg/gpg-agent.conf"
+    GPG_TTY="$(tty)"
+    export GPG_TTY
+    gpgconf --kill gpg-agent scdaemon
+    gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "${gpg_key}"
+    gpg --card-status > /dev/null  # Links the public key to the Yubikey's private keys
+
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "${tmp}"' EXIT
+    decrypt_secrets "${tmp}"
 fi
 
 # Write a key of a decrypted secrets file to a root-owned file, byte for byte.
@@ -97,7 +141,13 @@ luks_device="$(${nix} eval --raw ".#nixosConfigurations.${host}.config.boot.init
 luks_options="$(${nix} eval --json ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.crypttabExtraOpts")"
 case "${luks_options}" in
     *tpm2-device*) echo "TPM unlock: enroll it after the first boot, see hosts/${host}/default.nix" >&2 ;;
-    *) sudo systemd-cryptenroll --fido2-device=auto "${luks_device}" ;;
+    *)
+        if [ -n "${INSTALL_SECRETS:-}" ]; then
+            echo "No Yubikey here: after the first boot, sudo systemd-cryptenroll --fido2-device=auto ${luks_device}" >&2
+        else
+            sudo systemd-cryptenroll --fido2-device=auto "${luks_device}"
+        fi
+        ;;
 esac
 
 # 3. SSH host key and Secure Boot keys

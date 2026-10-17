@@ -100,6 +100,11 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
    The script sets up GnuPG and pcscd for the Yubikey, decrypts the host's install secrets (before touching the
    disk), wipes and partitions the disk with disko, enrolls the Yubikey (FIDO2) for LUKS, restores the SSH host key and
    Secure Boot keys, and runs `nixos-install`.
+
+   **Without the Yubikey on the host** (zeus: no USB-C): on the live ISO, `passwd` (for SSH) and `ip a`; then from
+   another machine with the Yubikey, in this repo: `scripts/install.sh <host> nixos@<IP>`. It decrypts the secrets
+   there, copies them into the live ISO's RAM, clones the repo on it and runs the install in the same terminal. No
+   FIDO2 enrollment then (TPM hosts don't need one; otherwise the command is printed, for after the first boot).
 4. **First boot:** unlock the disk with the Yubikey (PIN and touch; the LUKS passphrase is the fallback). Lanzaboote
    stages the Secure Boot keys and reboots, then systemd-boot enrolls them (with Microsoft's keys, needed by the NVIDIA
    option ROM). Check with `bootctl status` (`Secure Boot: enabled (user)`) or `sudo sbctl status`.
