@@ -1,16 +1,10 @@
-{ self, pkgs-unstable, ... }:
+{ pkgs-unstable, ... }:
 
 {
-  imports = [ self.inputs.plasma-nm-ts.nixosModules.default ];
-
-  # Tailscale on every desktop; sebastian can run tailscale up/down, switch tailnets... without sudo
+  # Tailscale on every desktop; sebastian can run tailscale up/down, switch tailnets... without sudo. In the network
+  # applet: modules/nixos/plasma (plasma-nm-ts).
   services.tailscale.enable = true;
   services.tailscale.package = pkgs-unstable.tailscale; # Self-contained, moves fast
 
   services.tailscale.extraSetFlags = [ "--operator=sebastian" ];
-
-  # Tailscale profiles as NetworkManager VPN connections, in Plasma's network applet (testing, instead of KTailctl).
-  # Prototype: connections are made with nmcli, e.g.
-  #   nmcli connection add type vpn vpn-type tailscale con-name "Tailscale (private)" vpn.data profile=karlsen.fr
-  services.plasma-nm-ts.enable = true;
 }

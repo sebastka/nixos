@@ -37,6 +37,7 @@
     ./disko.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
+    ../../modules/nixos/plasma
   ];
 
   networking.hostName = "boreas";

@@ -91,9 +91,14 @@ if test -f "${root}/boot/vendorfw/firmware.cpio"; then
 fi
 
 # Enroll the Yubikey (FIDO2) as LUKS unlock method: asks for the passphrase, FIDO2 PIN and a touch.
-# The passphrase stays enrolled as recovery.
+# The passphrase stays enrolled as recovery. Not for hosts unlocked by the TPM instead (tpm2-device in their crypttab
+# options, e.g. zeus): it binds to Secure Boot's state, so it's enrolled after the first boot (hosts/<host>/default.nix).
 luks_device="$(${nix} eval --raw ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.device")"
-sudo systemd-cryptenroll --fido2-device=auto "${luks_device}"
+luks_options="$(${nix} eval --json ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.crypttabExtraOpts")"
+case "${luks_options}" in
+    *tpm2-device*) echo "TPM unlock: enroll it after the first boot, see hosts/${host}/default.nix" >&2 ;;
+    *) sudo systemd-cryptenroll --fido2-device=auto "${luks_device}" ;;
+esac
 
 # 3. SSH host key and Secure Boot keys
 sudo install -d -m 755 "${root}/etc/ssh"

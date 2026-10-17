@@ -15,7 +15,6 @@
     ./fonts.nix
     ./gnupg.nix
     ./networkmanager.nix
-    ./plasma.nix
     ./syncthing.nix
     ./tailscale.nix
     # ./tern.nix # Disabled
@@ -24,7 +23,6 @@
   # User configuration for every user on desktops (home-manager)
   home-manager.sharedModules = [
     ../../home/programs/coding-agents
-    ../../home/programs/dolphin
     ../../home/programs/node
     ../../home/programs/ops
     ../../home/programs/vscode
@@ -47,11 +45,16 @@
 
   services.printing.enable = true;
 
+  # No screen reader (Orca, on with Plasma and GNOME), nor speech synthesis (speech-dispatcher, which Orca requires):
+  # unused. Started by Firefox listing voices, speech-dispatcher left a zombie per speech engine it probed without
+  # having it.
+  services.orca.enable = false;
+  services.speechd.enable = false;
+
   programs.firefox.enable = true;
   programs.thunderbird.enable = true;
 
   environment.systemPackages = with pkgs; [
-    kdePackages.kate
     libsecret # secret-tool: secrets in the keyring
     chromium # Also runs the web apps (modules/home/programs/web-apps)
     pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)

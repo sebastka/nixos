@@ -1,10 +1,13 @@
-{ pkgs, ... }:
+{ self, pkgs, ... }:
 
+# KDE Plasma 6, with SDDM: a desktop environment, next to modules/nixos/desktop (one per host: this or
+# modules/nixos/gnome). Secrets: KWallet (also for libsecret), unlocked at login by SDDM's PAM.
 {
+  imports = [ self.inputs.plasma-nm-ts.nixosModules.default ];
+
   # Enable the X11 windowing system (also required for Wayland on most setups).
   services.xserver.enable = true;
 
-  # KDE Plasma 6 with SDDM display manager.
   services.displayManager.sddm.enable = true;
   # Auto-unlock KWallet at login using the SDDM login password via PAM, so no separate passphrase is prompted.
   security.pam.services.sddm.kwallet.enable = true;
@@ -35,8 +38,23 @@
   # No push notification relay (KUnifiedPush, part of Plasma): for apps like NeoChat or Tokodon, none installed
   systemd.user.services.kunifiedpush-distributor.enable = false;
 
-  # No screen reader (Orca, on with Plasma), nor speech synthesis (speech-dispatcher, which Orca requires): unused.
-  # Started by Firefox listing voices, speech-dispatcher left a zombie per speech engine it probed without having it.
-  services.orca.enable = false;
-  services.speechd.enable = false;
+  # Laptops: the low battery warning at 20 % (10 % by default), for every user (/etc/xdg, as kded5rc above). Its
+  # critical level and action (5 %: sleep) stay. Charge thresholds: modules/nixos/desktop/battery.nix.
+  environment.etc."xdg/powerdevilrc".text = ''
+    [BatteryManagement]
+    BatteryLowLevel=20
+  '';
+
+  # Tailscale profiles as NetworkManager VPN connections, in Plasma's network applet (testing, instead of KTailctl).
+  # Tailscale itself: modules/nixos/desktop/tailscale.nix. Prototype: connections are made with nmcli, e.g.
+  #   nmcli connection add type vpn vpn-type tailscale con-name "Tailscale (private)" vpn.data profile=karlsen.fr
+  services.plasma-nm-ts.enable = true;
+
+  environment.systemPackages = [ pkgs.kdePackages.kate ];
+
+  home-manager.sharedModules = [
+    ../../home/programs/dolphin
+    # gpg-agent's PIN prompt (modules/nixos/desktop/gnupg.nix), Qt
+    { services.gpg-agent.pinentry.package = pkgs.pinentry-qt; }
+  ];
 }

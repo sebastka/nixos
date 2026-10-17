@@ -8,10 +8,5 @@
     ACTION=="add", SUBSYSTEM=="power_supply", KERNEL=="BAT*", ATTR{charge_types}=="*Custom*", ATTR{charge_types}="Custom"
   '';
 
-  # Plasma's low battery warning at 20 % (10 % by default), for every user (/etc/xdg, as in ./plasma.nix). Its
-  # critical level and action (5 %: sleep) stay.
-  environment.etc."xdg/powerdevilrc".text = ''
-    [BatteryManagement]
-    BatteryLowLevel=20
-  '';
+  # The low battery warning at 20 %: Plasma's in modules/nixos/plasma; GNOME's is UPower's, 20 % by default.
 }
