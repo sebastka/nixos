@@ -13,6 +13,7 @@
 # (with the password from desktop.sops.yaml), and passes them on to the other desktops, which decrypt them with the
 # same password. Every folder gets that by default (below): a user only lists theirs.
 let
+  nixosConfig = config; # Also in the folders' submodule, whose config is the folder's
   cfg = config.services.syncthing;
 
   # The server's device ID (Actions > Show ID in its web UI, syncthing.talmox.hera.home.karlsen.fr). The server knows
@@ -45,23 +46,38 @@ in
   # Every folder's defaults: shared with the server only, encrypted there; ignore patterns, watcher and versioning
   options.services.syncthing.settings.folders = lib.mkOption {
     type = lib.types.attrsOf (
-      lib.types.submodule {
-        config = {
-          devices = lib.mkDefault [
-            {
-              name = server;
-              encryptionPasswordFile = config.sops.secrets."syncthing-encryption-password".path;
-            }
-          ];
-          ignorePatterns = lib.mkDefault ignorePatterns;
-          # A few seconds after the last change (default 10s): saves never wait on it
-          fsWatcherEnabled = lib.mkDefault true;
-          versioning = lib.mkDefault {
-            type = "trashcan";
-            params.cleanoutDays = "7";
+      lib.types.submodule (
+        { config, ... }:
+        let
+          # Files the user's home-manager writes into this folder (e.g. the .envrc of programs.direnv.directoryEnv):
+          # each host makes its own, as links into its own Nix store. Synced, the hosts' links would replace each
+          # other, and each switch would collide with them. "/" anchors a pattern at the folder's root.
+          folder = lib.removePrefix "~/" config.path;
+          homeFiles = lib.filter (file: file.enable) (
+            lib.attrValues (nixosConfig.home-manager.users.${cfg.user}.home.file or { })
+          );
+          managed = map (file: "/" + lib.removePrefix "${folder}/" file.target) (
+            lib.filter (file: lib.hasPrefix "${folder}/" file.target) homeFiles
+          );
+        in
+        {
+          config = {
+            devices = lib.mkDefault [
+              {
+                name = server;
+                encryptionPasswordFile = nixosConfig.sops.secrets."syncthing-encryption-password".path;
+              }
+            ];
+            ignorePatterns = lib.mkDefault (managed ++ ignorePatterns);
+            # A few seconds after the last change (default 10s): saves never wait on it
+            fsWatcherEnabled = lib.mkDefault true;
+            versioning = lib.mkDefault {
+              type = "trashcan";
+              params.cleanoutDays = "7";
+            };
           };
-        };
-      }
+        }
+      )
     );
   };
 
