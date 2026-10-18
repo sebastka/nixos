@@ -5,7 +5,6 @@
 let
   lan = import ./lan.nix;
   hook = name: "libdhcp_${name}.so"; # Kea 3: only from its hooks directory (KEA_HOOKS_PATH, set by the module)
-  controlSocket = "kea4-ctrl-socket"; # In /run/kea (Kea 3 only allows sockets there)
 in
 {
   services.kea.dhcp4 = {
@@ -19,14 +18,10 @@ in
         service-sockets-retry-wait-time = 2000;
       };
 
+      # Kea's API (Stork's agent: ./stork.nix, scripts), local only. Kea 3's own HTTP socket, instead of the control
+      # agent (deprecated) in front of a unix socket: one Stork's agent can't use anyway, in /run/kea (Kea's dynamic
+      # user only), which it also looks for under Kea's install prefix (the Nix store).
       control-sockets = [
-        # The control agent's (below)
-        {
-          socket-type = "unix";
-          socket-name = controlSocket;
-        }
-        # The Stork agent's (./stork.nix): it can't use the unix one, in /run/kea (Kea's dynamic user only), which it
-        # also looks for under Kea's install prefix (the Nix store). Local only, as the control agent's.
         {
           socket-type = "http";
           socket-address = "127.0.0.1";
@@ -50,9 +45,11 @@ in
         unwarned-reclaim-cycles = 5;
       };
 
+      # Leases of 12 hours, renewed every 15 minutes: clients keep their address through a long outage of helios (a
+      # bad update, a failed reboot), the Talos nodes included, which drop theirs when it expires.
       renew-timer = 900;
       rebind-timer = 1800;
-      valid-lifetime = 3600;
+      valid-lifetime = 43200;
       # Several reservations may share an IP: a host's network cards (zeus: the same IP on either)
       ip-reservations-unique = false;
 
@@ -132,19 +129,6 @@ in
       dhcp-ddns.enable-updates = false;
       ddns-qualifying-suffix = lan.domain;
       ddns-override-client-update = true;
-    };
-  };
-
-  # Kea's REST API (Stork, scripts), as on Debian: local only
-  services.kea.ctrl-agent = {
-    enable = true;
-    settings = {
-      http-host = "127.0.0.1";
-      http-port = 8000;
-      control-sockets.dhcp4 = {
-        socket-type = "unix";
-        socket-name = controlSocket;
-      };
     };
   };
 }

@@ -2,7 +2,7 @@
 
 # ISC Stork's agent: Kea's DHCP for the Stork server in the cluster (stork.talmox.hera.home.karlsen.fr, homelab repo:
 # k8s/infrastructure/monitoring/stork). Not on Debian's helios. The agent finds Kea through its processes (hence
-# CAP_SYS_PTRACE) and the control agent's configuration: its REST API, on 127.0.0.1:8000 (./dhcp.nix).
+# CAP_SYS_PTRACE) and their configuration: Kea's HTTP control socket, on 127.0.0.1:8001 (./dhcp.nix).
 #
 # Registration, once: the agent registers with the server at its first start (its certificates then kept in
 # /var/lib/stork-agent). Approve it in Stork's web interface: Services > Machines > Unauthorized, helios.
@@ -20,13 +20,15 @@ in
     wants = [ "network-online.target" ];
     after = [
       "network-online.target"
-      "kea-ctrl-agent.service"
+      "kea-dhcp4-server.service"
     ];
     environment = {
-      # For the Stork server only (from the cluster's nodes: ./firewall.nix), not Prometheus
+      # For the Stork server (from the cluster's nodes: ./firewall.nix)
       STORK_AGENT_HOST = lan.router;
       STORK_AGENT_PORT = "8080";
-      STORK_AGENT_LISTEN_STORK_ONLY = "true";
+      # And Kea's statistics for VictoriaMetrics (./monitoring.nix)
+      STORK_AGENT_PROMETHEUS_KEA_EXPORTER_ADDRESS = lan.router;
+      STORK_AGENT_PROMETHEUS_KEA_EXPORTER_PORT = "9547";
       STORK_AGENT_SERVER_URL = "https://stork.talmox.hera.home.karlsen.fr";
       CLICOLOR = "false";
     };

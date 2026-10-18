@@ -130,8 +130,9 @@ in
           # LAN
           iifname "br0" ip protocol icmp accept
           iifname "br0" udp sport bootpc ip daddr { ${router}, 255.255.255.255 } udp dport bootps accept  # Kea
-          # The servers of Zabbix (passive checks) and Stork (./stork.nix), from the cluster's nodes (./lan.nix)
-          iifname "br0" ip saddr { ${clusterNodes} } ip daddr ${router} tcp dport { zabbix-agent, 8080 } accept
+          # From the cluster's nodes (./lan.nix): the servers of Zabbix (passive checks) and Stork (./stork.nix), and
+          # VictoriaMetrics' scrapes (./monitoring.nix: node exporter, Kea's statistics)
+          iifname "br0" ip saddr { ${clusterNodes} } ip daddr ${router} tcp dport { zabbix-agent, 8080, 9100, 9547 } accept
           iifname "br0" ip saddr ${lanPhysicalDevices} ip daddr ${router} tcp dport ssh accept
           iifname "br0" ip daddr ${router} tcp dport { domain, domain-s } accept  # Unbound, DNS over TLS too
           iifname "br0" ip daddr ${router} udp dport domain accept

@@ -42,6 +42,7 @@
     ./acme.nix
     ./wake.nix
     ./stork.nix
+    ./monitoring.nix
     ../../modules/nixos/common
     ../../modules/nixos/server
   ];
@@ -64,6 +65,13 @@
   boot.initrd.systemd.tpm2.enable = false;
   boot.initrd.verbose = false;
   boot.consoleLogLevel = 3;
+
+  # The hardware watchdog (iTCO_wdt, the chipset's): systemd pings it every 15 s, so a hung router reboots by itself
+  # after 30 s instead of waiting for someone at the box. A hung shutdown is forced after 10 minutes, as by default.
+  systemd.settings.Manager = {
+    RuntimeWatchdogSec = "30s";
+    RebootWatchdogSec = "10min";
+  };
 
   boot.tmp = {
     useTmpfs = true;
