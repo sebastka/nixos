@@ -58,11 +58,11 @@ in
         UseDNS = false;
         SendRelease = false;
       };
-      # CAKE (smart queue management), uploads only: off, no bufferbloat (2026-10-19, Ookla from zeus: 10 ms idle, 10 ms
-      # loaded both ways, upload 941 Mbit/s: the queue forms on this port, where its fq_codel already keeps latency
-      # low). Should it appear (e.g. a slower uplink): ~95% of the measured upload, Ethernet's overhead (header, FCS,
-      # preamble, gap), fairness between LAN hosts behind the NAT (validated values). Downloads would need an ifb
-      # device (tc: ingress qdisc, mirred to ifb0, CAKE on it), which networkd can't set up.
+      # CAKE (smart queue management) on uploads: off. Ookla from zeus, 2026-10-19, at full speed (943 Mbit/s down,
+      # 939 up, with ../wan-latency.nix): 14 ms idle, 25 ms while uploading (little: the queue forms on this port, where
+      # its fq_codel keeps latency low), but 158 ms (up to 327) while downloading: that bufferbloat is the ISP's queue,
+      # for the downloads' CAKE below (wan-ingress-cake). Should uploads need it too: ~95% of the measured upload,
+      # Ethernet's overhead (header, FCS, preamble, gap), fairness between LAN hosts behind the NAT (validated values).
       # cakeConfig = {
       #   Parent = "root";
       #   Bandwidth = "900M";
@@ -96,6 +96,37 @@ in
 
   # Online once the LAN is up: don't wait for the WAN, which may be down while the LAN must still be served
   systemd.network.wait-online.extraArgs = [ "--interface=br0" ];
+
+  # CAKE on the WAN's downloads, against their bufferbloat (158 ms while downloading, see 10-wan above): off, to try.
+  # A queue only controls what leaves an interface, so the downloads are redirected (tc's ingress hook, before
+  # nftables' and the flowtable) to an ifb device, and shaped as they leave it: just below the line (~95% of 943
+  # Mbit/s), so the queue forms here, under CAKE, instead of at the ISP. Ethernet's overhead; nat and dual-dsthost:
+  # fairness between LAN hosts (their address behind the NAT), "ingress" for its accounting of incoming traffic.
+  # Costs ~5% of download speed and some CPU. To try: uncomment, and { pkgs, ... }: as this file's arguments; check
+  # with tc -s qdisc show dev ifb4enp1s0, and Waveform's bufferbloat test. (Validated by evaluation, not run yet.)
+  # systemd.services.wan-ingress-cake = {
+  #   description = "CAKE on the WAN's downloads (ifb)";
+  #   after = [ "sys-subsystem-net-devices-enp1s0.device" ];
+  #   bindsTo = [ "sys-subsystem-net-devices-enp1s0.device" ];
+  #   wantedBy = [ "multi-user.target" ];
+  #   path = [ pkgs.iproute2 ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     RemainAfterExit = true;
+  #   };
+  #   script = ''
+  #     ip link add ifb4enp1s0 type ifb 2>/dev/null || true
+  #     ip link set ifb4enp1s0 up
+  #     tc qdisc replace dev enp1s0 handle ffff: ingress
+  #     tc filter replace dev enp1s0 parent ffff: matchall action mirred egress redirect dev ifb4enp1s0
+  #     tc qdisc replace dev ifb4enp1s0 root cake bandwidth 900mbit overhead 38 nat dual-dsthost ingress
+  #   '';
+  #   # Undone when stopped: the downloads unshaped again
+  #   preStop = ''
+  #     tc qdisc del dev enp1s0 ingress 2>/dev/null || true
+  #     ip link del ifb4enp1s0 2>/dev/null || true
+  #   '';
+  # };
 
   # Same DNS for the router itself: Unbound, the local zone
   services.resolved.settings.Resolve = localResolver;
