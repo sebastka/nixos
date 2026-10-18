@@ -63,11 +63,9 @@ in
     # Merged into ~/.config/zed/settings.json at each switch, these keys winning: Zed can still save its own changes
     # (the theme picker, an agent added...), kept unless set here (mutableUserSettings, the default).
     userSettings = {
-      # The agents of the Agent Panel (ACP), from Zed's registry
-      agent_servers = {
-        github-copilot-cli.type = "registry";
-        claude-acp.type = "registry";
-      };
+      # The agents of the Agent Panel (ACP), from Zed's registry. Claude Code: ours, from Nix
+      # (modules/home/programs/coding-agents).
+      agent_servers.github-copilot-cli.type = "registry";
 
       theme = {
         mode = "dark";
@@ -78,8 +76,9 @@ in
       ui_font_size = 16;
       buffer_font_size = 15;
 
-      # The project tree on the left (Zed's default: the right)
+      # The project tree on the left, the Agent Panel on the right: Zed's defaults swapped
       project_panel.dock = "left";
+      agent.dock = "right";
 
       # Editor, as VS Code (modules/home/programs/vscode). Already Zed's defaults: tab size 4, trailing whitespace
       # trimmed and a final newline on save, no minimap.
