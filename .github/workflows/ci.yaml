@@ -53,7 +53,10 @@ jobs:
             echo
           done
 
-  # Merge Dependabot pull requests once all checks passed (releases are at least 7 days old, see dependabot.yml)
+  # Merge Dependabot pull requests once all checks passed (releases are at least 7 days old, see dependabot.yml).
+  # As the sebastka-dependabot-merge GitHub App (installed on this repository only): GITHUB_TOKEN can never change
+  # .github/workflows, which every github-actions update does. Its private key: the Dependabot secret
+  # DEPENDABOT_MERGE_APP_PRIVATE_KEY (workflows run by Dependabot get those, not the Actions secrets).
   dependabot-merge:
     needs:
       - yamllint
@@ -63,12 +66,22 @@ jobs:
       && github.actor == 'dependabot[bot]'
       && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
+    permissions: {}  # Everything goes through the app's token
     steps:
+      - name: App token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510  # v3.3.0
+        with:
+          # app-id: 5367147  # Deprecated input, for client-id
+          client-id: Iv23liOVKxCEENn5avjB  # sebastka-dependabot-merge
+          private-key: ${{ secrets.DEPENDABOT_MERGE_APP_PRIVATE_KEY }}
+          # Only what merging needs, for this repository
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-workflows: write
       - name: Merge
         run: gh pr merge --squash "${PR_URL}"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
