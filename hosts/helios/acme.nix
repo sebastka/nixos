@@ -37,4 +37,15 @@
     ipv6 = false;
     proxied = false;
   };
+  # At boot, only once the WAN has its address and route (the ISP's DHCP): network-online.target waits for the LAN
+  # only (./network.nix), and without the WAN the public IP can't be looked up (the unit would fail until its next run).
+  # Wanted, not required: if the WAN stays down, it still runs (and fails) after the wait's timeout, as before.
+  systemd.services.cloudflare-dyndns =
+    let
+      wan = "systemd-networkd-wait-online@enp1s0:routable.service";
+    in
+    {
+      wants = [ wan ];
+      after = [ wan ];
+    };
 }
