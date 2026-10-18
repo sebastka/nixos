@@ -9,9 +9,13 @@ let
   router = lan.router;
   lanPhysicalDevices = "192.168.0.0/24";
   lanVirtualMachines = "192.168.1.0/24";
-  # Forced to use the local resolver. TODO: tvboks is 192.168.0.11 in DHCP (./lan.nix), Ansible had 192.168.0.5 here
-  tvbox = "192.168.0.5";
-  inherit (lan.vips) gatewayDefault delugeTorrent theloungeIdentd syncthing;
+  googletv = lan.hosts.googletv.ip;
+  inherit (lan.vips)
+    gatewayDefault
+    delugeTorrent
+    theloungeIdentd
+    syncthing
+    ;
 
   # New TCP connections must start with a bare SYN (also drops SYN+FIN, SYN+RST, null flags: scans, mid-stream pickup)
   conntrackFirst = ''
@@ -68,9 +72,9 @@ in
         chain prerouting {
           type nat hook prerouting priority dstnat; policy accept;
 
-          # Force DNS requests to the local resolver
-          iifname "br0" ip saddr ${tvbox} ip daddr != ${lanPhysicalDevices} meta l4proto { tcp, udp } th dport domain dnat to ${router}:53
-          iifname "br0" ip saddr ${tvbox} ip daddr != ${lanPhysicalDevices} meta l4proto { tcp, udp } th dport domain-s dnat to ${router}:853
+          # Force the TV box's DNS requests to the local resolver
+          # iifname "br0" ip saddr ${googletv} ip daddr != ${lanPhysicalDevices} meta l4proto { tcp, udp } th dport domain dnat to ${router}:53
+          # iifname "br0" ip saddr ${googletv} ip daddr != ${lanPhysicalDevices} meta l4proto { tcp, udp } th dport domain-s dnat to ${router}:853
 
           # Port forwards to the homelab
           iifname "${wan}" tcp dport { http, https, ssh } dnat to ${gatewayDefault}

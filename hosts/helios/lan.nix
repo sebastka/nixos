@@ -1,8 +1,7 @@
 # The LAN (192.168.0.0/16) as helios serves it: each host's DHCP reservation (./dhcp.nix, when it has a MAC
 # address), and its A and PTR records in home.karlsen.fr and 168.192.in-addr.arpa (./dns.nix). wakeMacs: other network
-# cards of a host, without a reservation (one per IP), which `wake <host>` also wakes (./wake.nix).
-# Names are relative to home.karlsen.fr. Before NixOS, the VMs came from OpenTofu (Ansible's tofu.py inventory):
-# update them here when they change.
+# cards of a host, with the same reservation (its IP), which `wake <host>` also wakes (./wake.nix).
+# Names are relative to home.karlsen.fr.
 {
   domain = "home.karlsen.fr";
   router = "192.168.0.1"; # br0, ./network.nix
@@ -13,13 +12,17 @@
       ip = "192.168.0.1";
       mac = "00:e0:67:2e:87:51";
     }; # Router (enp2s0, in br0)
+    harmonia = {
+      ip = "192.168.0.2";
+      mac = "d4:d6:df:0a:a6:1b";
+    };
     hermes = {
       ip = "192.168.0.10";
       mac = "dc:a6:32:e7:41:c9";
     };
-    tvboks = {
+    googletv = {
       ip = "192.168.0.11";
-      mac = "c4:eb:39:92:7d:cb";
+      mac = "b4:23:a2:42:88:44";
     };
     zeus = {
       ip = "192.168.0.15";
@@ -37,14 +40,20 @@
     };
     chronos = {
       ip = "192.168.0.30";
-    }; # DNS only
-    chronos-ipmi = {
-      ip = "192.168.0.31";
-    }; # DNS only
+    };
     hera = {
       ip = "192.168.0.40";
       mac = "88:ae:dd:68:ab:e8";
     };
+    hestia = {
+      ip = "192.168.0.50";
+      mac = "48:21:0b:7d:f6:25";
+    };
+    dike = {
+      ip = "192.168.0.60";
+      mac = "48:21:0b:7d:f4:73";
+    };
+
     # Wireless devices
     rax80 = {
       ip = "192.168.0.100";
@@ -52,7 +61,11 @@
     };
     boreas = {
       ip = "192.168.0.101";
-      mac = "76:63:d5:9e:fd:db";
+      mac = "c8:89:f3:b7:69:2d";
+    };
+    geras = {
+      ip = "192.168.0.102";
+      mac = "84:c5:a6:93:15:2a";
     };
     sebastka-caiman = {
       ip = "192.168.0.110";
@@ -91,14 +104,6 @@
     "t01.hera" = {
       ip = "192.168.1.201";
       mac = "bc:24:11:10:fe:09";
-    }; # Talos
-    "t02.hera" = {
-      ip = "192.168.1.202";
-      mac = "bc:24:11:10:fe:0a";
-    };
-    "t03.hera" = {
-      ip = "192.168.1.203";
-      mac = "bc:24:11:10:fe:0b";
     };
 
     # 192.168.2.0/24 - Cilium IP pool (LoadBalancer IPs of the cluster)

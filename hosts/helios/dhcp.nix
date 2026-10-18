@@ -43,6 +43,8 @@ in
       renew-timer = 900;
       rebind-timer = 1800;
       valid-lifetime = 3600;
+      # Several reservations may share an IP: a host's network cards (zeus: the same IP on either)
+      ip-reservations-unique = false;
 
       option-data = [
         {
@@ -103,11 +105,17 @@ in
               data = lan.router;
             }
           ];
-          reservations = lib.mapAttrsToList (hostname: host: {
-            inherit hostname;
-            hw-address = host.mac;
-            ip-address = host.ip;
-          }) (lib.filterAttrs (_: host: host ? mac) lan.hosts);
+          # One per network card (mac, and wakeMacs: zeus's two), with the host's IP
+          reservations = lib.concatLists (
+            lib.mapAttrsToList (
+              hostname: host:
+              map (mac: {
+                inherit hostname;
+                hw-address = mac;
+                ip-address = host.ip;
+              }) ([ host.mac ] ++ host.wakeMacs or [ ])
+            ) (lib.filterAttrs (_: host: host ? mac) lan.hosts)
+          );
         }
       ];
 
