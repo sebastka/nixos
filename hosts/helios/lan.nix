@@ -11,7 +11,12 @@
     helios = {
       # Router: Protectli FW6. Intel Core i5-8250U (UHD Graphics 620), 16 GB, 120 GB mSATA, 6 Intel I211 1 GbE ports
       ip = "192.168.0.1";
-      mac = "00:e0:67:2e:87:51"; # enp2s0, in br0
+      # mac = "00:e0:67:2e:87:50"; # enp1s0: WAN
+      mac = "00:e0:67:2e:87:51"; # enp2s0: LAN (br0)
+      # mac = "00:e0:67:2e:87:52"; # enp3s0: LAN (br0)
+      # mac = "00:e0:67:2e:87:53"; # enp4s0: LAN (br0)
+      # mac = "00:e0:67:2e:87:54"; # enp5s0: LAN (br0)
+      # mac = "00:e0:67:2e:87:55"; # enp6s0: LAN (br0)
     };
     harmonia = {
       # Switch: TP-Link ES210X-M2, with static LAGs to hestia (ports 3+4) and dike (ports 5+6)
