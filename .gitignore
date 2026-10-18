@@ -1,8 +1,9 @@
 .*
-!/.sops.yaml
 !/.github
-!/.yamllint.yaml
-!/.yamlignore
 !/.envrc
+!/.gitignore
+!/.sops.yaml
+!/.yamlignore
+!/.yamllint.yaml
 result
 result-*
