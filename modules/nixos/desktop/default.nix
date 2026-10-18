@@ -26,7 +26,7 @@
     ../../home/programs/node
     ../../home/programs/ops
     ../../home/programs/vscode
-    ../../home/programs/zed
+    # ../../home/programs/zed
   ];
 
   # Norwegian keyboard by default, as the console (modules/nixos/common)
