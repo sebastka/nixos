@@ -40,6 +40,11 @@
         CLAUDE_CODE_EXECUTABLE = lib.getExe config.programs.claude-code.finalPackage;
         CLAUDE_CONFIG_DIR = config.programs.claude-code.configDir;
       };
+      # New threads: edits accepted without asking (commands still ask), with Opus
+      default_config_options = {
+        mode = "acceptEdits";
+        model = "opus";
+      };
     };
   };
 
