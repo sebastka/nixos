@@ -41,6 +41,7 @@
     ./dns.nix
     ./acme.nix
     ./wake.nix
+    ./stork.nix
     ../../modules/nixos/common
     ../../modules/nixos/server
   ];

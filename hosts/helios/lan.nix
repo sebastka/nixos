@@ -138,6 +138,14 @@
     }; # *.talmox.hera too (./dns.nix)
   };
 
+  # The cluster's nodes (talmox, hosts above): the source of its pods' connections to helios (Cilium masquerades them
+  # to their node's IP), e.g. Zabbix's and Stork's servers (./firewall.nix, ./stork.nix, modules/nixos/server)
+  clusterNodes = [
+    "hestia"
+    "dike"
+    "t01.hera"
+  ];
+
   # Cluster services, also the targets of port forwards (./firewall.nix)
   vips = {
     gatewayInternal = "192.168.2.1";

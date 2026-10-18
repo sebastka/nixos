@@ -8,7 +8,7 @@ let
   wan = "enp1s0";
   router = lan.router;
   lanPhysicalDevices = "192.168.0.0/24";
-  lanVirtualMachines = "192.168.1.0/24";
+  clusterNodes = builtins.concatStringsSep ", " (map (host: lan.hosts.${host}.ip) lan.clusterNodes);
   googletv = lan.hosts.googletv.ip;
   inherit (lan.vips)
     gatewayDefault
@@ -21,6 +21,13 @@ let
   conntrackFirst = ''
     ct state vmap { invalid : drop, established : accept, related : accept }
     ct state new tcp flags & (fin|syn|rst|ack) != syn drop
+  '';
+
+  # A chain's last rules: what its policy drops, counted (nft list chain ip filter <chain>) and logged at most 10 times a
+  # minute (journalctl -k --grep 'nft drop'), the WAN's scans included
+  countDrops = chain: ''
+    limit rate 10/minute burst 20 packets log prefix "nft drop ${chain}: " level info
+    counter comment "dropped by the policy"
   '';
 in
 {
@@ -123,10 +130,13 @@ in
           # LAN
           iifname "br0" ip protocol icmp accept
           iifname "br0" udp sport bootpc ip daddr { ${router}, 255.255.255.255 } udp dport bootps accept  # Kea
-          iifname "br0" ip saddr ${lanVirtualMachines} ip daddr ${router} tcp dport { zabbix-agent, 8080 } accept  # Zabbix, Stork
+          # The servers of Zabbix (passive checks) and Stork (./stork.nix), from the cluster's nodes (./lan.nix)
+          iifname "br0" ip saddr { ${clusterNodes} } ip daddr ${router} tcp dport { zabbix-agent, 8080 } accept
           iifname "br0" ip saddr ${lanPhysicalDevices} ip daddr ${router} tcp dport ssh accept
           iifname "br0" ip daddr ${router} tcp dport { domain, domain-s } accept  # Unbound, DNS over TLS too
           iifname "br0" ip daddr ${router} udp dport domain accept
+
+          ${countDrops "input"}
         }
 
         chain forward {
@@ -143,11 +153,11 @@ in
           iifname "${wan}" ct state new tcp dport ssh add @wan_ssh4 { ip saddr ct count over 5 } counter drop
           iifname "${wan}" ct state new ip daddr ${syncthing} meta l4proto { tcp, udp } th dport 22000 update @wan_syncthing4 { ip saddr limit rate over 10/minute burst 20 packets } counter drop
 
-          # WAN -> homelab (port forwards above)
-          iifname "${wan}" ip daddr ${gatewayDefault} tcp dport { http, https, ssh } accept
-          iifname "${wan}" ip daddr ${delugeTorrent} meta l4proto { tcp, udp } th dport 6881 accept
-          iifname "${wan}" ip daddr ${theloungeIdentd} tcp dport auth accept
-          iifname "${wan}" ip daddr ${syncthing} meta l4proto { tcp, udp } th dport 22000 accept
+          # WAN -> homelab: what the port forwards (table nat) translated, and nothing else: no packets sent to the
+          # cluster's addresses directly (e.g. from the ISP's segment), and no forward to list twice
+          iifname "${wan}" ct status dnat accept
+
+          ${countDrops "forward"}
         }
 
         chain output {
