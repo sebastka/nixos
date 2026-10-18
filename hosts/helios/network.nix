@@ -12,7 +12,9 @@ let
   };
   localResolver = {
     DNS = "127.0.0.1"; # Unbound (./dns.nix)
-    DNSSEC = true;
+    # Unbound validates (the local zones too, with their trust anchors). resolved would validate again from the root,
+    # and reject home.karlsen.fr's answers: public karlsen.fr has no delegation to it ("no-signature").
+    DNSSEC = false;
     DNSOverTLS = false;
     Domains = "home.karlsen.fr";
   };
