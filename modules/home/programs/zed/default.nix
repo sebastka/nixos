@@ -6,6 +6,13 @@
 }:
 
 let
+  # A theme's accent colors (theme_overrides)
+  accent = color: {
+    "text.accent" = color;
+    "icon.accent" = color;
+    "border.focused" = color;
+  };
+
   # Ansible's own directories (playbooks, roles, inventories' variables)
   ansibleDirectories = [
     "playbooks"
@@ -56,6 +63,9 @@ in
       "dockerfile" # Docker Compose too
       "ansible" # Its files: file_types.Ansible below
       "helm" # Charts' templates ({{ }}), not plain YAML
+      # Themes: VS Code's defaults (theme below)
+      "vscode-dark-modern"
+      "vscode-light-modern"
     ];
     # In Zed's PATH: the Nix extension's language server (it downloads none, unlike Zed's other languages)
     extraPackages = [ pkgs.nixd ];
@@ -69,8 +79,9 @@ in
 
       theme = {
         mode = "dark";
-        light = "One Light";
-        dark = "One Dark";
+        # VS Code's (Dark Modern, its default): darker than Zed's One Dark (#1F1F1F, not #282C34)
+        light = "VSCode Light Modern";
+        dark = "VSCode Dark Modern";
       };
       icon_theme = "Zed (Default)";
       ui_font_size = 16;
@@ -83,6 +94,20 @@ in
         # Less verbose threads: commands' output and thinking collapsed (a click expands them); edits' diffs stay open
         expand_terminal_card = false;
         thinking_display = "always_collapsed";
+        # Elapsed time during a reply, and its duration afterwards
+        show_turn_stats = true;
+        # Shorter lines: the column centered in the panel narrower (default 850 px)
+        max_content_width = 720;
+      };
+      # The Agent Panel's text: Claude's replies (UI font, default its 16) and your messages (buffer font, default 12)
+      agent_ui_font_size = 15;
+      agent_buffer_font_size = 14;
+
+      # Claude's orange as the accent (links, accented text and icons, focused borders): everywhere in Zed, as themes
+      # can't target the Agent Panel alone. Darker on the light theme, for contrast.
+      theme_overrides = {
+        "VSCode Dark Modern" = accent "#d97757ff";
+        "VSCode Light Modern" = accent "#c15f3cff";
       };
 
       # Editor, as VS Code (modules/home/programs/vscode). Already Zed's defaults: tab size 4, trailing whitespace
