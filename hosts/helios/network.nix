@@ -17,6 +17,10 @@ let
     DNSSEC = false;
     DNSOverTLS = false;
     Domains = "home.karlsen.fr";
+    # No name resolution by asking the whole network (mDNS's .local, Microsoft's LLMNR): helios is the LAN's DNS, which
+    # knows every name (./lan.nix). The firewall let neither in, and LLMNR listened on the WAN too.
+    MulticastDNS = false;
+    LLMNR = false;
   };
 in
 {
@@ -80,10 +84,8 @@ in
   # Online once the LAN is up: don't wait for the WAN, which may be down while the LAN must still be served
   systemd.network.wait-online.extraArgs = [ "--interface=br0" ];
 
-  # Same DNS for the router itself: Unbound, the local zone, mDNS
-  services.resolved.settings.Resolve = localResolver // {
-    MulticastDNS = "yes";
-  };
+  # Same DNS for the router itself: Unbound, the local zone
+  services.resolved.settings.Resolve = localResolver;
 
   # Routing (IPv4 only), from the former Ansible role (routers/sysctlconf.yaml)
   boot.kernelModules = [ "nf_conntrack" ]; # Before sysctl, so net.netfilter.* exist when applied
