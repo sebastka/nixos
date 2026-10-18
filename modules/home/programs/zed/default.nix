@@ -78,7 +78,12 @@ in
 
       # The project tree on the left, the Agent Panel on the right: Zed's defaults swapped
       project_panel.dock = "left";
-      agent.dock = "right";
+      agent = {
+        dock = "right";
+        # Less verbose threads: commands' output and thinking collapsed (a click expands them); edits' diffs stay open
+        expand_terminal_card = false;
+        thinking_display = "always_collapsed";
+      };
 
       # Editor, as VS Code (modules/home/programs/vscode). Already Zed's defaults: tab size 4, trailing whitespace
       # trimmed and a final newline on save, no minimap.
