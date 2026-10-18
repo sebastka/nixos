@@ -13,6 +13,23 @@ let
     "border.focused" = color;
   };
 
+  # Zed's One Dark syntax colors (./one-dark-syntax.json: its .style.syntax, from Zed 1.24.2's
+  # assets/themes/one/one.json). With the highlights only Dark Modern defines, which would otherwise keep VS Code's
+  # colors over Zed's fallback to their parent's: their parent's in One Dark.
+  oneDarkSyntax =
+    let
+      oneDark = lib.importJSON ./one-dark-syntax.json;
+    in
+    oneDark
+    // lib.mapAttrs (_: parent: oneDark.${parent}) {
+      "function.macro" = "function";
+      "keyword.control" = "keyword";
+      "keyword.declaration" = "keyword";
+      "keyword.import" = "keyword";
+      "tag.component.jsx" = "tag";
+      "type.builtin" = "type";
+    };
+
   # Ansible's own directories (playbooks, roles, inventories' variables)
   ansibleDirectories = [
     "playbooks"
@@ -84,11 +101,16 @@ in
         dark = "VSCode Dark Modern";
       };
       icon_theme = "Zed (Default)";
-      ui_font_size = 16;
-      buffer_font_size = 15;
+      ui_font_size = 15; # Also the project tree's (it has none of its own), tabs, menus and panels
+      buffer_font_size = 14; # Code, as VS Code (its default editor.fontSize); also the terminal's
 
       # The project tree on the left, the Agent Panel on the right: Zed's defaults swapped
-      project_panel.dock = "left";
+      project_panel = {
+        dock = "left";
+        # Denser, as VS Code's: closer rows (default "comfortable"), less indentation per level (default 20)
+        entry_spacing = "standard";
+        indent_size = 16;
+      };
       agent = {
         dock = "right";
         # Less verbose threads: commands' output and thinking collapsed (a click expands them); edits' diffs stay open
@@ -99,14 +121,23 @@ in
         # Shorter lines: the column centered in the panel narrower (default 850 px)
         max_content_width = 720;
       };
-      # The Agent Panel's text: Claude's replies (UI font, default its 16) and your messages (buffer font, default 12)
+      # The Agent Panel's text: Claude's replies (UI font, by default its size) and your messages (buffer font, by
+      # default 12)
       agent_ui_font_size = 15;
       agent_buffer_font_size = 14;
 
       # Claude's orange as the accent (links, accented text and icons, focused borders): everywhere in Zed, as themes
       # can't target the Agent Panel alone. Darker on the light theme, for contrast.
+      # And Zed's One Dark syntax colors (grey comments, green strings...) on VS Code's Dark Modern UI.
       theme_overrides = {
-        "VSCode Dark Modern" = accent "#d97757ff";
+        "VSCode Dark Modern" = accent "#d97757ff" // {
+          # Comments a lighter grey (One Dark Pro's, not One Dark's #5d636f): more contrast on Dark Modern's darker
+          # background (#1F1F1F)
+          syntax = oneDarkSyntax // {
+            comment.color = "#7f848eff";
+            "comment.doc".color = "#7f848eff";
+          };
+        };
         "VSCode Light Modern" = accent "#c15f3cff";
       };
 
