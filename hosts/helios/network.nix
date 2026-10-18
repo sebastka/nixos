@@ -58,6 +58,18 @@ in
         UseDNS = false;
         SendRelease = false;
       };
+      # CAKE (smart queue management), uploads only: off, no bufferbloat (2026-10-19, Ookla from zeus: 10 ms idle, 10 ms
+      # loaded both ways, upload 941 Mbit/s: the queue forms on this port, where its fq_codel already keeps latency
+      # low). Should it appear (e.g. a slower uplink): ~95% of the measured upload, Ethernet's overhead (header, FCS,
+      # preamble, gap), fairness between LAN hosts behind the NAT (validated values). Downloads would need an ifb
+      # device (tc: ingress qdisc, mirred to ifb0, CAKE on it), which networkd can't set up.
+      # cakeConfig = {
+      #   Parent = "root";
+      #   Bandwidth = "900M";
+      #   OverheadBytes = 38;
+      #   NAT = true;
+      #   FlowIsolationMode = "dual-src-host";
+      # };
     };
 
     "20-br0" = {
