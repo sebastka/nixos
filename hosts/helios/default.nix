@@ -1,7 +1,8 @@
 { ... }:
 
 # Installing helios (the router: replaces Debian, set up by Ansible until now). See also README.md, "Installing a host".
-# The LAN has no DHCP, DNS nor internet while helios is being installed.
+# The LAN keeps its DHCP, DNS and internet while helios is being installed (4.), except during the reboots (5., 6.):
+# leases last 24 h, so its clients keep their addresses.
 #
 # Before installing:
 # 1. Secrets: from Ansible's secrets (secret_cloudflare_api_token, secret_dnssec_*_private), fill in
@@ -10,8 +11,12 @@
 # 2. Commit and push: scripts/install.sh pulls origin/master on the live ISO.
 # 3. Firmware (AMI): enable the TPM (Intel PTT; Advanced > Trusted Computing, or PCH-FW Configuration). Secure Boot
 #    mode Custom, delete only the PK (Setup Mode), keep dbx.
-# 4. Boot the NixOS ISO (screen and keyboard on helios), WAN cable in enp1s0 (port 1) as usual: the ISO gets the public
-#    IP from the ISP by DHCP, so it has internet. Yubikey plugged in. Then: scripts/install.sh helios
+# 4. Boot helios's installer (./installer.nix: the live ISO as the router, so the LAN keeps its DHCP, DNS and internet
+#    while helios's disk is installed). Build it on zeus, then dd it to a USB stick:
+#      nix build .#nixosConfigurations.helios-installer.config.system.build.isoImage
+#    Screen and keyboard on helios, WAN cable in enp1s0 (port 1) as usual: it gets the public IP from the ISP by DHCP.
+#    Then from geras (Yubikey there, no password: the installer has its SSH key):
+#      scripts/install.sh helios nixos@192.168.0.1
 # 5. First boots: the LUKS passphrase on the console. Lanzaboote enrolls the Secure Boot keys and reboots.
 # 6. Unattended unlock: enroll the TPM, bound to the Secure Boot state, then reboot to check:
 #      sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks

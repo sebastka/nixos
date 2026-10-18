@@ -159,6 +159,12 @@
         ];
       };
 
+      # helios's installer: the live ISO as the router, while helios is installed over SSH (hosts/helios/installer.nix)
+      nixosConfigurations.helios-installer = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [ ./hosts/helios/installer.nix ];
+      };
+
       # Raspberry Pi 4 Model b Rev 1.4 (2020)
       nixosConfigurations.hermes = nixpkgs.lib.nixosSystem {
         specialArgs = {

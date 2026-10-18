@@ -17,45 +17,8 @@ let
   nsdPort = 53530;
   tlsDirectory = config.security.acme.certs."karlsen.fr".directory; # ./acme.nix
 
-  # Public names served by the cluster's ingress, answered locally (no hairpin through the public IP)
-  localOverrides = {
-    "karlsen.fr" = {
-      type = "transparent";
-      names = [
-        ""
-        "auth"
-        "autoconfig"
-        "ca"
-        "captcha"
-        "git"
-        "ldap"
-        "mas"
-        "matrix"
-        "mta-sts"
-        "openpgpkey"
-        "www"
-      ];
-    };
-    "karlsen.org" = {
-      type = "transparent";
-      names = [
-        ""
-        "www"
-        "mta-sts"
-      ];
-    };
-    "karlsen.app" = {
-      type = "redirect"; # Every name
-      names = [ "" ];
-    };
-  };
-  fqdn = zone: name: if name == "" then "${zone}." else "${name}.${zone}.";
-
-  # Public names answered locally with a cluster service's own LoadBalancer rather than the ingress (their
-  # zones above are transparent: no local-zone of their own needed)
-  serviceOverrides = {
-    "sync.karlsen.fr" = lan.vips.syncthing; # Syncthing (TCP and QUIC 22000)
-  };
+  # Public names answered locally (no hairpin through the public IP)
+  inherit (import ./dns-overrides.nix) localOverrides serviceOverrides fqdn;
 
   # DNSSEC keys (ECDSAP256SHA256), public parts. The private parts are secrets (secrets/helios.sops.yaml).
   dnssecKeys = {
