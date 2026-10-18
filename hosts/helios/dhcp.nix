@@ -19,10 +19,20 @@ in
         service-sockets-retry-wait-time = 2000;
       };
 
-      control-socket = {
-        socket-type = "unix";
-        socket-name = controlSocket;
-      };
+      control-sockets = [
+        # The control agent's (below)
+        {
+          socket-type = "unix";
+          socket-name = controlSocket;
+        }
+        # The Stork agent's (./stork.nix): it can't use the unix one, in /run/kea (Kea's dynamic user only), which it
+        # also looks for under Kea's install prefix (the Nix store). Local only, as the control agent's.
+        {
+          socket-type = "http";
+          socket-address = "127.0.0.1";
+          socket-port = 8001;
+        }
+      ];
 
       lease-database = {
         type = "memfile";
