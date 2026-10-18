@@ -25,6 +25,9 @@
   users.users.root.hashedPasswordFile = config.sops.secrets."root-password".path;
 
   nixpkgs.config.allowUnfree = true;
+  # Unfree on the command line too (nix run/shell nixpkgs#...), which never reads the configuration above: with
+  # --impure, so Nix reads this variable (e.g. nix run --impure nixpkgs#ookla-speedtest)
+  environment.variables.NIXPKGS_ALLOW_UNFREE = "1";
   nix.settings.use-xdg-base-directories = true;
   nix.settings.experimental-features = [
     "nix-command" # Enable the new `nix` CLI subcommands (nix build, nix run, nix shell, etc.)
