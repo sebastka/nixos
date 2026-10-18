@@ -24,8 +24,9 @@ let
   };
 in
 {
-  # The I211's (igb) RX rings overflow (rx_missed_errors) while the CPU wakes from deep C-states: larger rings,
-  # and no C-state deeper than C2.
+  # The I211's (igb) RX rings overflow (rx_missed_errors) while the CPU wakes from deep C-states: larger rings.
+  # Deep C-states allowed all the same, as on Debian since 2026-10-14, to run cooler: past C1E, 2-4% of WAN packets
+  # are lost and downloads cap at ~260-450 Mbit/s (777 Mbit/s with intel_idle.max_cstate=2 in boot.kernelParams).
   systemd.network.links."10-igb" = {
     matchConfig.Driver = "igb";
     linkConfig = {
@@ -33,10 +34,10 @@ in
       NamePolicy = "keep kernel database onboard slot path";
       AlternativeNamesPolicy = "database onboard slot path mac";
       MACAddressPolicy = "persistent";
-      RxBufferSize = 4096;
+      RxBufferSize = 4096; # The igb driver's maximum
     };
   };
-  boot.kernelParams = [ "intel_idle.max_cstate=2" ];
+  # boot.kernelParams = [ "intel_idle.max_cstate=2" ]; # Throughput over heat: see above
 
   systemd.network.netdevs."10-br0".netdevConfig = {
     Name = "br0";
