@@ -44,7 +44,11 @@ export PATH="${jq}/bin:${sops}/bin:${PATH}"
 # Usage: decrypt_secrets <directory>
 decrypt_secrets() {
     sops decrypt --output-type json "${ssh_secrets}" > "$1/ssh.json"
-    if test -f "${sb_secrets}"; then
+    # Secure Boot keys only for hosts with Secure Boot (lanzaboote): not helios (legacy BIOS boot), whose keys stay
+    # in secrets/ should it boot UEFI again
+    secure_boot="$(${nix} eval ".#nixosConfigurations.${host}.config.boot" \
+        --apply 'b: b ? lanzaboote && b.lanzaboote.enable')"
+    if [ "${secure_boot}" = true ] && test -f "${sb_secrets}"; then
         sops decrypt --output-type json "${sb_secrets}" > "$1/sb.json"
     fi
 }
@@ -137,18 +141,24 @@ fi
 # Enroll the Yubikey (FIDO2) as LUKS unlock method: asks for the passphrase, FIDO2 PIN and a touch.
 # The passphrase stays enrolled as recovery. Not for hosts unlocked by the TPM instead (tpm2-device in their crypttab
 # options, e.g. zeus): it binds to Secure Boot's state, so it's enrolled after the first boot (hosts/<host>/default.nix).
-luks_device="$(${nix} eval --raw ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.device")"
-luks_options="$(${nix} eval --json ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.crypttabExtraOpts")"
-case "${luks_options}" in
-    *tpm2-device*) echo "TPM unlock: enroll it after the first boot, see hosts/${host}/default.nix" >&2 ;;
-    *)
-        if [ -n "${INSTALL_SECRETS:-}" ]; then
-            echo "No Yubikey here: after the first boot, sudo systemd-cryptenroll --fido2-device=auto ${luks_device}" >&2
-        else
-            sudo systemd-cryptenroll --fido2-device=auto "${luks_device}"
-        fi
-        ;;
-esac
+# Nor for hosts without LUKS (helios: no TPM, so not encrypted).
+has_luks="$(${nix} eval ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices" --apply 'd: d ? cryptroot')"
+if [ "${has_luks}" != true ]; then
+    echo "No LUKS on ${host}: nothing to enroll" >&2
+else
+    luks_device="$(${nix} eval --raw ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.device")"
+    luks_options="$(${nix} eval --json ".#nixosConfigurations.${host}.config.boot.initrd.luks.devices.cryptroot.crypttabExtraOpts")"
+    case "${luks_options}" in
+        *tpm2-device*) echo "TPM unlock: enroll it after the first boot, see hosts/${host}/default.nix" >&2 ;;
+        *)
+            if [ -n "${INSTALL_SECRETS:-}" ]; then
+                echo "No Yubikey here: after the first boot, sudo systemd-cryptenroll --fido2-device=auto ${luks_device}" >&2
+            else
+                sudo systemd-cryptenroll --fido2-device=auto "${luks_device}"
+            fi
+            ;;
+    esac
+fi
 
 # 3. SSH host key and Secure Boot keys
 sudo install -d -m 755 "${root}/etc/ssh"

@@ -30,7 +30,7 @@ modules/nixos/
                        (Firefox, Thunderbird, Kate, Chromium, Tern), and their user config (coding agents, ops tools,
                        VS Code)
   server/              Servers: systemd-networkd, resolved, Zabbix agent, unattended upgrades
-  secure-boot.nix      Lanzaboote with our own keys (geras, zeus, helios)
+  secure-boot.nix      Lanzaboote with our own keys (geras, zeus; helios boots legacy BIOS, without it)
   home-manager/        home-manager integration, modules shared by every user
 modules/home/          home-manager modules: zsh, starship, git, gpg, ssh, neovim, vim, htop, readline, direnv, XDG,
                        web apps (programs.webApps), and the desktop ones (coding agents, ops, VS Code)
