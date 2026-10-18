@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ./smartd.nix
     ./zabbix-agent.nix
   ];
 

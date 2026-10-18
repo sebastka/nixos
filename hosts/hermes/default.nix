@@ -36,6 +36,9 @@
 
   networking.hostName = "hermes";
 
+  # An SD card: no SMART, so nothing for smartd to watch (it would fail). smartctl stays (modules/nixos/server).
+  services.smartd.enable = false;
+
   systemd.network.networks."eth0" = {
     matchConfig.MACAddress = "dc:a6:32:e7:41:c9";
     networkConfig.DHCP = "ipv4";
