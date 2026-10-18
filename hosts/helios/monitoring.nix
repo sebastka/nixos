@@ -4,7 +4,7 @@
 # - Metrics, scraped by VictoriaMetrics' vmagent (victoria-metrics-k8s-stack, VMStaticScrape.helios.yaml), from the
 #   cluster's nodes (./firewall.nix): the node exporter's (CPU, temperatures, network, conntrack...) on :9100, and
 #   Kea's statistics on :9547, exported by the Stork agent (./stork.nix).
-# - Logs: the journal, pushed to VictoriaLogs (its journald endpoint, through the cluster's internal gateway).
+# - Logs: the journal, pushed to VictoriaLogs by Vector (through the cluster's internal gateway).
 let
   lan = import ./lan.nix;
 in
@@ -23,17 +23,35 @@ in
     serviceConfig.RestartSec = "5s";
   };
 
-  services.journald.upload = {
+  # The journal to VictoriaLogs, by Vector: its Elasticsearch bulk API, as VictoriaLogs documents for Vector. Not
+  # systemd-journal-upload: over HTTP/2 (the gateway's choice), libcurl hands it buffers too small for an entry ("Buffer
+  # space is too small to write entry"), retried forever on the same one, and it can't be told to use HTTP/1.1.
+  # Its position in the journal is kept in /var/lib/vector: a restart resumes there.
+  services.vector = {
     enable = true;
-    settings.Upload = {
-      # The port explicitly: without one, journal-upload appends its own (:19532) to the end of the URL, path included
-      # (".../insert/journald:19532/upload"). /upload is appended to the path.
-      URL = "https://victorialogs.talmox.hera.home.karlsen.fr:443/insert/journald";
-      # No client certificate (VictoriaLogs asks none), and the server's (Let's Encrypt) checked against the system's
-      # CAs: by default, journal-upload looks for its own in /etc/ssl (private/journal-upload.pem, ca/trusted.pem)
-      ServerKeyFile = "-";
-      ServerCertificateFile = "-";
-      TrustedCertificateFile = "/etc/ssl/certs/ca-certificates.crt";
+    journaldAccess = true; # The systemd-journal group
+    settings = {
+      data_dir = "/var/lib/vector";
+      sources.journald.type = "journald";
+      sinks.victorialogs = {
+        type = "elasticsearch";
+        inputs = [ "journald" ];
+        endpoints = [ "https://victorialogs.talmox.hera.home.karlsen.fr/insert/elasticsearch/" ];
+        mode = "bulk";
+        api_version = "v8";
+        compression = "gzip";
+        healthcheck.enabled = false;
+        # VictoriaLogs' fields: the message, its time, and the streams (by host and unit)
+        query = {
+          _msg_field = "message";
+          _time_field = "timestamp";
+          _stream_fields = "host,_SYSTEMD_UNIT";
+        };
+      };
     };
+  };
+  systemd.services.vector = {
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
   };
 }
