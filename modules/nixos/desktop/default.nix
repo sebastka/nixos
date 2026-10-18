@@ -58,6 +58,7 @@
     libsecret # secret-tool: secrets in the keyring
     chromium # Also runs the web apps (modules/home/programs/web-apps)
     pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
+    pkgs-unstable.zed-editor # zeditor; weekly releases (stable lags months behind), from cache.nixos.org
     php # The CLI (php), with its default extensions
     php.packages.composer # Built on the php above
     # Its latest release (nixpkgs lags behind), x86_64 and arm64, with the system's fonts in its documents
