@@ -1,8 +1,9 @@
 { lib, modulesPath, ... }:
 
 # Protectli FW6 (BIOS 5.12): Intel Core i5-8250U, 16 GB, 120 GB mSATA (./disko.nix), 6 Intel I211 ports (igb,
-# ./network.nix). From the hardware as seen by Debian: check against `nixos-generate-config --show-hardware-config`
-# on the live ISO.
+# ./network.nix). As `nixos-generate-config --show-hardware-config --no-filesystems` on NixOS, plus usbhid and
+# usb_storage: it lists only what was plugged in, and they keep a USB keyboard (GRUB, early boot) and a rescue stick
+# working.
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -19,7 +20,7 @@
 
   hardware.cpu.intel.updateMicrocode = true;
 
-  # Filesystems, LUKS and swap are generated from ./disko.nix.
+  # Filesystems and swap are generated from ./disko.nix.
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }
