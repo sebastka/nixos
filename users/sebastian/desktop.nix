@@ -84,6 +84,8 @@ in
         home.activation.createDevPrivate = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           run mkdir -p ${config.home.homeDirectory}/Dev/Private
         '';
+        # This repository
+        programs.zsh.shellAliases.nixos = "cd ${config.home.homeDirectory}/Dev/Private/Nix/nixos";
 
         # Rootless Docker (modules/nixos/desktop/docker.nix: not started by default) started at login, as
         # `systemctl --user enable` would (it can't: the unit has no [Install] section)
