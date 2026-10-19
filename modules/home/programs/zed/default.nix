@@ -73,9 +73,8 @@ in
     # Merged into ~/.config/zed/settings.json at each switch, these keys winning: Zed can still save its own changes
     # (the theme picker, an agent added...), kept unless set here (mutableUserSettings, the default).
     userSettings = {
-      # The agents of the Agent Panel (ACP), from Zed's registry. Claude Code: ours, from Nix
-      # (modules/home/programs/coding-agents).
-      agent_servers.github-copilot-cli.type = "registry";
+      # The agents of the Agent Panel (ACP): Claude Code and GitHub Copilot, ours from Nix
+      # (modules/home/programs/coding-agents)
 
       theme = {
         mode = "dark";

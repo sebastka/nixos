@@ -18,7 +18,7 @@
   # Move GNUPGHOME out of ~/ into the XDG data directory.
   home.sessionVariables.GNUPGHOME = "${config.xdg.dataHome}/gnupg";
 
-  # Claude Code (CLAUDE_CONFIG_DIR) and Codex (CODEX_HOME): set by their home-manager modules,
+  # Claude Code (CLAUDE_CONFIG_DIR), Codex (CODEX_HOME) and Copilot (COPILOT_HOME): set by their home-manager modules,
   # see modules/home/programs/coding-agents
 
   # Move .dotnet out of ~/ into the XDG data directory.

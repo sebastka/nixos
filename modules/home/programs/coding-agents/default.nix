@@ -46,6 +46,17 @@
         model = "opus";
       };
     };
+    # Our Copilot CLI too (ACP: --acp), instead of the registry's (npx, ~/.copilot): the same config directory, so the
+    # same login, as in a terminal
+    "GitHub Copilot" = {
+      type = "custom";
+      command = lib.getExe config.programs.github-copilot-cli.package;
+      args = [ "--acp" ];
+      env = {
+        COPILOT_HOME = config.programs.github-copilot-cli.configDir;
+        COPILOT_AUTO_UPDATE = "false";
+      };
+    };
   };
 
   # CODEX_HOME = ~/.config/codex (home.preferXdgDirectories)
@@ -53,4 +64,12 @@
     enable = true;
     package = pkgs-unstable.codex;
   };
+
+  # COPILOT_HOME = ~/.config/copilot (home.preferXdgDirectories), instead of ~/.copilot. Its self-update is off: it
+  # would download newer releases into COPILOT_HOME/pkg, and run them instead of ours.
+  programs.github-copilot-cli = {
+    enable = true;
+    package = pkgs-unstable.github-copilot-cli;
+  };
+  home.sessionVariables.COPILOT_AUTO_UPDATE = "false";
 }
