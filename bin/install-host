@@ -6,10 +6,10 @@
 #    and Secure Boot keys (if the host has some)
 # 4. Install NixOS
 #
-# Usage: scripts/install.sh <host>   (as the live ISO user, Yubikey plugged in)
+# Usage: bin/install-host <host>   (as the live ISO user, Yubikey plugged in)
 #
 # Or from another machine, when the Yubikey can't be plugged into the host (zeus: no USB-C), over SSH:
-#   scripts/install.sh <host> nixos@<live ISO's IP>   (on the live ISO first: passwd, for SSH; ip a, for its IP)
+#   bin/install-host <host> nixos@<live ISO's IP>   (on the live ISO first: passwd, for SSH; ip a, for its IP)
 # The Yubikey decrypts the secrets here, copied into the live ISO's RAM (INSTALL_SECRETS there). Then this script runs
 # there, from a clone of the repo, in this terminal: its prompts (wipe, LUKS passphrase) as usual. No Yubikey there, so
 # no FIDO2 enrollment either: after the first boot, as printed.
@@ -71,7 +71,7 @@ if [ -n "${live_iso}" ]; then
     # Over HTTPS: the public repo, no GitHub SSH key on the live ISO
     # shellcheck disable=SC2029 # Expanded here, on purpose
     remote -t "${live_iso}" "test -d nixos || git clone https://github.com/sebastka/nixos.git \
-        && INSTALL_SECRETS='${remote_tmp}' nixos/scripts/install.sh '${host}'"
+        && INSTALL_SECRETS='${remote_tmp}' nixos/bin/install-host '${host}'"
     remote -O exit "${live_iso}" 2> /dev/null || true
     exit
 fi

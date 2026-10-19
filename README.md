@@ -38,7 +38,7 @@ users/<user>/          User account; home.nix (every host: identities in keys/ a
                        desktop.nix, work.nix and tern.nix (desktops), assets/ (config files)
 pkgs/                  Packages built from upstream release binaries (both architectures), updated nightly
 secrets/               sops-encrypted secrets (see Secrets)
-scripts/               install.sh, build.sh, update.sh, update-pkgs.sh
+bin/                   install-host, build, update, update-pkgs (in the PATH with direnv: .envrc)
 .github/               CI, nightly updates, Dependabot
 ```
 
@@ -49,16 +49,16 @@ The repository includes a development shell with the tools to work on it (`sops`
 
 | Task | Command | Changes the code |
 |---|---|---|
-| Deploy | `scripts/build.sh [host]` | no |
-| Update dependencies | `scripts/update.sh` (also done nightly by CI) | yes |
+| Deploy | `bin/build [host]` | no |
+| Update dependencies | `bin/update` (also done nightly by CI) | yes |
 | Check | `nix flake check`, then evaluate the hosts (see CI) | no |
-| Install a host | `scripts/install.sh <host>` from the NixOS live ISO | no |
+| Install a host | `bin/install-host <host>` from the NixOS live ISO | no |
 
-- **`scripts/build.sh [host]`** pulls `origin/master` (fast-forward only, on `master`), then runs
+- **`bin/build [host]`** pulls `origin/master` (fast-forward only, on `master`), then runs
   `nixos-rebuild switch` for one host: this one by default, or another one, built on itself and switched over SSH
   once reachable (`--build-host`, `--target-host`, sudo's password asked once). It never writes `flake.lock`
   (`--no-update-lock-file`).
-- **`scripts/update.sh`** runs `nix flake update`, `scripts/update-pkgs.sh` (latest release and hashes of each
+- **`bin/update`** runs `nix flake update`, `bin/update-pkgs` (latest release and hashes of each
   package in `pkgs/`, plus `vendorHash` for the PHP ones), and prints a Markdown summary. Locally on `master`, it pulls `origin/master` first.
 - **`nix flake check`** builds `pkgs/` for the current system. It doesn't fully evaluate the NixOS configurations, so
   CI also evaluates each host's `config.system.build.toplevel.drvPath`:
@@ -74,12 +74,12 @@ The repository includes a development shell with the tools to work on it (`sops`
 | Workflow | When | What |
 |---|---|---|
 | `ci.yaml` | Push to `master`, pull requests | yamllint and shellcheck (devShell tools), `nix flake check` on x86_64 and aarch64, host evaluation. Merges Dependabot pull requests once everything passed. |
-| `update.yaml` | Nightly (02:00 UTC), manually | `scripts/update.sh`, the same checks on both architectures, then opens a signed pull request and merges it. |
+| `update.yaml` | Nightly (02:00 UTC), manually | `bin/update`, the same checks on both architectures, then opens a signed pull request and merges it. |
 | `cache.yaml` | Push to `master`, after `update.yaml`, manually (never pull requests) | Builds each x86_64 host on our runners (`talmox-nix`, ARC in sebastka/homelab) and pushes it to our binary cache (`modules/nixos/common/nix-cache.nix`). |
 | Dependabot | Weekly | Updates the actions (pinned by commit), only releases at least 7 days old. |
 
 Servers deploy what is merged on `master` by themselves (`system.autoUpgrade`, rebooting between 04:00 and 06:00 when
-the kernel changed). Desktops are deployed with `scripts/build.sh`.
+the kernel changed). Desktops are deployed with `bin/build`.
 
 ## Installing a host
 
@@ -94,7 +94,7 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
    ```sh
    git clone https://github.com/sebastka/nixos.git && cd nixos
    lsblk                     # check the disk in hosts/<host>/disko.nix
-   scripts/install.sh geras
+   bin/install-host geras
    ```
 
    The script sets up GnuPG and pcscd for the Yubikey, decrypts the host's install secrets (before touching the
@@ -102,7 +102,7 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
    Secure Boot keys, and runs `nixos-install`.
 
    **Without the Yubikey on the host** (zeus: no USB-C): on the live ISO, `passwd` (for SSH) and `ip a`; then from
-   another machine with the Yubikey, in this repo: `scripts/install.sh <host> nixos@<IP>`. It decrypts the secrets
+   another machine with the Yubikey, in this repo: `bin/install-host <host> nixos@<IP>`. It decrypts the secrets
    there, copies them into the live ISO's RAM, clones the repo on it and runs the install in the same terminal. No
    FIDO2 enrollment then (TPM hosts don't need one; otherwise the command is printed, for after the first boot).
 4. **First boot:** unlock the disk with the Yubikey (PIN and touch; the LUKS passphrase is the fallback). Lanzaboote
@@ -122,7 +122,7 @@ Windows disks (980 PRO 500 GB with Windows' ESP, 980 PRO 2 TB) are never touched
   (Setup Mode). Keep `dbx`.
 - **Live ISO:** `lsblk` must show the 970 EVO Plus (serial `S4EVNS0N905239P`, `hosts/zeus/disko.nix`) as the disk with
   Mint's partitions: it's the only disk disko wipes.
-- **Disk unlock:** the passphrase by default (no waiting for a Yubikey). The Yubikey enrolled by `scripts/install.sh`
+- **Disk unlock:** the passphrase by default (no waiting for a Yubikey). The Yubikey enrolled by `bin/install-host`
   still works when plugged in at boot (PIN and touch).
 - **Windows:** NixOS is the default boot entry. Windows is picked in the firmware boot menu (F12), or from NixOS
   with `sudo efibootmgr --bootnext <number of "Windows Boot Manager">` and a reboot. Our Secure Boot keys include
@@ -143,7 +143,7 @@ Windows disks (980 PRO 500 GB with Windows' ESP, 980 PRO 2 TB) are never touched
 | `secrets/<host>-secure-boot.sops.yaml` | The host's Secure Boot keys (PK, KEK, db) | GnuPG key only |
 
 Recipients are defined in `.sops.yaml`. Hosts decrypt with the age key derived from their SSH host key; the host key
-and Secure Boot files are only used at install time, by `scripts/install.sh`.
+and Secure Boot files are only used at install time, by `bin/install-host`.
 
 Plaintext copies follow the `secrets/.<name>.sops.yaml` naming (git-ignored), and encrypt to `secrets/<name>.sops.yaml`:
 

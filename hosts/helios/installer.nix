@@ -8,7 +8,7 @@
 # installed, from another machine over SSH (no Yubikey on helios needed):
 #   nix build .#nixosConfigurations.helios-installer.config.system.build.isoImage   (on zeus)
 #   dd it to a USB stick, boot helios from it (WAN cable in enp1s0, as usual), then from geras:
-#   scripts/install.sh helios nixos@192.168.0.1
+#   bin/install-host helios nixos@192.168.0.1
 # The same network, firewall and DHCP as helios (./network.nix, ./firewall.nix, ./dhcp.nix), from RAM. DNS without
 # secrets: the live ISO can't decrypt helios's (no host key), so a plainer Unbound than ./dns.nix: the local names
 # unsigned, no DNS over TLS (its certificate), no ad blocking. No Cloudflare record updates (./acme.nix) either.

@@ -14,9 +14,9 @@
 #    changes what the TPM measures, so Windows would otherwise ask for the recovery key.
 # 2. Firmware: CSM disabled, Secure Boot mode Custom, delete only the PK (Setup Mode). Keep dbx. For wake-on-LAN:
 #    Wake on LAN enabled, ErP disabled (it cuts the network card's power when off).
-# 3. Live ISO: scripts/install.sh zeus. Will install to the disk with serial S4EVNS0N905239P (./disko.nix)
+# 3. Live ISO: bin/install-host zeus. Will install to the disk with serial S4EVNS0N905239P (./disko.nix)
 #    The Yubikey (USB-C) doesn't fit zeus: on the live ISO passwd and ip a, then from geras
-#    scripts/install.sh zeus nixos@<IP> (README.md, "Installing a host").
+#    bin/install-host zeus nixos@<IP> (README.md, "Installing a host").
 #
 # After installing:
 # - First boot: lanzaboote enrolls our Secure Boot keys (Microsoft's included) and reboots. Check: `bootctl status`

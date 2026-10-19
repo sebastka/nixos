@@ -8,18 +8,18 @@
 # 1. Secrets: from Ansible's secrets (secret_cloudflare_api_token, secret_dnssec_*_private), fill in
 #    secrets/.helios.sops.yaml, then encrypt it: sops -e secrets/.helios.sops.yaml > secrets/helios.sops.yaml
 #    Then add helios to the shared secrets (Yubikey PIN): sops updatekeys -y secrets/common.sops.yaml
-# 2. Commit and push: scripts/install.sh pulls origin/master on the live ISO.
+# 2. Commit and push: bin/install-host pulls origin/master on the live ISO.
 # 3. Firmware (AMI): legacy BIOS boot, as the FW6's BIOS updates need: Secure Boot off (it can't be on with legacy
 #    boot), CSM on, boot mode Legacy (not UEFI). No TPM: the FW6's firmware has no PTT, hence a disk without
 #    encryption (./disko.nix).
 # 4. Boot helios's installer (./installer.nix: the live ISO as the router, so the LAN keeps its DHCP, DNS and internet
 #    while helios's disk is installed). Build it on zeus, then dd it to a USB stick:
 #      nix build .#nixosConfigurations.helios-installer.config.system.build.isoImage
-#    In the firmware's boot menu, its legacy (non-UEFI) entry: the ISO boots both ways, and install.sh installs GRUB
-#    for the mode it was booted in. Check on it: [ -d /sys/firmware/efi ] && echo UEFI || echo BIOS
+#    In the firmware's boot menu, its legacy (non-UEFI) entry: the ISO boots both ways, and bin/install-host installs
+#    GRUB for the mode it was booted in. Check on it: [ -d /sys/firmware/efi ] && echo UEFI || echo BIOS
 #    Screen and keyboard on helios, WAN cable in enp1s0 (port 1) as usual: it gets the public IP from the ISP by DHCP.
 #    Then from geras (Yubikey there, no password: the installer has its SSH key):
-#      scripts/install.sh helios nixos@192.168.0.1
+#      bin/install-host helios nixos@192.168.0.1
 # 5. Reboot, without the USB stick: GRUB boots NixOS by itself (no passphrase, no Secure Boot keys to enroll).
 #
 # After installing:

@@ -3,7 +3,7 @@
 {
   imports = [ disko.nixosModules.disko ];
 
-  # Declarative partitioning, used by scripts/install.sh to wipe, format and mount the disk.
+  # Declarative partitioning, used by bin/install-host to wipe, format and mount the disk.
   # Layout: ESP + single LUKS container holding BTRFS subvolumes (swapfile included, so one unlock).
   # Only this disk: the Windows disks (980 PRO 500 GB and 2 TB) and their ESP are left alone (dual boot).
   disko.devices.disk.main = {
@@ -35,7 +35,7 @@
               allowDiscards = true;
               # Unlocked by the TPM (enrolled after the first boot, ./default.nix): no input, so wake-on-LAN boots
               # all the way. The passphrase otherwise, when the TPM refuses (Secure Boot off or other keys) or
-              # nothing is enrolled in it yet. No Yubikey (scripts/install.sh skips it: tpm2-device below).
+              # nothing is enrolled in it yet. No Yubikey (bin/install-host skips it: tpm2-device below).
               crypttabExtraOpts = [ "tpm2-device=auto" ];
             };
             content = {

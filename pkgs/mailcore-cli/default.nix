@@ -8,7 +8,7 @@
 
 # mailcore CLI, built with the lock of the (private) Fjordmail/mailcore-sdk monorepo: each release of the
 # public Fjordmail/mailcore-cli has a mailcore-sdk-<version>.tar.gz with its composer.json, composer.lock and packages/.
-# Update: scripts/update-pkgs.sh (version, then hash and vendorHash).
+# Update: bin/update-pkgs (version, then hash and vendorHash).
 php84.buildComposerProject2 (finalAttrs: {
   pname = "mailcore-cli";
   version = "0.1.9";

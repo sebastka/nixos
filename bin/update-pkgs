@@ -2,7 +2,7 @@
 # Update the version and per-architecture hashes of the packages in pkgs/ to their latest upstream release.
 # Prints a Markdown list of the updates on stdout (used as pull request body).
 #
-# Usage: ./scripts/update-pkgs.sh
+# Usage: ./bin/update-pkgs
 set -euo pipefail
 cd "$(dirname "$0")/.." # Repo root
 

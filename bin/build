@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Deploy a host's NixOS configuration, as it is in the code on origin/master. Never changes the code:
-# - Update dependencies with scripts/update.sh (or the "Update dependencies" workflow)
+# - Update dependencies with bin/update (or the "Update dependencies" workflow)
 # - Check everything with `nix flake check`
 #
-# Usage: scripts/build.sh [host]   (this host by default)
+# Usage: bin/build [host]   (this host by default)
 # Another host is built on itself (no Nix trust needed there: only the derivations are copied to it, from the
 # substituters otherwise), then switched over SSH, with sudo's password asked once.
 set -euxo pipefail

@@ -3,7 +3,7 @@
 {
   imports = [ disko.nixosModules.disko ];
 
-  # Declarative partitioning, used by scripts/install.sh to wipe, format and mount the disk.
+  # Declarative partitioning, used by bin/install-host to wipe, format and mount the disk.
   # Layout: ESP + BTRFS subvolumes (swapfile included), as on the other hosts but not encrypted: helios has no TPM
   # (the FW6's firmware has no PTT), and a router must come back by itself after a power cut or an upgrade's reboot,
   # with nobody to type a passphrase. Its secrets on disk (sops-nix's: DNSSEC keys, Cloudflare token, SSH host key)

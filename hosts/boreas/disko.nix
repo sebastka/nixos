@@ -15,7 +15,7 @@
       name = "cryptroot"; # Passphrase is prompted when formatting, kept as recovery
       settings = {
         allowDiscards = true;
-        # Unlock with the Yubikey (FIDO2 + PIN + touch), enrolled by scripts/install.sh.
+        # Unlock with the Yubikey (FIDO2 + PIN + touch), enrolled by bin/install-host.
         # Falls back to the passphrase prompt if the Yubikey is not plugged in within 10s.
         crypttabExtraOpts = [
           "fido2-device=auto"

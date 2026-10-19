@@ -8,7 +8,7 @@
 
 # domeneshop CLI with the dashboard:* commands (sebastka/domeneshop-dashboard, picked up when installed).
 # Built from the monorepo the packages are split from: its root composer.lock pins every dependency.
-# Update: scripts/update-pkgs.sh (version, then hash and vendorHash).
+# Update: bin/update-pkgs (version, then hash and vendorHash).
 php84.buildComposerProject2 (finalAttrs: {
   pname = "domeneshop-cli";
   version = "0.3.0";

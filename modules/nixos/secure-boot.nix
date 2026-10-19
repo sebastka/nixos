@@ -13,7 +13,7 @@
 
   boot.lanzaboote = {
     enable = true;
-    # Pre-generated keys (secrets/<host>-secure-boot.sops.yaml), restored by scripts/install.sh.
+    # Pre-generated keys (secrets/<host>-secure-boot.sops.yaml), restored by bin/install-host.
     pkiBundle = "/var/lib/sbctl";
 
     # On first boot, stage the keys on the ESP and reboot: systemd-boot then enrolls them,

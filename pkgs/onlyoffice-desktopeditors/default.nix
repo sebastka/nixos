@@ -198,7 +198,7 @@ in
 # Fonts are also discovered by looking in /usr/share/fonts, so adding fonts to targetPkgs will include them
 buildFHSEnv {
   inherit (derivation) pname version;
-  # Its .deb, for scripts/update-pkgs.sh (src.url of each system)
+  # Its .deb, for bin/update-pkgs (src.url of each system)
   passthru.src = derivation.src;
 
   targetPkgs = pkgs': [

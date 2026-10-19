@@ -22,7 +22,7 @@
 #      sgdisk -p /dev/nvme0n1          # Its number N (usually 5), then name it:
 #      sgdisk -c N:nixos /dev/nvme0n1
 #    Never touch p1 (iBootSystemContainer), the macOS container or the last one (RecoveryOSContainer).
-# 3. scripts/install.sh boreas: LUKS and BTRFS on the "nixos" partition only (./disko.nix), mounts the ESP
+# 3. bin/install-host boreas: LUKS and BTRFS on the "nixos" partition only (./disko.nix), mounts the ESP
 #    (./hardware-configuration.nix), adds firmware.cpio to the Nix store, then installs.
 #
 # After installing:
@@ -60,7 +60,7 @@
 
   # Peripheral firmware (Wi-Fi, Bluetooth, webcam...), extracted from macOS by the Asahi installer into
   # vendorfw/firmware.cpio on the ESP. A flake can't read /boot, and the file can't be in this public repository:
-  # it's added to the Nix store by its hash (scripts/install.sh, or `sudo nix-store --add-fixed sha256
+  # it's added to the Nix store by its hash (bin/install-host, or `sudo nix-store --add-fixed sha256
   # /boot/vendorfw/firmware.cpio` after a new Asahi installer run, with the new hash here).
   hardware.asahi.peripheralFirmwareDirectory = pkgs.linkFarm "asahi-peripheral-firmware" {
     "firmware.cpio" = pkgs.requireFile {

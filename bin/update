@@ -3,7 +3,7 @@
 # Run by the "Update dependencies" workflow, or locally to update without waiting for it.
 # Prints a Markdown summary on stdout (used as pull request body).
 #
-# Usage: ./scripts/update.sh
+# Usage: ./bin/update
 set -euo pipefail
 cd "$(dirname "$0")/.." # Repo root
 
@@ -22,5 +22,5 @@ ${nix} flake update 2>&1 | grep -v '^warning:' || true
 echo '```'
 
 echo "## pkgs"
-pkgs="$(./scripts/update-pkgs.sh)"
+pkgs="$(./bin/update-pkgs)"
 echo "${pkgs:-No updates}"

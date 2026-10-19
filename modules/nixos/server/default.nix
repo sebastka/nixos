@@ -16,7 +16,7 @@
     enable = true;
     flake = "github:sebastka/nixos#${config.networking.hostName}"; # Explicit, not from the running hostname
     upgrade = false; # --upgrade only updates root's channels, unused with flakes
-    # Fail instead of resolving inputs missing from master's flake.lock (as scripts/build.sh)
+    # Fail instead of resolving inputs missing from master's flake.lock (as bin/build)
     flags = [ "--no-update-lock-file" ];
     dates = "04:30";
     randomizedDelaySec = "30min";
