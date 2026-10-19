@@ -46,6 +46,16 @@
         model = "opus";
       };
     };
+    # Codex through the ACP adapter from Nix (instead of the registry's, npx), running our CLI: the same CODEX_HOME,
+    # so the same login and settings as in a terminal
+    Codex = {
+      type = "custom";
+      command = lib.getExe pkgs-unstable.codex-acp;
+      env = {
+        CODEX_PATH = lib.getExe config.programs.codex.package;
+        CODEX_HOME = config.home.sessionVariables.CODEX_HOME;
+      };
+    };
     # Our Copilot CLI too (ACP: --acp), instead of the registry's (npx, ~/.copilot): the same config directory, so the
     # same login, as in a terminal
     "GitHub Copilot" = {
