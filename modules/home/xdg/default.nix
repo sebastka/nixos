@@ -71,6 +71,9 @@
   # (programs.npm, on desktops, sets the same file: it writes it)
   home.sessionVariables.NPM_CONFIG_USERCONFIG = lib.mkDefault "${config.xdg.configHome}/npm/npmrc";
   home.sessionVariables.NPM_CONFIG_CACHE = "${config.xdg.cacheHome}/npm";
+  # The same in lower case, the only case prebuild-install reads (rc library: npm_config_*): its native modules'
+  # prebuilt binaries in $XDG_CACHE_HOME/npm/_prebuilds, not ~/.npm/_prebuilds
+  home.sessionVariables.npm_config_cache = "${config.xdg.cacheHome}/npm";
   home.sessionVariables.NPM_CONFIG_LOGS_DIR = "${config.xdg.stateHome}/npm/logs";
 
   # Node.js REPL history instead of ~/.node_repl_history
