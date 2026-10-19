@@ -11,10 +11,10 @@ Yubikeys for disk unlocking, SSH and signing.
 | Host | Hardware | Role | Status |
 |---|---|---|---|
 | `geras` | Dell XPS 15 7590 (x86_64) | Desktop (KDE Plasma) | Installed |
-| `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (KDE Plasma), dual boot with Windows | Not installed yet (Linux Mint) |
+| `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (Cinnamon), dual boot with Windows | Installed |
 | `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Not installed yet (Fedora Asahi Remix) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
-| `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall, DHCP (Kea), DNS (Unbound, NSD) | Not installed yet (Debian 13, Ansible) |
+| `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall, DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
 
 Each host's install steps are at the top of its `hosts/<host>/default.nix`.
 
@@ -25,15 +25,19 @@ flake.nix              Inputs, hosts (nixosConfigurations), pkgs/ as packages an
 hosts/<host>/          Per-host configuration (hardware, disko, impermanence; helios: the router's services)
 modules/nixos/
   common/              Every host: nix, boot, locale and keyboard, sops-nix, users (email and picture), OpenSSH server
-  desktop/             Desktops: Plasma (no Flatpak), PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH
-                       agent), Tailscale (profiles in the network applet: plasma-nm-ts), fonts; apps for every user
-                       (Firefox, Thunderbird, Kate, Chromium, Tern), and their user config (coding agents, ops tools,
+  desktop/             Desktops: PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH agent), Tailscale,
+                       Bluetooth, rootless Docker, Syncthing, fonts; apps for every user (Firefox, Thunderbird,
+                       Chromium, Telegram, OnlyOffice, Tern), and their user config (coding agents, Node, ops tools,
                        VS Code)
-  server/              Servers: systemd-networkd, resolved, Zabbix agent, unattended upgrades
+  plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Tailscale in the network
+  cinnamon/            applet: plasma-nm-ts), GNOME (with GNOME Classic) or Cinnamon
+  server/              Servers: systemd-networkd, resolved, Zabbix agent, SMART monitoring (smartd), unattended
+                       upgrades
   secure-boot.nix      Lanzaboote with our own keys (geras, zeus; helios boots legacy BIOS, without it)
   home-manager/        home-manager integration, modules shared by every user
 modules/home/          home-manager modules: zsh, starship, git, gpg, ssh, neovim, vim, htop, readline, direnv, XDG,
-                       web apps (programs.webApps), and the desktop ones (coding agents, ops, VS Code)
+                       bw, bws, cscli, web apps (programs.webApps), and the desktop ones (coding agents, Node, ops,
+                       VS Code, Dolphin; Zed, currently disabled)
 users/<user>/          User account; home.nix (every host: identities in keys/ and ssh/, git, GnuPG, scripts),
                        desktop.nix, work.nix and tern.nix (desktops), assets/ (config files)
 pkgs/                  Packages built from upstream release binaries (both architectures), updated nightly
@@ -134,13 +138,14 @@ Windows disks (980 PRO 500 GB with Windows' ESP, 980 PRO 2 TB) are never touched
 | File | Content | Encrypted for |
 |---|---|---|
 | `secrets/common.sops.yaml` | User password hashes | GnuPG key, every host |
-| `secrets/desktop.sops.yaml` | NetworkManager Wi-Fi PSKs (`nm-wifi-env`) | GnuPG key, desktops |
+| `secrets/desktop.sops.yaml` | NetworkManager Wi-Fi PSKs (`nm-wifi-env`), Claude Code's instructions (`claude-md`), Syncthing's folder encryption password (`syncthing-encryption-password`) | GnuPG key, desktops |
+| `secrets/<host>.sops.yaml` | The host's pull token for our binary cache (`attic-pull-token`); desktops: its Syncthing identity (`syncthing-cert`, `syncthing-key`) | GnuPG key, the host |
 | `secrets/ssh-work.sops.yaml` | Work SSH hosts (`ssh-work-config`, linked as `~/.ssh/config.d/work.conf`) and their keys (`ssh-work-known-hosts`, `~/.ssh/known_hosts.d/inboxcom`) | GnuPG key, desktops |
 | `secrets/work.sops.yaml` | Work (inboxcom): Kubernetes clusters and default context (`inboxcom-clusters`, `default-context`, for `inboxcom_kubeconfig`) | GnuPG key, desktops |
 | `secrets/tern.sops.yaml` | Tern account files and signatures, names included: a `files` list of `path`/`content` (`users/sebastian/tern.nix`) | GnuPG key, desktops |
-| `secrets/helios.sops.yaml` | Cloudflare API token (certificates, dynamic DNS), DNSSEC private keys of the local zones (`hosts/helios`) | GnuPG key, helios |
+| `secrets/helios.sops.yaml` | Also: Cloudflare API token (certificates, dynamic DNS), DNSSEC private keys of the local zones, `home.karlsen.fr` and `168.192.in-addr.arpa` (`hosts/helios`) | GnuPG key, helios |
 | `secrets/<host>-ssh-host-key.sops.yaml` | The host's SSH host key (also its age identity) | GnuPG key only |
-| `secrets/<host>-secure-boot.sops.yaml` | The host's Secure Boot keys (PK, KEK, db) | GnuPG key only |
+| `secrets/<host>-secure-boot.sops.yaml` | The host's Secure Boot keys (PK, KEK, db): geras, zeus (helios's is unused: legacy BIOS) | GnuPG key only |
 
 Recipients are defined in `.sops.yaml`. Hosts decrypt with the age key derived from their SSH host key; the host key
 and Secure Boot files are only used at install time, by `bin/install-host`.
@@ -163,7 +168,7 @@ Two Yubikeys: personal (`private`) and work (`inboxcom`).
 
 | Use | Yubikey application | Details |
 |---|---|---|
-| Disk unlock (LUKS) | FIDO2 | PIN and touch at boot, passphrase as fallback (`crypttabExtraOpts`). zeus: passphrase by default, the Yubikey when plugged in. helios: the TPM (unattended). |
+| Disk unlock (LUKS) | FIDO2 | PIN and touch at boot, passphrase as fallback (`crypttabExtraOpts`). zeus: passphrase by default, the Yubikey when plugged in. helios: no disk encryption (no TPM, unattended boots). |
 | SSH | OpenPGP (authentication subkey) | Through gpg-agent (`SSH_AUTH_SOCK`), PIN once. Public keys in `users/sebastian/keys/*.id_ed25519_gpg.pub` |
 | Commit signing, sops | OpenPGP | Personal key by default, work key in `~/Dev/Work/` (`users/sebastian/work.nix`, desktops) |
 
@@ -221,6 +226,22 @@ Notes:
   public. They stay in the inboxcom vault, e.g. in `.envrc.local`, with the inboxcom `BITWARDENCLI_APPDATA_DIR` and
   an unlocked session (`BW_SESSION`): `export BWS_ACCESS_TOKEN="$(bw get password <item>)"`.
 
+## Coding agents
+
+Claude Code, Codex and the GitHub Copilot CLI are installed on desktops from nixpkgs-unstable
+(`modules/home/programs/coding-agents`): they move fast, and are updated with `flake.lock`, never by themselves
+(Copilot's self-update is off: `COPILOT_AUTO_UPDATE=false`). Their config directories are in `~/.config`, not `~/`:
+
+| Agent | Command | Config directory | VS Code | Zed (ACP) |
+|---|---|---|---|---|
+| Claude Code | `claude` | `~/.config/claude` (`CLAUDE_CONFIG_DIR`) | our CLI (`claudeCode.claudeProcessWrapper`) | `claude-agent-acp`, running our CLI |
+| Codex | `codex` | `~/.config/codex` (`CODEX_HOME`) | our CLI (`chatgpt.cliExecutable`) | `codex-acp`, running our CLI (`CODEX_PATH`) |
+| GitHub Copilot | `copilot` | `~/.config/copilot` (`COPILOT_HOME`) | VS Code's built-in Copilot, with its own bundled CLI | our CLI (`copilot --acp`) |
+
+Editors use the same config directories as the terminal: one login per agent. Claude Code's `CLAUDE.md` is written at
+login and each day, from the `claude-md` secret plus today's date (`users/sebastian/desktop.nix`): edit the secret,
+not the file.
+
 ## Known caveats
 
 - **Hibernation after a kernel update:** reboot before hibernating. Otherwise the next boot starts the new kernel,
@@ -228,3 +249,5 @@ Notes:
 - **NVIDIA dGPU on geras:** powered off by kernel runtime PM (no driver bound, see `hosts/geras/default.nix`). Never
   combine it with bbswitch: both at boot froze the machine.
 - **Impermanence** (`hosts/geras/impermanence.nix`) is prepared but disabled.
+- **Copilot in VS Code:** its CLI sessions watch `~/.copilot/session-state` (hard-coded), so they may recreate
+  `~/.copilot`, and miss sessions in `COPILOT_HOME`.
