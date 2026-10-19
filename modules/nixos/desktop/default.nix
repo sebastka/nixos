@@ -17,7 +17,7 @@
     ./networkmanager.nix
     ./syncthing.nix
     ./tailscale.nix
-    # ./tern.nix # Disabled
+    ./tern.nix
   ];
 
   # User configuration for every user on desktops (home-manager)
