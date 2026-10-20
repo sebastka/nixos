@@ -21,6 +21,8 @@
     {
       settings = {
         "org/cinnamon/settings-daemon/plugins/power".percentage-low = lib.gvariant.mkInt32 20;
+        # Hack as the monospace font (modules/nixos/desktop/fonts.nix), as on Plasma, instead of DejaVu Sans Mono
+        "org/gnome/desktop/interface".monospace-font-name = "Hack 10";
         # Night light, from sunset to sunrise (auto: from the timezone)
         "org/cinnamon/settings-daemon/plugins/color" = {
           night-light-enabled = true;
