@@ -39,6 +39,34 @@
         "org/cinnamon/settings-daemon/plugins/power".percentage-low = lib.gvariant.mkInt32 20;
         # Hack as the monospace font (modules/nixos/desktop/fonts.nix), as on Plasma, instead of DejaVu Sans Mono
         "org/gnome/desktop/interface".monospace-font-name = "Hack 10";
+        # GNOME Terminal (Cinnamon's), its default profile: VS Code's terminal colours (Dark Modern: its panel's grey,
+        # #CCCCCC text, VS Code's dark ANSI palette), instead of the theme's black and the Tango palette (dark blue on
+        # black: the prompt's host name, ls' directories). Bold in the bright colours: VS Code raises low-contrast
+        # colours (minimumContrastRatio), GNOME Terminal can't; the prompt's bold blue (starship) gets #3B8EEA so.
+        "org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9" = {
+          use-theme-colors = false;
+          background-color = "#181818";
+          foreground-color = "#CCCCCC";
+          bold-is-bright = true;
+          palette = [
+            "#000000" # Black
+            "#CD3131" # Red
+            "#0DBC79" # Green
+            "#E5E510" # Yellow
+            "#2472C8" # Blue
+            "#BC3FBC" # Magenta
+            "#11A8CD" # Cyan
+            "#E5E5E5" # White
+            "#666666" # Bright black
+            "#F14C4C" # Bright red
+            "#23D18B" # Bright green
+            "#F5F543" # Bright yellow
+            "#3B8EEA" # Bright blue
+            "#D670D6" # Bright magenta
+            "#29B8DB" # Bright cyan
+            "#E5E5E5" # Bright white
+          ];
+        };
         # Night light, from sunset to sunrise (auto: from the timezone)
         "org/cinnamon/settings-daemon/plugins/color" = {
           night-light-enabled = true;
