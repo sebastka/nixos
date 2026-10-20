@@ -43,7 +43,7 @@
     ./wake.nix
     ./stork.nix
     ./monitoring.nix
-    ./wan-latency.nix
+    ./port-latency.nix
     ../../modules/nixos/common
     ../../modules/nixos/server
   ];

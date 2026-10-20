@@ -59,7 +59,7 @@ in
         SendRelease = false;
       };
       # CAKE (smart queue management) on uploads: off. Ookla from zeus, 2026-10-19, at full speed (943 Mbit/s down,
-      # 939 up, with ../wan-latency.nix): 14 ms idle, 25 ms while uploading (little: the queue forms on this port, where
+      # 939 up, with ./port-latency.nix): 14 ms idle, 25 ms while uploading (little: the queue forms on this port, where
       # its fq_codel keeps latency low), but 158 ms (up to 327) while downloading: that bufferbloat is the ISP's queue,
       # for the downloads' CAKE below (wan-ingress-cake). Should uploads need it too: ~95% of the measured upload,
       # Ethernet's overhead (header, FCS, preamble, gap), fairness between LAN hosts behind the NAT (validated values).
