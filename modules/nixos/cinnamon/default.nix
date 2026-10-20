@@ -15,6 +15,22 @@
   # SSH_AUTH_SOCK.
   services.gnome.gcr-ssh-agent.enable = false;
 
+  # Linux Mint's wallpaper packs (./mint-backgrounds.nix), in System Settings > Backgrounds, one collection per pack
+  environment.systemPackages = [ (pkgs.callPackage ./mint-backgrounds.nix { }) ];
+  # Backgrounds' system collections from the system's lists (/run/current-system/sw/share), as from /usr/share on
+  # Mint. nixpkgs' rewrite of /usr/share/cinnamon (to the package's own share/cinnamon) also catches
+  # /usr/share/cinnamon-background-properties: a directory no package installs into, so none showed. Rebuilds Cinnamon.
+  nixpkgs.overlays = [
+    (final: prev: {
+      cinnamon = prev.cinnamon.overrideAttrs (old: {
+        postPatch = old.postPatch + ''
+          substituteInPlace files/usr/share/cinnamon/cinnamon-settings/modules/cs_backgrounds.py --replace-fail \
+            "$out/share/cinnamon-background-properties" "/run/current-system/sw/share/cinnamon-background-properties"
+        '';
+      });
+    })
+  ];
+
   # Laptops: the low battery warning at 20 % (10 % by default), for every user, as Plasma's (modules/nixos/plasma).
   # Its critical level and action (4 %, then 3 %: hibernate) stay. Charge thresholds: modules/nixos/desktop/battery.nix.
   programs.dconf.profiles.user.databases = [
