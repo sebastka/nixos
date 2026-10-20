@@ -21,6 +21,20 @@
     { settings."org/cinnamon/settings-daemon/plugins/power".percentage-low = lib.gvariant.mkInt32 20; }
   ];
 
-  # gpg-agent's PIN prompt (modules/nixos/desktop/gnupg.nix), GTK
-  home-manager.sharedModules = [ { services.gpg-agent.pinentry.package = pkgs.pinentry-gnome3; } ];
+  home-manager.sharedModules = [
+    # gpg-agent's PIN prompt (modules/nixos/desktop/gnupg.nix), GTK
+    { services.gpg-agent.pinentry.package = pkgs.pinentry-gnome3; }
+
+    # The session variables (home.sessionVariables: CLAUDE_CONFIG_DIR, CODEX_HOME, GNUPGHOME…) in the session, so in
+    # the apps launched from it: LightDM's session wrapper is bash, sourcing ~/.profile and ~/.xprofile, never zsh's
+    # ~/.zshenv (SDDM, on Plasma, runs the login shell). Not xsession.enable: it would also write a ~/.xsession.
+    (
+      { config, ... }:
+      {
+        home.file.".xprofile".text = ''
+          . "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
+        '';
+      }
+    )
+  ];
 }
