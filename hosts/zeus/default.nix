@@ -79,6 +79,9 @@
     }
   ];
 
+  # sebastian's user services from boot, not only while logged in: his rootless Docker
+  users.users.sebastian.linger = true;
+
   # systemd-based initrd: unit-based stage 1, enables TPM2 LUKS unlock via systemd-cryptenroll.
   boot.initrd.systemd.enable = true;
   boot.initrd.systemd.tpm2.enable = true;
