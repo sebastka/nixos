@@ -1,0 +1,54 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i python3 -p "python3.withPackages (ps: [ ps.secretstorage ])"
+# Import secrets exported by bin/keyring-export into the desktop keyring's default collection (through the Secret
+# Service API: KWallet, GNOME Keyring...), then delete the export. Items with the same attributes are replaced, so it
+# can run again. Run in the desktop session of the keyring to import into.
+# Usage: bin/keyring-import [file]   (default: $XDG_STATE_HOME/keyring-export.json.gpg)
+import argparse
+import base64
+import json
+import os
+import subprocess
+import sys
+
+import secretstorage
+
+DEFAULT_FILE = os.path.join(
+    os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "keyring-export.json.gpg"
+)
+
+# Chromium's encryption key (its saved passwords and cookies), as its KWallet backend stores it (Plasma's default),
+# and where its libsecret backend looks for it (elsewhere, and on every desktop with --password-store=gnome-libsecret,
+# modules/nixos/desktop)
+CHROMIUM_KWALLET = {"server": "Chromium Keys", "user": "Chromium Safe Storage"}
+CHROMIUM_LIBSECRET = {"xdg:schema": "chrome_libsecret_os_crypt_password_v2", "application": "chromium"}
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Import secrets exported by bin/keyring-export.")
+    parser.add_argument("file", nargs="?", default=DEFAULT_FILE)
+    args = parser.parse_args()
+
+    decrypted = subprocess.run(["gpg", "--decrypt", "--quiet", args.file], stdout=subprocess.PIPE, check=True)
+    items = json.loads(decrypted.stdout)
+
+    connection = secretstorage.dbus_init()
+    collection = secretstorage.get_default_collection(connection)
+    if collection.is_locked() and collection.unlock():
+        sys.exit(f"{collection.get_label()}: not unlocked")
+    for item in items:
+        secret = base64.b64decode(item["secret"])
+        collection.create_item(
+            item["label"], item["attributes"], secret, replace=True, content_type=item["content_type"]
+        )
+        print(f"  {item['label']}")
+        if CHROMIUM_KWALLET.items() <= item["attributes"].items():
+            collection.create_item("Chromium Safe Storage", CHROMIUM_LIBSECRET, secret, replace=True)
+            print("  Chromium Safe Storage (libsecret, from KWallet's)")
+
+    os.remove(args.file)
+    print(f"{len(items)} secrets imported into {collection.get_label()}, {args.file} deleted")
+
+
+if __name__ == "__main__":
+    main()

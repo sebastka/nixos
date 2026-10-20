@@ -1,0 +1,60 @@
+#!/usr/bin/env nix-shell
+#!nix-shell -i python3 -p "python3.withPackages (ps: [ ps.secretstorage ])"
+# Export the desktop keyring's secrets (every collection, through the Secret Service API: KWallet, GNOME Keyring...),
+# encrypted to our GnuPG key, to import them into another keyring with bin/keyring-import. Run in the desktop session
+# of the keyring to export, before switching desktop environment (e.g. Plasma to Cinnamon, or back).
+# Usage: bin/keyring-export [file]   (default: $XDG_STATE_HOME/keyring-export.json.gpg)
+import argparse
+import base64
+import json
+import os
+import subprocess
+import sys
+
+import secretstorage
+
+DEFAULT_FILE = os.path.join(
+    os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"), "keyring-export.json.gpg"
+)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Export the desktop keyring's secrets, encrypted with GnuPG.")
+    parser.add_argument("file", nargs="?", default=DEFAULT_FILE)
+    args = parser.parse_args()
+    if os.path.exists(args.file):
+        sys.exit(f"{args.file} exists: import it (bin/keyring-import), or remove it first")
+
+    connection = secretstorage.dbus_init()
+    items = []
+    for collection in secretstorage.get_all_collections(connection):
+        if collection.collection_path.endswith("/session"):
+            continue  # GNOME Keyring's in-memory collection, gone at logout
+        if collection.is_locked() and collection.unlock():
+            sys.exit(f"{collection.get_label()}: not unlocked")
+        for item in collection.get_all_items():
+            items.append(
+                {
+                    "collection": collection.get_label(),
+                    "label": item.get_label(),
+                    "attributes": item.get_attributes(),
+                    "content_type": item.get_secret_content_type(),
+                    "secret": base64.b64encode(item.get_secret()).decode(),
+                }
+            )
+
+    # Encrypted to our own key (default-recipient-self): decrypting it needs the Yubikey
+    os.makedirs(os.path.dirname(args.file), exist_ok=True)
+    os.umask(0o077)
+    subprocess.run(
+        ["gpg", "--encrypt", "--default-recipient-self", "--output", args.file],
+        input=json.dumps(items).encode(),
+        check=True,
+    )
+    print(f"{len(items)} secrets exported to {args.file}")
+    for item in items:
+        print(f"  {item['collection']}: {item['label']}")
+
+
+if __name__ == "__main__":
+    main()

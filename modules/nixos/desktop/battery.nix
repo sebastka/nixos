@@ -8,5 +8,6 @@
     ACTION=="add", SUBSYSTEM=="power_supply", KERNEL=="BAT*", ATTR{charge_types}=="*Custom*", ATTR{charge_types}="Custom"
   '';
 
-  # The low battery warning at 20 %: Plasma's in modules/nixos/plasma; GNOME's is UPower's, 20 % by default.
+  # The low battery warning at 20 %: Plasma's in modules/nixos/plasma, Cinnamon's in modules/nixos/cinnamon; GNOME's is
+  # UPower's, 20 % by default.
 }

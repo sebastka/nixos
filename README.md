@@ -10,7 +10,7 @@ Yubikeys for disk unlocking, SSH and signing.
 
 | Host | Hardware | Role | Status |
 |---|---|---|---|
-| `geras` | Dell XPS 15 7590 (x86_64) | Desktop (KDE Plasma) | Installed |
+| `geras` | Dell XPS 15 7590 (x86_64) | Desktop (Cinnamon) | Installed |
 | `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (Cinnamon), dual boot with Windows | Installed |
 | `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Not installed yet (Fedora Asahi Remix) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
@@ -29,8 +29,8 @@ modules/nixos/
                        Bluetooth, rootless Docker, Syncthing, fonts; apps for every user (Firefox, Thunderbird,
                        Chromium, Telegram, OnlyOffice, Tern), and their user config (coding agents, Node, ops tools,
                        VS Code)
-  plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Tailscale in the network
-  cinnamon/            applet: plasma-nm-ts), GNOME (with GNOME Classic) or Cinnamon
+  plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, Tailscale in the
+  cinnamon/            network applet: plasma-nm-ts), GNOME (with GNOME Classic) or Cinnamon (geras, zeus)
   server/              Servers: systemd-networkd, resolved, Zabbix agent, SMART monitoring (smartd), unattended
                        upgrades
   secure-boot.nix      Lanzaboote with our own keys (geras, zeus; helios boots legacy BIOS, without it)
@@ -42,7 +42,8 @@ users/<user>/          User account; home.nix (every host: identities in keys/ a
                        desktop.nix, work.nix and tern.nix (desktops), assets/ (config files)
 pkgs/                  Packages built from upstream release binaries (both architectures), updated nightly
 secrets/               sops-encrypted secrets (see Secrets)
-bin/                   install-host, build, update, update-pkgs (in the PATH with direnv: .envrc)
+bin/                   install-host, build, update, update-pkgs, keyring-export and keyring-import (in the PATH with
+                       direnv: .envrc)
 .github/               CI, nightly updates, Dependabot
 ```
 
@@ -219,7 +220,7 @@ Notes:
 - `~/.config/bws/config.toml` is generated for every user (`modules/home/programs/bws`, profiles from
   `programs.bws.profiles`): the servers, by profile (`inboxcom`: `vault.bitwarden.eu`, `users/sebastian/work.nix`)
   and their login cache (`~/.local/state/bws`, a private directory). The token comes from the desktop's keyring
-  (KWallet), stored once per desktop with
+  (KWallet on Plasma, GNOME Keyring on GNOME and Cinnamon), stored once per desktop with
   `secret-tool store --label='bws (inboxcom)' service bws account inboxcom`, and read by `~/Dev/Work/.envrc`.
   Outside `~/Dev/Work`, `bws` has no account. A project can use another machine account (`.envrc.local`).
 - Work credentials (`BWS_ACCESS_TOKEN`, `MAILCORE_API_KEY`...) are never in this repository, not even encrypted: it is
@@ -241,6 +242,22 @@ Claude Code, Codex and the GitHub Copilot CLI are installed on desktops from nix
 Editors use the same config directories as the terminal: one login per agent. Claude Code's `CLAUDE.md` is written at
 login and each day, from the `claude-md` secret plus today's date (`users/sebastian/desktop.nix`): edit the secret,
 not the file.
+
+## Desktop keyring
+
+Apps keep their secrets (Tern's, `gh`'s, `bws`'s token, Chromium's key...) in the desktop environment's keyring,
+through the Secret Service API: KWallet on Plasma, GNOME Keyring on GNOME and Cinnamon. Each stores them in its own
+file, so they don't follow when a host changes desktop environment. To move them, either way:
+
+```sh
+bin/keyring-export   # In the old desktop environment: every item, encrypted to our GnuPG key, in ~/.local/state
+# Deploy the new desktop environment, reboot, log in
+bin/keyring-import   # In the new one (Yubikey): into its default collection, then deletes the export
+```
+
+Chromium uses the Secret Service on every desktop environment (`--password-store=gnome-libsecret`,
+`modules/nixos/desktop`), so its saved passwords follow too. Its key from before, in KWallet's own format, is also
+imported where libsecret looks for it.
 
 ## Known caveats
 

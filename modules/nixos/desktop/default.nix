@@ -6,6 +6,13 @@
   ...
 }:
 
+let
+  # Chromium's key (its saved passwords and cookies) in the Secret Service on every desktop environment, through
+  # libsecret: by default, its KWallet API on Plasma. The same item whatever the keyring (KWallet, GNOME Keyring), so it
+  # follows with bin/keyring-export and bin/keyring-import. Only its wrapper changes: the browser stays cached.
+  chromium = pkgs.chromium.override { commandLineArgs = "--password-store=gnome-libsecret"; };
+in
+
 {
   imports = [
     ./audio.nix
@@ -22,6 +29,7 @@
 
   # User configuration for every user on desktops (home-manager)
   home-manager.sharedModules = [
+    { programs.webApps.package = chromium; }
     ../../home/programs/coding-agents
     ../../home/programs/node
     ../../home/programs/ops
@@ -57,7 +65,7 @@
 
   environment.systemPackages = with pkgs; [
     libsecret # secret-tool: secrets in the keyring
-    chromium # Also runs the web apps (modules/home/programs/web-apps)
+    chromium # Also runs the web apps (modules/home/programs/web-apps, above)
     pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
     php # The CLI (php), with its default extensions
     php.packages.composer # Built on the php above

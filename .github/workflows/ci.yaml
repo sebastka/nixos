@@ -23,7 +23,8 @@ jobs:
         run: nix develop --command yamllint --strict .
 
       - name: shellcheck
-        run: nix develop --command shellcheck bin/* users/*/scripts/*.sh
+        # bin/'s shell scripts only (by their shebang): bin/keyring-* are Python
+        run: nix develop --command shellcheck $(grep -lE '^#!(/bin/|/usr/bin/env )(ba)?sh$' bin/*) users/*/scripts/*.sh
 
   # Evaluate every host and build pkgs/, natively on both systems
   flake-check:

@@ -75,7 +75,9 @@
       "/var/lib/bluetooth"
       "/var/lib/nixos"
       "/var/lib/sbctl"
-      "/var/lib/sddm"
+      # "/var/lib/sddm"
+      "/var/lib/lightdm" # LightDM (modules/nixos/cinnamon): the last user and session
+      "/var/lib/lightdm-data"
       "/var/lib/systemd/coredump"
       "/var/lib/systemd/timers"
       "/var/lib/tailscale"
