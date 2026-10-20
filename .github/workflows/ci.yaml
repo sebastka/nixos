@@ -24,7 +24,9 @@ jobs:
 
       - name: shellcheck
         # bin/'s shell scripts only (by their shebang): bin/keyring-* are Python
-        run: nix develop --command shellcheck $(grep -lE '^#!(/bin/|/usr/bin/env )(ba)?sh$' bin/*) users/*/scripts/*.sh
+        run: >-
+          nix develop --command shellcheck $(grep -lE '^#!(/bin/|/usr/bin/env )(ba)?sh$' bin/*)
+          users/*/scripts/*.sh hosts/*/scripts/*.sh
 
   # Evaluate every host and build pkgs/, natively on both systems
   flake-check:
