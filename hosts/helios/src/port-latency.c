@@ -2,9 +2,12 @@
 // ../scripts/port-latency.sh, in C: each counter file opened once (pread at offset 0 rereads it), an absolute clock
 // (no drift), no process per check.
 //
-// Usage: port-latency [-i interval_ms] [-q quiet_seconds] [-d device]
+// Usage: port-latency [-i interval_ms] [-q quiet_seconds] [-b base_us] [-d device]
 //   -i  Check interval, in ms (default 100; 1000 must be a multiple of it)
 //   -q  Quiet seconds before releasing (default 30)
+//   -b  A base wake-up latency, in us, asked for all the time (default none): the C-states too slow for the RX FIFO
+//       forbidden even while quiet, for the bursts shorter than a check. The kernel applies the lowest request: 20 us
+//       while busy all the same.
 //   -d  The PM QoS device (default /dev/cpu_dma_latency; another file, to test without root)
 
 #define _GNU_SOURCE
@@ -86,15 +89,21 @@ static const char *device = "/dev/cpu_dma_latency";
 static int held_fd = -1;  // Open while held: the kernel keeps the request as long as the file stays open
 static int quiet;         // Quiet seconds in a row
 
-static void hold(const char *port, uint64_t bytes, double seconds) {
-  quiet = 0;
-  if (held_fd >= 0) return;
-  held_fd = open(device, O_WRONLY | O_CLOEXEC | O_CREAT, 0600);  // O_CREAT: only for a test file (-d)
-  int32_t latency = LATENCY_US;  // As the binary s32 the kernel reads
-  if (held_fd < 0 || write(held_fd, &latency, sizeof latency) != sizeof latency) {
+// A PM QoS request, kept as long as the returned file stays open
+static int request(int32_t latency_us) {
+  int fd = open(device, O_WRONLY | O_CLOEXEC | O_CREAT, 0600);  // O_CREAT: only for a test file (-d)
+  // As the binary s32 the kernel reads
+  if (fd < 0 || write(fd, &latency_us, sizeof latency_us) != sizeof latency_us) {
     perror(device);
     exit(1);
   }
+  return fd;
+}
+
+static void hold(const char *port, uint64_t bytes, double seconds) {
+  quiet = 0;
+  if (held_fd >= 0) return;
+  held_fd = request(LATENCY_US);
   printf("%s (%" PRIu64 " Mbit/s over %g s) busy: wake-up latency %d us at most\n", port,
          (uint64_t)(bytes * 8 / seconds / 1000000), seconds, LATENCY_US);
 }
@@ -106,22 +115,30 @@ static void release(int quiet_seconds) {
 }
 
 int main(int argc, char **argv) {
-  int interval_ms = 100, quiet_seconds = 30, opt;
-  while ((opt = getopt(argc, argv, "i:q:d:")) != -1) {
+  int interval_ms = 100, quiet_seconds = 30, base_us = 0, opt;
+  while ((opt = getopt(argc, argv, "i:q:b:d:")) != -1) {
     switch (opt) {
       case 'i': interval_ms = atoi(optarg); break;
       case 'q': quiet_seconds = atoi(optarg); break;
+      case 'b': base_us = atoi(optarg); break;
       case 'd': device = optarg; break;
       default:
-        fprintf(stderr, "Usage: %s [-i interval_ms] [-q quiet_seconds] [-d device]\n", argv[0]);
+        fprintf(stderr, "Usage: %s [-i interval_ms] [-q quiet_seconds] [-b base_us] [-d device]\n", argv[0]);
         return 2;
     }
   }
-  if (interval_ms <= 0 || 1000 % interval_ms != 0 || quiet_seconds <= 0) {
-    fprintf(stderr, "%s: the interval must divide 1000 ms, the quiet time be positive\n", argv[0]);
+  if (interval_ms <= 0 || 1000 % interval_ms != 0 || quiet_seconds <= 0 || base_us < 0 ||
+      (base_us > 0 && base_us <= LATENCY_US)) {
+    fprintf(stderr, "%s: the interval must divide 1000 ms, the quiet time be positive, the base above %d us\n",
+            argv[0], LATENCY_US);
     return 2;
   }
   setvbuf(stdout, NULL, _IOLBF, 0);  // A line at a time to the journal
+
+  if (base_us > 0) {
+    request(base_us);  // Never closed: for as long as the program runs
+    printf("Base wake-up latency: %d us at most, all the time\n", base_us);
+  }
 
   struct port ports[MAX_PORTS];
   int count = find_ports(ports);

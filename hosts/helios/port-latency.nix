@@ -32,7 +32,10 @@ in
     wantedBy = [ "multi-user.target" ];
     after = [ "systemd-networkd.service" ]; # Its ports, renamed (enpXs0), found at its start
     serviceConfig = {
-      ExecStart = "${portLatency}/bin/port-latency -i 100";
+      # Testing -b 150: at most C7s (124 us) even while quiet, not C8-C10 (200-890 us), for the bursts shorter than a
+      # check (the I211's RX FIFO, ~250 us at 1 Gbit/s, overflows while waking from C10). To compare with -b none:
+      # rx_missed_errors per received packet, and x86_pkg_temp (48 °C without, quiet, 2026-10-20).
+      ExecStart = "${portLatency}/bin/port-latency -i 100 -b 150";
       Restart = "always"; # Its request ends with it: deep C-states again, never stuck shallow
     };
   };
