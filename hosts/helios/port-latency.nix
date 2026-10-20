@@ -6,19 +6,25 @@
 # ports (uploads, backups: there, the WAN only receives their ACKs). Off for the heat, except under load: above 20
 # Mbit/s received on any port (over a second), a CPU wake-up latency of 20 us at most is asked (PM QoS, held while
 # /dev/cpu_dma_latency stays open): C1E (10 us) still, not C3 (70 us) and deeper, as intel_idle.max_cstate=2 did.
-# Also within 0.2 s of a burst (a transfer's first packets come before a second's average shows it): above 100
-# Mbit/s over 0.2 s. Not 20 Mbit/s there: everyday traffic (a web page, a video's chunk) reaches it in 11% of
-# 0.2 s windows, while idle (none above 50 Mbit/s), and would never let it go. Released after 30 seconds, each
-# below 20 Mbit/s.
-# The script: ./scripts/port-latency.sh
+# Also within a check of a burst (a transfer's first packets come before a second's average shows it; every 0.1 s
+# for the C version, 0.2 s for the shell script): above 100 Mbit/s over it. Not 20 Mbit/s there: everyday traffic (a
+# web page, a video's chunk) reaches it in 11% of 0.2 s windows, while idle (none above 50 Mbit/s, nor above 100 over
+# 0.1 s), and would never let it go. Released after 30 seconds, each below 20 Mbit/s.
+# The program: ./src/port-latency.c (or the shell script, ./scripts/port-latency.sh, below)
 #   journalctl -u port-latency    Its switches
 #   grep . /sys/class/net/enp*/statistics/rx_missed_errors    The losses it is about
 let
-  portLatency = pkgs.writeShellApplication {
-    name = "port-latency";
-    runtimeInputs = [ pkgs.coreutils ];
-    text = builtins.readFile ./scripts/port-latency.sh;
-  };
+  # Testing: ./src/port-latency.c, every 0.1 s (0.7% of a core, vs 2.1% for the shell script at 0.1 s, 1.1% at 0.2 s)
+  portLatency = pkgs.runCommandCC "port-latency" { meta.mainProgram = "port-latency"; } ''
+    mkdir -p $out/bin
+    $CC -O2 -Wall -Wextra -Werror -o $out/bin/port-latency ${./src/port-latency.c}
+  '';
+  # The shell script, every 0.2 s, until the test convinces
+  # portLatency = pkgs.writeShellApplication {
+  #   name = "port-latency";
+  #   runtimeInputs = [ pkgs.coreutils ];
+  #   text = builtins.readFile ./scripts/port-latency.sh;
+  # };
 in
 {
   systemd.services.port-latency = {
@@ -26,7 +32,7 @@ in
     wantedBy = [ "multi-user.target" ];
     after = [ "systemd-networkd.service" ]; # Its ports, renamed (enpXs0), found at its start
     serviceConfig = {
-      ExecStart = "${portLatency}/bin/port-latency";
+      ExecStart = "${portLatency}/bin/port-latency -i 100";
       Restart = "always"; # Its request ends with it: deep C-states again, never stuck shallow
     };
   };
