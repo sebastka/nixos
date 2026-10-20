@@ -42,6 +42,7 @@
     ./acme.nix
     ./wake.nix
     ./stork.nix
+    ./crowdsec.nix
     ./monitoring.nix
     ./port-latency.nix
     ../../modules/nixos/common

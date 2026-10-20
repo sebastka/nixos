@@ -14,7 +14,7 @@ Yubikeys for disk unlocking, SSH and signing.
 | `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (Cinnamon), dual boot with Windows | Installed |
 | `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Not installed yet (Fedora Asahi Remix) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
-| `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall, DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
+| `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall (with the homelab's CrowdSec decisions), DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
 
 Each host's install steps are at the top of its `hosts/<host>/default.nix`.
 
@@ -144,7 +144,7 @@ Windows disks (980 PRO 500 GB with Windows' ESP, 980 PRO 2 TB) are never touched
 | `secrets/ssh-work.sops.yaml` | Work SSH hosts (`ssh-work-config`, linked as `~/.ssh/config.d/work.conf`) and their keys (`ssh-work-known-hosts`, `~/.ssh/known_hosts.d/inboxcom`) | GnuPG key, desktops |
 | `secrets/work.sops.yaml` | Work (inboxcom): Kubernetes clusters and default context (`inboxcom-clusters`, `default-context`, for `inboxcom_kubeconfig`) | GnuPG key, desktops |
 | `secrets/tern.sops.yaml` | Tern account files and signatures, names included: a `files` list of `path`/`content` (`users/sebastian/tern.nix`) | GnuPG key, desktops |
-| `secrets/helios.sops.yaml` | Also: Cloudflare API token (certificates, dynamic DNS), DNSSEC private keys of the local zones, `home.karlsen.fr` and `168.192.in-addr.arpa` (`hosts/helios`) | GnuPG key, helios |
+| `secrets/helios.sops.yaml` | Also: Cloudflare API token (certificates, dynamic DNS), DNSSEC private keys of the local zones, `home.karlsen.fr` and `168.192.in-addr.arpa`, CrowdSec bouncer's API key (`crowdsec-bouncer-api-key`) (`hosts/helios`) | GnuPG key, helios |
 | `secrets/<host>-ssh-host-key.sops.yaml` | The host's SSH host key (also its age identity) | GnuPG key only |
 | `secrets/<host>-secure-boot.sops.yaml` | The host's Secure Boot keys (PK, KEK, db): geras, zeus (helios's is unused: legacy BIOS) | GnuPG key only |
 

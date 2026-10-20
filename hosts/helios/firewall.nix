@@ -44,9 +44,11 @@ in
     tables.wan = {
       family = "netdev";
       content = ''
-        # Volatile: nothing adds to them yet
+        # Volatile: nothing adds to them yet (ranges, by hand: nft add element netdev wan blackhole4 { 192.0.2.0/24 })
         set blackhole4 { type ipv4_addr; flags interval; auto-merge; }
         set blackhole6 { type ipv6_addr; flags interval; auto-merge; }
+        # CrowdSec's decisions, filled by its bouncer (./crowdsec.nix): single addresses, until their decision expires
+        set crowdsec4 { type ipv4_addr; flags timeout; }
 
         set bogons4 {
           type ipv4_addr; flags interval;
@@ -69,9 +71,23 @@ in
           ip6 saddr @bogons6 drop
           ip saddr @blackhole4 drop
           ip6 saddr @blackhole6 drop
+          ip saddr @crowdsec4 counter drop
         }
       '';
     };
+
+    # With IPv6 from the ISP: CrowdSec's IPv6 decisions (./crowdsec.nix), in a table of their own (its bouncer can't
+    # have both families in table wan), dropped at the same point (a second ingress chain on the WAN)
+    # tables.wan6 = {
+    #   family = "netdev";
+    #   content = ''
+    #     set crowdsec6 { type ipv6_addr; flags timeout; }
+    #     chain ingress {
+    #       type filter hook ingress devices = { "${wan}" } priority -500;
+    #       ip6 saddr @crowdsec6 counter drop
+    #     }
+    #   '';
+    # };
 
     tables.nat = {
       family = "ip";
