@@ -48,10 +48,15 @@ let
         echo "$1 busy: wake-up latency 20 us at most"
       }
 
+      # Waits with read's timeout, on a pipe nothing writes to: a builtin, where sleep would be a process 5 times a
+      # second (7% of a core, vs under 1%)
+      exec 4<> <(:)
+
       held=false
       quiet=0 # Quiet seconds in a row
       tick=0
-      while sleep "$interval"; do
+      while true; do
+        read -r -t "$interval" -u 4 || true
         tick=$((tick + 1))
         for port in "''${ports[@]}"; do
           read -r current < "/sys/class/net/$port/statistics/rx_bytes" # A builtin: no process per port and tick
