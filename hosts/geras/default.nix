@@ -5,6 +5,7 @@
     nixos-hardware.nixosModules.dell-xps-15-7590
     ./hardware-configuration.nix
     ./disko.nix
+    ./display.nix
     ../../modules/nixos/secure-boot.nix
     # ./impermanence.nix
     ../../modules/nixos/common

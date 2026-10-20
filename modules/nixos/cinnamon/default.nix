@@ -18,7 +18,16 @@
   # Laptops: the low battery warning at 20 % (10 % by default), for every user, as Plasma's (modules/nixos/plasma).
   # Its critical level and action (4 %, then 3 %: hibernate) stay. Charge thresholds: modules/nixos/desktop/battery.nix.
   programs.dconf.profiles.user.databases = [
-    { settings."org/cinnamon/settings-daemon/plugins/power".percentage-low = lib.gvariant.mkInt32 20; }
+    {
+      settings = {
+        "org/cinnamon/settings-daemon/plugins/power".percentage-low = lib.gvariant.mkInt32 20;
+        # Night light, from sunset to sunrise (auto: from the timezone)
+        "org/cinnamon/settings-daemon/plugins/color" = {
+          night-light-enabled = true;
+          night-light-schedule-mode = "auto";
+        };
+      };
+    }
   ];
 
   home-manager.sharedModules = [
