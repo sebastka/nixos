@@ -32,11 +32,11 @@ in
     wantedBy = [ "multi-user.target" ];
     after = [ "systemd-networkd.service" ]; # Its ports, renamed (enpXs0), found at its start
     serviceConfig = {
-      # Testing -b 75: C3 (70 us) allowed, not C6-C10 (85-890 us). The losses are C-states': none with -b 20 (C1E at
-      # most, 2026-10-21: 0 in 750,000 packets), 0.27% on enp1s0 and 1.07% on enp6s0 with -b 150 (at most C7s). Still
-      # none: next -b 90 (C6). Some: back to -b 20. Compare rx_missed_errors per received packet, and quiet
-      # x86_pkg_temp (48 °C without a base, 60 °C with -b 150).
-      ExecStart = "${portLatency}/bin/port-latency -i 100 -b 75";
+      # -b 20: C1E (10 us) at most, all the time, as intel_idle.max_cstate=2 did. Only C1E is fast enough for the
+      # I211s (2026-10-21, 10 minutes each, losses on enp1s0 / enp6s0): -b 20 none (0 in 750,000 packets), -b 75 (C3
+      # allowed) 1.6% / 1.4%, -b 150 (up to C7s) 0.27% / 1.07%. C3 even loses more than deeper states. Quiet
+      # x86_pkg_temp: 48 °C without a base, 60 °C with -b 150; to compare with -b 20.
+      ExecStart = "${portLatency}/bin/port-latency -i 100 -b 20";
       Restart = "always"; # Its request ends with it: deep C-states again, never stuck shallow
     };
   };
