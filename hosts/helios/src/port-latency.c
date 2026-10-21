@@ -128,8 +128,8 @@ int main(int argc, char **argv) {
     }
   }
   if (interval_ms <= 0 || 1000 % interval_ms != 0 || quiet_seconds <= 0 || base_us < 0 ||
-      (base_us > 0 && base_us <= LATENCY_US)) {
-    fprintf(stderr, "%s: the interval must divide 1000 ms, the quiet time be positive, the base above %d us\n",
+      (base_us > 0 && base_us < LATENCY_US)) {
+    fprintf(stderr, "%s: the interval must divide 1000 ms, the quiet time be positive, the base %d us or more\n",
             argv[0], LATENCY_US);
     return 2;
   }
