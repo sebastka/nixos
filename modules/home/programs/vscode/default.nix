@@ -52,6 +52,7 @@ in
             fileMatch = [
               "*.jsonc"
               "*.hujson"
+              "*.json5"
             ];
             schema.allowTrailingCommas = true;
           }
