@@ -32,13 +32,11 @@ in
     wantedBy = [ "multi-user.target" ];
     after = [ "systemd-networkd.service" ]; # Its ports, renamed (enpXs0), found at its start
     serviceConfig = {
-      # Testing -b 20: C1E (10 us) at most, all the time, as intel_idle.max_cstate=2 did: do C-states cause helios's
-      # losses at all? -b 150 (at most C7s) didn't reduce them (2026-10-20/21: 0.27% on enp1s0, 1.07% on enp6s0), and
-      # its I211s have no ASPM (the cause on the I226-V machines). If they stop: the limit is between 20 and 150 us
-      # (next: -b 75, C3). If not: not the CPU's sleep (next: the I211's DMA coalescing, flow control, the switch's
-      # bursts). Compare rx_missed_errors per received packet, and x86_pkg_temp (48 °C quiet without a base, 60 °C
-      # with -b 150).
-      ExecStart = "${portLatency}/bin/port-latency -i 100 -b 20";
+      # Testing -b 75: C3 (70 us) allowed, not C6-C10 (85-890 us). The losses are C-states': none with -b 20 (C1E at
+      # most, 2026-10-21: 0 in 750,000 packets), 0.27% on enp1s0 and 1.07% on enp6s0 with -b 150 (at most C7s). Still
+      # none: next -b 90 (C6). Some: back to -b 20. Compare rx_missed_errors per received packet, and quiet
+      # x86_pkg_temp (48 °C without a base, 60 °C with -b 150).
+      ExecStart = "${portLatency}/bin/port-latency -i 100 -b 75";
       Restart = "always"; # Its request ends with it: deep C-states again, never stuck shallow
     };
   };
