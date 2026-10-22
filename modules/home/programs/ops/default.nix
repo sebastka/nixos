@@ -41,7 +41,7 @@ in
     pkgs.velero
     cilium-cli
     pkgs-unstable.egctl
-    pkgs.talosctl
+    pkgs-unstable.talosctl
     topf
     longhorn-cli
     pkgs.cmctl
