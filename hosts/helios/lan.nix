@@ -32,6 +32,8 @@
       # TV box: Google TV Streamer (4K)
       ip = "192.168.0.11";
       mac = "b4:23:a2:42:88:44";
+      # mac = "10:0c:6b:59:c2:91"; # WiFi
+      wakeMacs = [ "10:0c:6b:59:c2:91" ];
     };
     zeus = {
       # Desktop (Windows and NixOS): Gigabyte X570 AORUS XTREME. AMD Ryzen 9 5950X, Radeon RX 6800 XT, 32 GB, Samsung 980 PRO 500 GB and 2 TB (Windows), 970 EVO Plus 500 GB (NixOS)
