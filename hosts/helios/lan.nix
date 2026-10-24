@@ -31,8 +31,8 @@
     googletv = {
       # TV box: Google TV Streamer (4K)
       ip = "192.168.0.11";
-      mac = "b4:23:a2:42:88:44";
-      # mac = "10:0c:6b:59:c2:91"; # WiFi
+      mac = "b4:23:a2:42:88:44"; # Ethernet
+      # mac = "10:0c:6b:59:c2:91"; # WiFi: the same IP
       wakeMacs = [ "10:0c:6b:59:c2:91" ];
     };
     zeus = {
