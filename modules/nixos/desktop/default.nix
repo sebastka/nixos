@@ -54,6 +54,10 @@ in
 
   services.printing.enable = true;
 
+  # NFS client (mount.nfs, the kernel's NFS support): file.home.karlsen.fr's shares (hosts/file), mounted by hand or
+  # from the file manager. Not a server: nothing is exported from desktops.
+  boot.supportedFilesystems.nfs = true;
+
   # No screen reader (Orca, on with Plasma and GNOME), nor speech synthesis (speech-dispatcher, which Orca requires):
   # unused. Started by Firefox listing voices, speech-dispatcher left a zombie per speech engine it probed without
   # having it.
