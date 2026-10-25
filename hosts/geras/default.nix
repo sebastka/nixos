@@ -10,7 +10,7 @@
     # ./impermanence.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
-    ../../modules/nixos/cinnamon
+    ../../modules/nixos/plasma
   ];
 
   networking.hostName = "geras";
