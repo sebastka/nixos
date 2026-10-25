@@ -130,6 +130,11 @@
     "talmox.hera" = {
       ip = "192.168.2.1";
     }; # *.talmox.hera too (./dns.nix)
+    # KubeVirt VM (hosts/file): its LoadBalancer IP, for NFS and SSH. No DHCP: its address in the
+    # cluster comes from its pod.
+    file = {
+      ip = "192.168.2.15";
+    };
   };
 
   # The cluster's nodes (talmox, hosts above): the source of its pods' connections to helios (Cilium masquerades them
@@ -139,6 +144,9 @@
     "dike"
     "t01.hera"
   ];
+  # The cluster's pods (Cilium's pod CIDR): the source of their connections to what runs inside the cluster,
+  # unmasqueraded (hosts/file: its NFS exports, the Zabbix server's passive checks)
+  clusterPods = "10.244.0.0/16";
 
   # Cluster services, also the targets of port forwards (./firewall.nix)
   vips = {

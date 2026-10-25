@@ -37,6 +37,13 @@
     ];
     publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvkfWlIPiHCpZ4hOcWiI0ZAu+IE+rQFcpJBzpRrcQ4F";
   };
+  programs.ssh.knownHosts.file = {
+    hostNames = [
+      "file"
+      "file.home.karlsen.fr"
+    ];
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILEYbm8ze84+MTHPkM86KqYJEp3UGF0wCUcLYOnk2vE/";
+  };
 
   services.openssh = {
     enable = true;

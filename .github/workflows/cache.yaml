@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        host: [geras, zeus, helios]
+        host: [geras, zeus, helios, file]
     runs-on: talmox-nix
     timeout-minutes: 240
     # The latest commit only: a newer run replaces a host's older one

@@ -13,10 +13,11 @@ keys:
   - &zeus age1s7un05umqftr0p49skvjuvzwvuc4amtt6u4hy8f56flk34pnjsrslxsf76
   - &hermes age1q98mdl6dv8j75nhtvensqfq4l8942utenxuc8ptscqxru5uwn3xqgc9qmj
   - &boreas age1pz30l5agzdnhc23vvmsc836d9h7d9ys4kz9k9n33r3wyhzks4yus8vnrmc
+  - &file age14vytm0evym8s99cxzx57fxhlyjrkj0qn2clz3kuvl8w2yrp2hf0qtt8npd
 
 creation_rules:
   - {path_regex: 'secrets/\.?[^/]*-(ssh-host-key|secure-boot)\.sops\.yaml$', key_groups: [{pgp: [*sebastian]}]}
-  - {path_regex: 'secrets/\.?common\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *hermes, *boreas, *helios]}]}
+  - {path_regex: 'secrets/\.?common\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *hermes, *boreas, *helios, *file]}]}
   - {path_regex: 'secrets/\.?desktop\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
   - {path_regex: 'secrets/\.?tern\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
   - {path_regex: 'secrets/\.?ssh-work\.sops\.yaml$', key_groups: [{pgp: [*sebastian], age: [*geras, *zeus, *boreas]}]}
@@ -27,3 +28,4 @@ creation_rules:
   - {path_regex: 'secrets/\.?zeus\.sops\.yaml$',    key_groups: [{pgp: [*sebastian], age: [*zeus]}]}
   - {path_regex: 'secrets/\.?hermes\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*hermes]}]}
   - {path_regex: 'secrets/\.?boreas\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*boreas]}]}
+  - {path_regex: 'secrets/\.?file\.sops\.yaml$',  key_groups: [{pgp: [*sebastian], age: [*file]}]}

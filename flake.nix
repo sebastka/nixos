@@ -159,6 +159,22 @@
         ];
       };
 
+      # KubeVirt VM in the homelab cluster: the NFS server replacing file01
+      nixosConfigurations.file = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit
+            self
+            home-manager
+            sops-nix
+            ;
+          pkgs-unstable = mkPkgsUnstable "x86_64-linux";
+        };
+        modules = [
+          ./hosts/file
+          ./users/sebastian
+        ];
+      };
+
       # helios's installer: the live ISO as the router, while helios is installed over SSH (hosts/helios/installer.nix)
       nixosConfigurations.helios-installer = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
