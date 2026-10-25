@@ -14,6 +14,7 @@ let
     "Downloads"
     "Music"
     "Pictures"
+    "Torrent"
     "Videos"
     "homelab/k8s"
   ];
@@ -53,6 +54,7 @@ in
       /mnt/nfs/Downloads                192.168.0.0/24(rw,sync,no_subtree_check)
       /mnt/nfs/Music                    192.168.0.0/24(rw,sync,no_subtree_check)
       /mnt/nfs/Pictures                 192.168.0.0/24(rw,sync,no_subtree_check)
+      /mnt/nfs/Torrent                  192.168.0.0/24(rw,sync,no_subtree_check)
       /mnt/nfs/Videos                   192.168.0.0/24(rw,sync,no_subtree_check)
       /mnt/nfs/homelab/k8s              192.168.0.0/16(rw,sync,no_subtree_check,no_root_squash) ${lan.clusterPods}(rw,sync,no_subtree_check,no_root_squash)
     '';

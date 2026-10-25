@@ -36,6 +36,7 @@
   imports = [
     "${modulesPath}/virtualisation/kubevirt.nix" # qemu guest, serial console, / by label (grows), system.build.image
     ./nfs.nix
+    ./backup.nix
     ./firewall.nix
     ../../modules/nixos/common
     ../../modules/nixos/server
