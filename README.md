@@ -15,7 +15,7 @@ Yubikeys for disk unlocking, SSH and signing.
 | `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Not installed yet (Fedora Asahi Remix) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
 | `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall (with the homelab's CrowdSec decisions), DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
-| `file` | KubeVirt VM in the homelab cluster (x86_64; data on a passed-through NVMe once hera runs Talos) | Server: NFS (replaces file01), Zabbix agent, firewall | Not installed yet |
+| `file` | KubeVirt VM in the homelab cluster (x86_64, on hera; its data is hera's passed-through NVMe) | Server: NFS, Zabbix agent, firewall | Installed |
 
 Each host's install steps are at the top of its `hosts/<host>/default.nix`.
 

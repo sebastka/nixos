@@ -105,10 +105,6 @@
     };
 
     # 192.168.1.0/24 - Virtual machines
-    "file01.hera" = {
-      ip = "192.168.1.20";
-      mac = "bc:24:11:82:e0:a3";
-    };
     "file.atlas" = {
       ip = "192.168.1.100";
       mac = "f6:c0:b4:cb:36:3e";
@@ -120,10 +116,6 @@
     "xp.atlas" = {
       ip = "192.168.1.105";
       mac = "92:b6:40:06:70:e6";
-    };
-    "t01.hera" = {
-      ip = "192.168.1.201";
-      mac = "bc:24:11:10:fe:09";
     };
 
     # 192.168.2.0/24 - Cilium IP pool (LoadBalancer IPs of the cluster)
