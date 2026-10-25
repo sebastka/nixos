@@ -57,7 +57,7 @@
       ip = "192.168.0.30";
     };
     hera = {
-      # Proxmox host: ASUS NUC 15 Pro+ (NUC15CRSU9). Intel Core Ultra 9 285H (Arc graphics), 96 GB, Samsung 9100 PRO 4 TB, Corsair MP600 Micro 1 TB, Intel I226-V 2.5 GbE
+      # Talos node (talmox): ASUS NUC 15 Pro+ (NUC15CRSU9). Intel Core Ultra 9 285H (Arc graphics), 96 GB, Samsung 9100 PRO 4 TB (the file VM's, passed through), Corsair MP600 Micro 1 TB, Intel I226-V 2.5 GbE
       ip = "192.168.0.40";
       mac = "88:ae:dd:68:ab:e8";
     };
@@ -142,7 +142,7 @@
   clusterNodes = [
     "hestia"
     "dike"
-    "t01.hera"
+    "hera"
   ];
   # The cluster's pods (Cilium's pod CIDR): the source of their connections to what runs inside the cluster,
   # unmasqueraded (hosts/file: its NFS exports, the Zabbix server's passive checks)
