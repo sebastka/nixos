@@ -46,10 +46,10 @@
 
   # Bridge binding: the VM gets its pod's address by DHCP from virt-launcher, so it sees the NFS clients'
   # real addresses, which the exports rely on (masquerade would show them all as 10.0.2.1).
-  # The MAC is pinned in the VirtualMachine (locally administered: 02:...), as KubeVirt would pick
-  # another one on every start.
+  # Matched by type, not MAC: the VM gets its pod's MAC (new on every start), the one Cilium sends the pod's traffic
+  # to. A MAC pinned in the VirtualMachine would differ from it, and the VM would never see its inbound traffic.
   systemd.network.networks."10-pod" = {
-    matchConfig.MACAddress = "02:6b:76:00:f0:02";
+    matchConfig.Type = "ether";
     networkConfig.DHCP = "ipv4";
   };
 
