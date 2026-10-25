@@ -4,6 +4,7 @@
 # nothing is opened implicitly (e.g. by services' openFirewall). Sources are the clients' real addresses: the Service
 # in front of the VM keeps them (externalTrafficPolicy: Local), and pods reach it unmasqueraded.
 let
+  lan = import ../helios/lan.nix;
   lanPhysicalDevices = "192.168.0.0/24";
   zabbixSources = builtins.concatStringsSep ", " config.services.zabbixAgent.passiveSources;
 in
@@ -24,8 +25,9 @@ in
           iif != lo ip protocol icmp limit rate 5/second accept
           udp sport bootps udp dport bootpc accept  # Its pod's address, by DHCP from virt-launcher
           ip saddr ${lanPhysicalDevices} tcp dport ssh accept
-          # NFS (./nfs.nix: the exports narrow it per share): the LAN and the Talos nodes (kubelet mounts)
-          ip saddr 192.168.0.0/16 tcp dport nfs accept
+          # NFS (./nfs.nix: the exports narrow it per share): the LAN and the Talos nodes (kubelet mounts), also from
+          # the pods' range: the VM's own node (hera) mounts from its Cilium router address (cilium_host)
+          ip saddr { 192.168.0.0/16, ${lan.clusterPods} } tcp dport nfs accept
           ip saddr { ${zabbixSources} } tcp dport 10050 accept  # Zabbix agent (modules/nixos/server)
         }
         chain forward {
