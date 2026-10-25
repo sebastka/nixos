@@ -42,6 +42,7 @@ in
     cilium-cli
     pkgs-unstable.egctl
     pkgs-unstable.talosctl
+    pkgs-unstable.kubevirt # virtctl (KubeVirt's VMs)
     topf
     longhorn-cli
     pkgs.cmctl
