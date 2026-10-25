@@ -37,6 +37,10 @@ in
       settings = {
         ServerActive = zabbixServer; # Active checks
         Hostname = config.networking.fqdnOrHostName; # e.g. hermes.home.karlsen.fr, as in Zabbix
+        # Autoregistration: the server's action "NixOS servers" (Alerts > Actions > Autoregistration actions) adds any
+        # agent whose metadata contains "nixos", in group Linux servers with template "Linux by Zabbix agent active".
+        # Sent with the active checks' first contact, so a new server appears in Zabbix without being added by hand.
+        HostMetadata = "nixos";
         LogRemoteCommands = 1; # system.run (denied by default); agent 2: Plugins.SystemRun.LogRemoteCommands
       };
     };
