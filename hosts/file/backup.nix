@@ -53,6 +53,10 @@ let
     name = "kopia";
     runtimeInputs = [ pkgs.kopia ];
     text = ''
+      if [ ! -r ${config.sops.secrets.kopia-env.path} ]; then
+        echo "kopia: the repository's credentials are root's: sudo kopia $*" >&2
+        exit 1
+      fi
       set -a
       # shellcheck disable=SC1091 # The credentials, at runtime (sops-nix)
       . ${config.sops.secrets.kopia-env.path}
