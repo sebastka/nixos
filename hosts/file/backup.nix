@@ -94,7 +94,9 @@ in
     wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     serviceConfig = serviceConfig // {
-      ExecStart = "${lib.getExe kopia} snapshot create ${data}/%i";
+      # 8 files at once: by default Kopia goes by the CPUs (2 here), which left a single upload to Hetzner, about
+      # 40 Mbit/s for one TCP stream (21 ms away, its window shrunk by losses). Several streams fill the uplink.
+      ExecStart = "${lib.getExe kopia} snapshot create --parallel=8 ${data}/%i";
     };
   };
 
