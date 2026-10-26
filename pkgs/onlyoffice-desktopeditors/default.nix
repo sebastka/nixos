@@ -221,7 +221,10 @@ buildFHSEnv {
   extraInstallCommands = ''
     mkdir -p $out/share
     ln -s ${derivation}/share/icons $out/share
-    cp -r ${derivation}/share/applications $out/share
+    # Its one file, not the directory (nixpkgs': cp -r): copying the directory also copies its store permissions
+    # (read-only), which CI's unsandboxed builds can't set ("cp: setting permissions for …: Operation not permitted")
+    install -Dm644 ${derivation}/share/applications/onlyoffice-desktopeditors.desktop \
+      $out/share/applications/onlyoffice-desktopeditors.desktop
     substituteInPlace $out/share/applications/onlyoffice-desktopeditors.desktop \
         --replace-fail "/usr/bin/onlyoffice-desktopeditors" "$out/bin/onlyoffice-desktopeditors"
   '';
