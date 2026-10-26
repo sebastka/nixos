@@ -69,7 +69,9 @@ let
   };
 
   serviceConfig = {
-    Type = "oneshot";
+    # Started once Kopia runs, not once it's done (oneshot): `systemctl start` returns at once, instead of for the
+    # backup's whole length. Failures still show in `systemctl status` and the journal.
+    Type = "exec";
     StateDirectory = "kopia";
     StateDirectoryMode = "0700";
     CacheDirectory = "kopia";
@@ -86,6 +88,9 @@ in
   # One job per share: kopia-snapshot@Documents.service...
   systemd.services."kopia-snapshot@" = {
     description = "Kopia snapshot of ${data}/%i";
+    # A deploy leaves a running backup alone (a changed unit would be restarted, which waited for hours): the new
+    # definition applies from the next run
+    restartIfChanged = false;
     # Only with the data disk mounted: a snapshot of its empty mount point would look like everything deleted
     unitConfig = {
       RequiresMountsFor = data;
@@ -129,6 +134,7 @@ in
 
   systemd.services.kopia-maintenance = {
     description = "Kopia full maintenance (renews the object locks)";
+    restartIfChanged = false; # As the snapshots'
     wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     serviceConfig = serviceConfig // {
