@@ -29,7 +29,7 @@ in
       ];
       userSettings = {
         # Editor
-        "editor.formatOnSave" = true;
+        "editor.formatOnSave" = false; # Format on demand only (Ctrl+Shift+I)
         "editor.tabSize" = 4;
         "editor.minimap.enabled" = false;
         "editor.renderWhitespace" = "boundary";
