@@ -15,6 +15,7 @@ in
   imports = [
     # ./tern.nix # Disabled (as modules/nixos/desktop/tern.nix)
     ./work.nix
+    ./nfs.nix
   ];
 
   # On desktops: set by every desktop environment (modules/nixos/plasma, gnome, cinnamon), not by servers
