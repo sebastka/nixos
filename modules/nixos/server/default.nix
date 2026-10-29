@@ -18,7 +18,7 @@
     upgrade = false; # --upgrade only updates root's channels, unused with flakes
     # Fail instead of resolving inputs missing from master's flake.lock (as bin/build)
     flags = [ "--no-update-lock-file" ];
-    dates = "04:30";
+    dates = "04:30"; # After helios (04:00, hosts/helios): it's the DNS
     randomizedDelaySec = "30min";
     allowReboot = true;
     rebootWindow = {

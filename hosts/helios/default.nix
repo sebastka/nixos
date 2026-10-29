@@ -29,8 +29,8 @@
 # - Remove Debian's helios host key from users/sebastian/ssh/known_hosts.d/private and ~/.ssh/known_hosts
 #   (the new one is in modules/nixos/common/openssh.nix).
 #
-# Updates: nightly from master, rebooting between 04:00 and 06:00 when needed (modules/nixos/server). The previous
-# generations stay in the boot menu.
+# Updates: nightly from master, rebooting between 04:00 and 06:00 when needed (modules/nixos/server), first, at 04:00
+# (below). The previous generations stay in the boot menu.
 {
   imports = [
     ./hardware-configuration.nix
@@ -50,6 +50,13 @@
   ];
 
   networking.hostName = "helios";
+
+  # Upgraded (and rebooted) first, at 04:00 sharp: the other servers' upgrades (04:30-05:00) need its DNS. One of them
+  # during its reboot couldn't resolve GitHub, and kept its previous system.
+  system.autoUpgrade = {
+    dates = lib.mkForce "04:00";
+    randomizedDelaySec = lib.mkForce "0";
+  };
 
   # Legacy BIOS boot, with GRUB (on the disk's BIOS boot partition, ./disko.nix): the FW6's BIOS updates need the
   # firmware in legacy mode. No UEFI then, so neither systemd-boot (modules/nixos/common) nor Secure Boot, which without
