@@ -77,14 +77,25 @@ jobs:
             echo "cached=true" >> "${GITHUB_OUTPUT}"
           fi
 
-      - name: Build ${{ matrix.host }}
+      # --keep-going: a failed derivation doesn't stop the others, so they can still be pushed
+      - id: build
+        name: Build ${{ matrix.host }}
         if: steps.cached.outputs.cached != 'true'
         run: >-
-          nix build --print-build-logs --out-link result
+          nix build --keep-going --print-build-logs --out-link result
           ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel"
 
       # Its whole closure: what cache.nixos.org already has is skipped (the cache's upstream key). Two uploads at a time
       # per job: Attic chunks and compresses each in memory, and several jobs push at once (OOM-killed by the default).
+      # A failed build still pushes what it built (the existing outputs of the system's derivations), or a single broken
+      # derivation would leave the host to build hundreds of others itself; the job stays failed.
       - name: Push ${{ matrix.host }}
-        if: steps.cached.outputs.cached != 'true'
-        run: attic push --jobs 2 "karlsen:${ATTIC_CACHE}" result
+        if: ${{ !cancelled() && steps.cached.outputs.cached != 'true' }}
+        run: |
+          if [ "${{ steps.build.outcome }}" = success ]; then
+            attic push --jobs 2 "karlsen:${ATTIC_CACHE}" result
+          else
+            drv="$(nix eval --raw ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel.drvPath")"
+            nix-store --query --requisites --include-outputs "${drv}" | grep -v '\.drv$' \
+              | xargs --no-run-if-empty attic push --jobs 2 "karlsen:${ATTIC_CACHE}"
+          fi
