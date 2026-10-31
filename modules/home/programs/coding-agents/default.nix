@@ -12,7 +12,12 @@
     enable = true;
     package = pkgs-unstable.claude-code;
     configDir = "${config.xdg.configHome}/claude"; # Exports CLAUDE_CONFIG_DIR
+    enableMcpIntegration = true; # programs.mcp's servers (below)
   };
+
+  # MCP servers (programs.mcp.servers, per user: users/<user>) for Claude Code (a plugin of its wrapper) and Copilot
+  # (mcp-config.json): their enableMcpIntegration
+  programs.mcp.enable = true;
 
   # The VS Code extensions run our CLIs instead of their bundled binaries
   programs.vscode.profiles.default.userSettings = lib.mkIf config.programs.vscode.enable {
@@ -73,6 +78,8 @@
   programs.codex = {
     enable = true;
     package = pkgs-unstable.codex;
+    # Not programs.mcp's servers: they'd make its config.toml a read-only file from the store, which Codex writes to
+    # (trusted projects, /model)
   };
 
   # COPILOT_HOME = ~/.config/copilot (home.preferXdgDirectories), instead of ~/.copilot. Its self-update is off: it
@@ -80,6 +87,7 @@
   programs.github-copilot-cli = {
     enable = true;
     package = pkgs-unstable.github-copilot-cli;
+    enableMcpIntegration = true;
   };
   home.sessionVariables.COPILOT_AUTO_UPDATE = "false";
 }

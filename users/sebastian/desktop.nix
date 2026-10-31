@@ -47,9 +47,27 @@ in
       owner = "sebastian";
     };
 
+    # mcp-nixos's key (below): one per client, X-API-Key (sebastka/homelab: k8s/applications/utils/mcp-nixos)
+    sops.secrets.mcp-nixos-key = {
+      sopsFile = ../../secrets/desktop.sops.yaml;
+      owner = "sebastian";
+    };
+
     home-manager.users.sebastian =
       { config, lib, ... }: # home-manager's lib (lib.hm)
       {
+        # mcp-nixos (NixOS, home-manager and nix-darwin options and packages, package version history), run in the
+        # homelab, for the coding agents (modules/home/programs/coding-agents). Its key from the session's environment,
+        # graphical apps included: readable by sebastian anyway (the secret's file).
+        programs.mcp.servers.nixos = {
+          type = "http";
+          url = "https://mcp-nixos.karlsen.app/mcp";
+          headers.x-api-key = "\${MCP_NIXOS_KEY}"; # Expanded by the agents
+        };
+        home.sessionVariablesExtra = ''
+          export MCP_NIXOS_KEY="$(cat ${nixosConfig.sops.secrets.mcp-nixos-key.path} 2>/dev/null)"
+        '';
+
         # Claude Code's instructions: "1. Current date: YYYY-MM-DD", then the secret's (claude-md, above). Written at
         # login and each day (at midnight, or on waking after it): edit the secret, not the file.
         systemd.user.services.claude-md = {
