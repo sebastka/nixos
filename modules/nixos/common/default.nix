@@ -58,6 +58,12 @@
     dates = "weekly";
     options = "--delete-older-than 30d";
   };
+  # Identical files in the store hard-linked into one, weekly: not as each path is added (auto-optimise-store, on
+  # servers only: modules/nixos/server), which slows every build and download
+  nix.optimise = {
+    automatic = true;
+    dates = [ "weekly" ]; # As nix.gc (by default: daily)
+  };
 
   boot.kernelPackages = lib.mkOverride 1001 pkgs.linuxPackages_latest; # Below mkDefault, so hardware modules (RPi, Asahi) pick their own kernel
   boot.tmp.useTmpfs = true;
