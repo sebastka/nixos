@@ -101,12 +101,14 @@ in
 
           # Port forwards to the homelab
           iifname "${wan}" tcp dport { http, https, ssh } dnat to ${gatewayDefault}
+          iifname "${wan}" udp dport https dnat to ${gatewayDefault}  # HTTP/3 (QUIC)
           iifname "${wan}" meta l4proto { tcp, udp } th dport 6881 dnat to ${delugeTorrent}
           iifname "${wan}" tcp dport auth dnat to ${theloungeIdentd}
           iifname "${wan}" meta l4proto { tcp, udp } th dport 22000 dnat to ${syncthing}
 
           # Hairpin NAT: LAN clients reaching our (dynamic) public IP get the same DNAT as the WAN
           iifname "br0" fib daddr type local ip daddr != 192.168.0.0/16 tcp dport { http, https, ssh } dnat to ${gatewayDefault}
+          iifname "br0" fib daddr type local ip daddr != 192.168.0.0/16 udp dport https dnat to ${gatewayDefault}
           iifname "br0" fib daddr type local ip daddr != 192.168.0.0/16 meta l4proto { tcp, udp } th dport 22000 dnat to ${syncthing}
         }
 
