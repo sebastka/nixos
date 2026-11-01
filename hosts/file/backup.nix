@@ -48,10 +48,18 @@ let
     KOPIA_CHECK_FOR_UPDATES = "false";
   };
 
+  # Kopia, its lock renewals retried on transient errors (./patches): it retries reading, writing and deleting blobs,
+  # but not ExtendBlobRetention, so each night's full maintenance (~33,000 renewals, one per blob) failed on a few
+  # transient answers from Hetzner (SlowDown, timeouts, UnknownError: 1-12 a night, 2026-10-26 to 11-01). Remove the
+  # patch once upstream retries it (repo/blob/retrying/retrying_storage.go); the build fails if it no longer applies.
+  kopiaPackage = pkgs.kopia.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [ ./patches/kopia-retry-extend-blob-retention.patch ];
+  });
+
   # kopia as root with the repository's credentials: the jobs' and the admin's (sudo kopia ...) command
   kopia = pkgs.writeShellApplication {
     name = "kopia";
-    runtimeInputs = [ pkgs.kopia ];
+    runtimeInputs = [ kopiaPackage ];
     text = ''
       if [ ! -r ${config.sops.secrets.kopia-env.path} ]; then
         echo "kopia: the repository's credentials are root's: sudo kopia $*" >&2

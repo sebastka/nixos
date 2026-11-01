@@ -1,0 +1,28 @@
+--- a/repo/blob/retrying/retrying_storage.go
++++ b/repo/blob/retrying/retrying_storage.go
+@@ -42,6 +42,15 @@
+ 	}, isRetriable)
+ }
+ 
++// ExtendBlobRetention is retried too: maintenance renews every blob's object lock (--extend-object-locks), one
++// request per blob, and a single transient error (SlowDown, timeout, 5xx) otherwise fails the whole run. Retrying is
++// safe: each attempt sets the retention from the current time, so it only ends a little later.
++func (s retryingStorage) ExtendBlobRetention(ctx context.Context, id blob.ID, opts blob.ExtendOptions) error {
++	return retry.WithExponentialBackoffNoValue(ctx, "ExtendBlobRetention("+string(id)+")", func() error {
++		return s.Storage.ExtendBlobRetention(ctx, id, opts)
++	}, isRetriable)
++}
++
+ // NewWrapper returns a Storage wrapper that adds retry loop around all operations of the underlying storage.
+ func NewWrapper(wrapped blob.Storage) blob.Storage {
+ 	return &retryingStorage{Storage: wrapped}
+@@ -67,6 +76,9 @@
+ 	case errors.Is(err, blob.ErrBlobAlreadyExists):
+ 		return false
+ 
++	case errors.Is(err, blob.ErrUnsupportedObjectLock):
++		return false
++
+ 	case errors.Is(err, repo.ErrRepositoryUnavailableDueToUpgradeInProgress):
+ 		// hard-fail when upgrade is in progress
+ 		return false
