@@ -23,23 +23,27 @@ let
   server = "talmox";
 
   # Rebuildable or machine-local: not synced. **/ matches at any depth; (?d) lets Syncthing delete them when they
-  # block a directory removal. Add more as needed: it applies to every folder.
+  # block a directory removal: a directory deleted or renamed on another desktop (e.g. a project with its
+  # node_modules) would otherwise stay on this one, the folder out of sync. Add more as needed: it applies to every
+  # folder.
   ignorePatterns = [
     "(?d).DS_Store"
     "(?d)Thumbs.db"
-    "**/node_modules"
-    "**/.venv"
-    "**/venv"
-    "**/__pycache__"
-    "**/.direnv"
-    "**/result"
-    "**/result-*"
-    "**/target"
-    "**/.cache"
-    "**/base/charts" # kustomize helmCharts caches (not YAML/charts, the chart sources)
-    "**/overlays/*/charts"
-    "**/.terraform"
-    "**/.persist" # Containers' local state (local-stacks): files owned by their (rootless Docker) users, unreadable
+    "(?d)**/node_modules"
+    "(?d)**/.venv"
+    "(?d)**/venv"
+    "(?d)**/__pycache__"
+    "(?d)**/.direnv"
+    "(?d)**/result"
+    "(?d)**/result-*"
+    "(?d)**/target"
+    "(?d)**/.cache"
+    "(?d)**/base/charts" # kustomize helmCharts caches (not YAML/charts, the chart sources)
+    "(?d)**/overlays/*/charts"
+    "(?d)**/.terraform"
+    # Containers' local state (local-stacks): files owned by their (rootless Docker) users, unreadable. Not
+    # rebuildable: never deleted by Syncthing (no (?d)), a directory holding it is left for a person to remove.
+    "**/.persist"
   ];
 in
 {
