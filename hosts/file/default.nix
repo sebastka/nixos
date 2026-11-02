@@ -1,6 +1,7 @@
 {
   lib,
   modulesPath,
+  pkgs,
   ...
 }:
 
@@ -47,6 +48,9 @@
 
   # Virtual disks have no SMART. smartctl stays (modules/nixos/server).
   services.smartd.enable = false;
+
+  # PDF tools for the shares' documents (pdfunite, pdfseparate, pdftotext...)
+  environment.systemPackages = [ pkgs.poppler-utils ];
 
   # No cloud-init (on in kubevirt.nix): everything is configured here, and the SSH host key restored by hand (above).
   # Its first boot would regenerate the host keys (its ssh module), and it touches passwords, users, resolv.conf and
