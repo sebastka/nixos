@@ -87,6 +87,22 @@ The repository includes a development shell with the tools to work on it (`sops`
 Servers deploy what is merged on `master` by themselves (`system.autoUpgrade`, rebooting between 04:00 and 06:00 when
 the kernel changed). Desktops are deployed with `bin/build`.
 
+### Nightly schedule
+
+The hosts' times are local (Europe/Oslo), GitHub's are UTC (02:00 UTC is 03:00 in winter, 04:00 in summer).
+
+| When | Host | What |
+|---|---|---|
+| 01:00-01:30 | `file` | Kopia snapshots, one per share (`hosts/file/backup.nix`): a few seconds to minutes each |
+| 02:00-04:00 | `file` | Kopia full maintenance: renews the object locks, 1-2 h depending on Hetzner |
+| 02:00 UTC | GitHub | `update.yaml`, then `cache.yaml` |
+| 04:00 | `helios` | Upgrade (first: it's the DNS) |
+| 04:30-05:00 | Other servers | Upgrade |
+| 04:00-06:00 | Servers | Reboot window, when the kernel or initrd changed |
+
+Keep the backups out of the reboot window: a reboot interrupts them, and an interrupted run waits for the next night
+(`Persistent` only catches up on runs missed while the host was down).
+
 ## Installing a host
 
 Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and SSH host key pre-generated in

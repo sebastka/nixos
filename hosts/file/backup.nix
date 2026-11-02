@@ -130,11 +130,12 @@ in
     )
     // {
       # Full maintenance: drops what no snapshot needs any more, and renews the locks of the rest (its interval must
-      # stay under the 30-day lock). Kopia skips it when it isn't due yet.
+      # stay under the 30-day lock). Kopia skips it when it isn't due yet. At 02:00, once the snapshots are done
+      # (01:30 at the latest): its ~33,000 renewals take 1-2 h, depending on Hetzner, done before the reboot window.
       kopia-maintenance = {
         wantedBy = [ "timers.target" ];
         timerConfig = {
-          OnCalendar = "03:00";
+          OnCalendar = "02:00";
           Persistent = true;
         };
       };
