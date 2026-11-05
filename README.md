@@ -256,9 +256,8 @@ Claude Code, Codex and the GitHub Copilot CLI are installed on desktops from nix
 | Codex | `codex` | `~/.config/codex` (`CODEX_HOME`) | our CLI (`chatgpt.cliExecutable`) | `codex-acp`, running our CLI (`CODEX_PATH`) |
 | GitHub Copilot | `copilot` | `~/.config/copilot` (`COPILOT_HOME`) | VS Code's built-in Copilot, with its own bundled CLI | our CLI (`copilot --acp`) |
 
-Editors use the same config directories as the terminal: one login per agent. Claude Code's `CLAUDE.md` is written at
-login and each day, from the `claude-md` secret plus today's date (`users/sebastian/desktop.nix`): edit the secret,
-not the file.
+Editors use the same config directories as the terminal: one login per agent. Claude Code's `CLAUDE.md` is a link to
+the `claude-md` secret (`users/sebastian/desktop.nix`): edit the secret, not the file.
 
 ## Desktop keyring
 

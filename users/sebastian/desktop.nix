@@ -41,7 +41,7 @@ in
       };
     };
 
-    # Claude Code's instructions (CLAUDE.md, below), without the date
+    # Claude Code's instructions (CLAUDE.md, below)
     sops.secrets.claude-md = {
       sopsFile = ../../secrets/desktop.sops.yaml;
       owner = "sebastian";
@@ -68,35 +68,12 @@ in
           export MCP_NIXOS_KEY="$(cat ${nixosConfig.sops.secrets.mcp-nixos-key.path} 2>/dev/null)"
         '';
 
-        # Claude Code's instructions: "1. Current date: YYYY-MM-DD", then the secret's (claude-md, above). Written at
-        # login and each day (at midnight, or on waking after it): edit the secret, not the file.
-        systemd.user.services.claude-md = {
-          Unit.Description = "Claude Code's CLAUDE.md, with today's date";
-          Service = {
-            Type = "oneshot";
-            ExecStart = lib.getExe (
-              pkgs.writeShellApplication {
-                name = "claude-md";
-                runtimeInputs = [ pkgs.coreutils ];
-                text = ''
-                  dir=${lib.escapeShellArg config.programs.claude-code.configDir}
-                  install -d -m 700 "$dir"
-                  tmp="$(mktemp "$dir/.CLAUDE.md.XXXXXX")"
-                  { echo "1. Current date: $(date +%F)"; cat ${nixosConfig.sops.secrets.claude-md.path}; } > "$tmp"
-                  mv -f "$tmp" "$dir/CLAUDE.md"
-                '';
-              }
-            );
-          };
-          Install.WantedBy = [ "default.target" ];
-        };
-        systemd.user.timers.claude-md = {
-          Unit.Description = "Claude Code's CLAUDE.md, with today's date, each day";
-          Timer = {
-            OnCalendar = "daily";
-            Persistent = true;
-          };
-          Install.WantedBy = [ "timers.target" ];
+        # Claude Code's instructions: a link to the secret (claude-md, above), not programs.claude-code.context, which
+        # would copy it into the world-readable Nix store. Edit the secret, not the file. force: replaces the file the
+        # former claude-md service wrote (the secret plus today's date, which Claude Code now gives itself).
+        home.file."${config.programs.claude-code.configDir}/CLAUDE.md" = {
+          source = config.lib.file.mkOutOfStoreSymlink nixosConfig.sops.secrets.claude-md.path;
+          force = true;
         };
 
         # Projects: ~/Dev/Private (private), ~/Dev/Work (./work.nix)
