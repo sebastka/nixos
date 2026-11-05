@@ -6,15 +6,15 @@
 }:
 
 let
-  version = "2.39.3";
+  version = "2.39.4";
   assets = {
     x86_64-linux = {
       arch = "x86_64";
-      hash = "sha256-FMs1gJrXVH3Txp+piZo5dfvYULameR8/4mSFZJDNmmM=";
+      hash = "sha256-UVNhDd1d/xPUOyllyS1Y8W6fP1QWTup206uynzh4dZc=";
     };
     aarch64-linux = {
       arch = "aarch64";
-      hash = "sha256-9uuEX7rLEb7ofeP1++gEN3PL6J0EFGB7RLceIW65Ims=";
+      hash = "sha256-duSsD4K1sexo38dHcF+jKYwF4iZI5VA/GGnw0DWtV7s=";
     };
   };
   asset =
