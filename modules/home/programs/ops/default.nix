@@ -66,6 +66,7 @@ in
     # Cloud
     awscli2
     pkgs.doctl
+    pkgs-unstable.cf # Cloudflare's CLI (the whole API, Wrangler's successor): in beta, moves fast
     pkgs.rclone # Cloud storage (S3, Drive...): sync, copy, mount
     stripe-cli
     mailcore-cli
