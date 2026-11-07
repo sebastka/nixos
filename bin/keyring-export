@@ -18,6 +18,16 @@ DEFAULT_FILE = os.path.join(
 )
 
 
+def default_key():
+    """gpg.conf's default-key, from gpgconf (e.g. default-key:0:0:...:"0B25...)."""
+    options = subprocess.run(["gpgconf", "--list-options", "gpg"], stdout=subprocess.PIPE, text=True, check=True)
+    for line in options.stdout.splitlines():
+        fields = line.split(":")
+        if fields[0] == "default-key" and fields[-1].startswith('"'):
+            return fields[-1][1:]
+    sys.exit("No default-key in gpg.conf")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Export the desktop keyring's secrets, encrypted with GnuPG.")
     parser.add_argument("file", nargs="?", default=DEFAULT_FILE)
@@ -43,11 +53,13 @@ def main():
                 }
             )
 
-    # Encrypted to our own key (default-recipient-self): decrypting it needs the Yubikey
+    # Encrypted to our own key: gpg.conf's default-key, as a recipient (its public key only), not
+    # --default-recipient-self, which also wants its secret key: missing on a host the Yubikey was never linked to
+    # (gpg --card-status). Decrypting it needs the Yubikey.
     os.makedirs(os.path.dirname(args.file), exist_ok=True)
     os.umask(0o077)
     subprocess.run(
-        ["gpg", "--encrypt", "--default-recipient-self", "--output", args.file],
+        ["gpg", "--encrypt", "--recipient", default_key(), "--output", args.file],
         input=json.dumps(items).encode(),
         check=True,
     )

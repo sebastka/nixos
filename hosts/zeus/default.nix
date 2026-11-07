@@ -1,5 +1,4 @@
 {
-  lib,
   nixos-hardware,
   pkgs,
   pkgs-unstable,
@@ -70,15 +69,13 @@
   # input (./disko.nix).
   networking.interfaces.enp6s0.wakeOnLan.enable = true;
   networking.interfaces.enp7s0.wakeOnLan.enable = true;
-  # Nor back to sleep on its own while used over ssh (builds): no suspend when idle in a Cinnamon session, already
-  # Cinnamon's default, kept whatever its next default (a default for every user, changeable in System Settings >
-  # Power Management). LightDM's greeter doesn't suspend.
-  programs.dconf.profiles.user.databases = [
-    {
-      settings."org/cinnamon/settings-daemon/plugins/power".sleep-inactive-ac-timeout =
-        lib.gvariant.mkInt32 0;
-    }
-  ];
+  # Nor back to sleep on its own while used over ssh (builds): no suspend when idle in a Plasma session (its default
+  # on AC: after 15 minutes). A default for every user (/etc/xdg, added to modules/nixos/plasma's), changeable in
+  # System Settings > Power Management.
+  environment.etc."xdg/powerdevilrc".text = ''
+    [AC][SuspendAndShutdown]
+    AutoSuspendAction=0
+  '';
 
   # systemd-based initrd: unit-based stage 1, enables TPM2 LUKS unlock via systemd-cryptenroll.
   boot.initrd.systemd.enable = true;

@@ -11,7 +11,7 @@ Yubikeys for disk unlocking, SSH and signing.
 | Host | Hardware | Role | Status |
 |---|---|---|---|
 | `geras` | Dell XPS 15 7590 (x86_64) | Desktop (KDE Plasma) | Installed |
-| `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (Cinnamon), dual boot with Windows | Installed |
+| `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (KDE Plasma), dual boot with Windows | Installed |
 | `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Not installed yet (Fedora Asahi Remix) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
 | `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall (with the homelab's CrowdSec decisions), DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
@@ -31,7 +31,7 @@ modules/nixos/
                        Chromium, Telegram, OnlyOffice, Tern), and their user config (coding agents, Node, ops tools,
                        VS Code)
   plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, Tailscale in the
-  cinnamon/            network applet: plasma-nm-ts), GNOME (with GNOME Classic) or Cinnamon (zeus)
+  cinnamon/            network applet: plasma-nm-ts), GNOME (with GNOME Classic) or Cinnamon
   server/              Servers: systemd-networkd, resolved, Zabbix agent, SMART monitoring (smartd), unattended
                        upgrades
   secure-boot.nix      Lanzaboote with our own keys (geras, zeus; helios boots legacy BIOS, without it)
