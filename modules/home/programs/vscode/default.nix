@@ -13,6 +13,7 @@ in
 {
   programs.vscode = {
     enable = true;
+    package = pkgs-unstable.vscode;
     # Extensions from Nix only (updated with flake.lock): ~/.vscode/extensions is a read-only store directory, with
     # its own extensions.json. A mutable one mixes VS Code's own state with them (its Marketplace updates, marking
     # ours obsolete, and an extensions.json rebuilt whenever this list changes), which broke extensions.
