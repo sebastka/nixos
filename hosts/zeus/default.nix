@@ -39,7 +39,7 @@
     ../../modules/nixos/secure-boot.nix
     ../../modules/nixos/common
     ../../modules/nixos/desktop
-    ../../modules/nixos/cinnamon
+    ../../modules/nixos/plasma
     ../../users/sebastian/hosts/zeus.nix
   ];
 
