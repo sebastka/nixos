@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.." # Repo root
 
 nix="nix --extra-experimental-features nix-command --extra-experimental-features flakes"
 
-# Package directory, upstream Git repository, tag prefix
+# Package directory, upstream Git repository (owner/name on GitHub, or host/owner/name elsewhere), tag prefix
 packages=(
     "ansible-lint   ansible/ansible-lint        v"
     "argocd         argoproj/argo-cd            v"
@@ -17,6 +17,7 @@ packages=(
     "bws            bitwarden/sdk-sm            bws-v"
     "cilium-cli     cilium/cilium-cli           v"
     "domeneshop-cli sebastka/domeneshop-sdk     v"
+    "fractal        gitlab.gnome.org/World/fractal -"
     "helm           helm/helm                   v"
     "kube-capacity  robscott/kube-capacity      v"
     "kubeseal       bitnami-labs/sealed-secrets v"
@@ -30,12 +31,22 @@ packages=(
     "yamllint       adrienverge/yamllint        v"
 )
 
-# Latest stable (X.Y.Z, no pre-release) tag of a GitHub repository, without its prefix.
+# A repository's URL: owner/name on GitHub, host/owner/name as is.
+repo_url() {
+    local repo="$1"
+    if [[ "${repo}" == */*/* ]]; then
+        echo "https://${repo}"
+    else
+        echo "https://github.com/${repo}"
+    fi
+}
+
+# Latest stable (X.Y.Z, or X.Y as Fractal's; no pre-release) tag of a repository, without its prefix.
 latest_version() {
     local repo="$1" prefix="$2"
     [ "${prefix}" = "-" ] && prefix=""
-    git ls-remote --tags --refs "https://github.com/${repo}" \
-        | sed -n "s|.*refs/tags/${prefix}\([0-9]\+\.[0-9]\+\.[0-9]\+\)$|\1|p" \
+    git ls-remote --tags --refs "$(repo_url "${repo}").git" \
+        | sed -n "s|.*refs/tags/${prefix}\([0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?\)$|\1|p" \
         | sort -V | tail -n 1
 }
 
@@ -89,7 +100,7 @@ for entry in "${packages[@]}"; do
     # Built from source (no per-system entries): emptied, each hash is reported by the build (source first, then
     # dependencies)
     if [ -z "${systems}" ]; then
-        for attr in hash vendorHash; do
+        for attr in hash vendorHash cargoHash; do
             grep -qE "^ *${attr} = \"" "${file}" || continue
             sed -i -E "s|^( *${attr} = \")[^\"]*(\";)|\1\2|" "${file}"
             hash="$(build_hash_mismatch "${pkg}")"
@@ -97,5 +108,7 @@ for entry in "${packages[@]}"; do
         done
     fi
 
-    echo "- \`${pkg}\`: ${current} → ${latest} ([releases](https://github.com/${repo}/releases))"
+    releases="$(repo_url "${repo}")/releases"
+    [[ "${repo}" == */*/* ]] && releases="$(repo_url "${repo}")/-/releases" # GitLab
+    echo "- \`${pkg}\`: ${current} → ${latest} ([releases](${releases}))"
 done
