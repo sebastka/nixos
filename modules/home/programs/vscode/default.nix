@@ -13,7 +13,11 @@ in
 {
   programs.vscode = {
     enable = true;
-    package = pkgs-unstable.vscode;
+    # Its shared storage (recently opened, workspace trust: state) in XDG's state directory instead of ~/.vscode-shared:
+    # only this flag moves it (no variable), added to its launcher (bin/code, which the desktop entry runs)
+    package = pkgs-unstable.vscode.override {
+      commandLineArgs = "--shared-data-dir=${config.xdg.stateHome}/vscode/shared";
+    };
     # Extensions from Nix only (updated with flake.lock): their directory (below) is a read-only store directory, with
     # its own extensions.json. A mutable one mixes VS Code's own state with them (its Marketplace updates, marking
     # ours obsolete, and an extensions.json rebuilt whenever this list changes), which broke extensions.
