@@ -69,7 +69,7 @@
   hardware.asahi.peripheralFirmwareDirectory = pkgs.linkFarm "asahi-peripheral-firmware" {
     "firmware.cpio" = pkgs.requireFile {
       name = "firmware.cpio";
-      sha256 = "43f588e63f5f96d746379a2c0f393aea25645a04bd4a90f876aa472ce49e79b7"; # sha256sum of the file
+      sha256 = "656d9f7735ce012cf425a9fe4c11643fed71422a8a1a08bc85411fbced3f788a"; # sha256sum of the file
       message = "Add boreas's Asahi firmware: sudo nix-store --add-fixed sha256 /boot/vendorfw/firmware.cpio";
     };
   };
