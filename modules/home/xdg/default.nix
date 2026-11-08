@@ -40,6 +40,9 @@
   # AWS CLI
   home.sessionVariables.AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
   home.sessionVariables.AWS_SHARED_CREDENTIALS_FILE = "${config.xdg.configHome}/aws/credentials";
+  # Nor its session database (~/.aws/cli/cache/session.db, hard-coded): a random session ID in its requests' user agent,
+  # for AWS's telemetry. Its SSO and assume-role caches would still use ~/.aws/{sso,cli}/cache (unused here).
+  home.sessionVariables.AWS_CLI_SESSION_ID_DISABLED = "true";
 
   # Docker CLI: config.json (registry logins) instead of ~/.docker
   home.sessionVariables.DOCKER_CONFIG = "${config.xdg.configHome}/docker";
