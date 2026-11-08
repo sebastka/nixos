@@ -1,4 +1,9 @@
-{ self, pkgs, ... }:
+{
+  self,
+  lib,
+  pkgs,
+  ...
+}:
 
 # KDE Plasma 6, with SDDM: a desktop environment, next to modules/nixos/desktop (one per host: this,
 # modules/nixos/gnome or modules/nixos/cinnamon). Secrets: KWallet (also for libsecret), unlocked at login by SDDM's
@@ -51,11 +56,44 @@
   #   nmcli connection add type vpn vpn-type tailscale con-name "Tailscale (private)" vpn.data profile=karlsen.fr
   services.plasma-nm-ts.enable = true;
 
-  environment.systemPackages = [ pkgs.kdePackages.kate ];
+  environment.systemPackages = [
+    pkgs.kdePackages.kate
+    pkgs.haruna # KDE's video player (on mpv: FFmpeg's codecs, VA-API hardware decoding)
+  ];
 
   home-manager.sharedModules = [
     ../../home/programs/dolphin
     # gpg-agent's PIN prompt (modules/nixos/desktop/gnupg.nix), Qt
     { services.gpg-agent.pinentry.package = pkgs.pinentry-qt; }
+    # Plasma's viewers by default (xdg.mimeApps: modules/nixos/desktop), for the types their desktop entries declare:
+    # Haruna for video, Gwenview for images, Okular for PDFs
+    {
+      xdg.mimeApps.defaultApplications =
+        lib.genAttrs [
+          "video/mp4"
+          "video/x-matroska"
+          "video/mpeg"
+          "video/ogg"
+          "video/quicktime"
+          "video/vnd.avi"
+          "video/mp2t"
+          "video/webm"
+          "video/x-ms-wmv"
+        ] (_: "org.kde.haruna.desktop")
+        // lib.genAttrs [
+          "image/avif"
+          "image/bmp"
+          "image/gif"
+          "image/heif"
+          "image/jpeg"
+          "image/png"
+          "image/svg+xml"
+          "image/tiff"
+          "image/webp"
+        ] (_: "org.kde.gwenview.desktop")
+        // {
+          "application/pdf" = "okularApplication_pdf.desktop"; # Okular's PDF entry (org.kde.okular.desktop declares no PDF)
+        };
+    }
   ];
 }

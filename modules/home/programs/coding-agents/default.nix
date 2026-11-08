@@ -14,6 +14,8 @@
     configDir = "${config.xdg.configHome}/claude"; # Exports CLAUDE_CONFIG_DIR
     enableMcpIntegration = true; # programs.mcp's servers (below)
   };
+  # Its login callback (claude-cli:), to the desktop entry it writes itself (~/.local/share/applications)
+  xdg.mimeApps.defaultApplications."x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
 
   # MCP servers (programs.mcp.servers, per user: users/<user>) for Claude Code (a plugin of its wrapper) and Copilot
   # (mcp-config.json): their enableMcpIntegration

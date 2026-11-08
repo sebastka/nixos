@@ -30,6 +30,31 @@ in
   # User configuration for every user on desktops (home-manager)
   home-manager.sharedModules = [
     { programs.webApps.package = chromium; }
+    # Default apps: ~/.config/mimeapps.list from home-manager, each set next to its app (here, the desktop
+    # environment's modules, modules/home/programs...). Read-only: "Always open with" and apps' "set as default" no
+    # longer save. force: replaces the file apps wrote before.
+    {
+      xdg.mimeApps = {
+        enable = true;
+        defaultApplications =
+          lib.genAttrs [
+            "x-scheme-handler/http"
+            "x-scheme-handler/https"
+            "text/html"
+            "application/xhtml+xml"
+          ] (_: "firefox.desktop")
+          // lib.genAttrs [
+            "x-scheme-handler/mailto"
+            "x-scheme-handler/mid"
+            "message/rfc822"
+          ] (_: "thunderbird.desktop")
+          // lib.genAttrs [
+            "x-scheme-handler/tg"
+            "x-scheme-handler/tonsite"
+          ] (_: "org.telegram.desktop.desktop");
+      };
+      xdg.configFile."mimeapps.list".force = true;
+    }
     ../../home/programs/coding-agents
     ../../home/programs/node
     ../../home/programs/ops
