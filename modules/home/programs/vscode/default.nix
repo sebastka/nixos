@@ -18,6 +18,8 @@ in
     # its own extensions.json. A mutable one mixes VS Code's own state with them (its Marketplace updates, marking
     # ours obsolete, and an extensions.json rebuilt whenever this list changes), which broke extensions.
     mutableExtensionsDir = false;
+    # ~/.vscode/argv.json (runtime arguments), read-only: no crash reporter, so no crash-reporter-id either
+    argvSettings.enable-crash-reporter = false;
     profiles.default = {
       enableExtensionUpdateCheck = false; # Nothing to update (extensions.autoCheckUpdates)
       extensions = with pkgs.vscode-extensions; [
