@@ -22,8 +22,8 @@ in
   config = lib.mkIf config.services.graphical-desktop.enable {
     users.users.sebastian.extraGroups = [ "networkmanager" ];
 
-    # Syncthing (modules/nixos/desktop/syncthing.nix): ~/Documents and ~/Dev, synced between the desktops through the
-    # homelab's server
+    # Syncthing (modules/nixos/desktop/syncthing.nix): ~/Documents, ~/Dev and Claude Code's sessions, synced between the
+    # desktops through the homelab's server
     services.syncthing = {
       enable = true;
       user = "sebastian";
@@ -37,6 +37,14 @@ in
         Dev = {
           id = "dev";
           path = "~/Dev";
+        };
+        ClaudeProjects = {
+          id = "claude-projects";
+          path = "~/.config/claude/projects";
+        };
+        ClaudeFileHistory = {
+          id = "claude-file-history";
+          path = "~/.config/claude/file-history";
         };
       };
     };
