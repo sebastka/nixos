@@ -38,10 +38,16 @@ let
     "(?d)**/result-*"
     "(?d)**/target"
     "(?d)**/build" # CMake, Gradle and JS/TS bundles' output (no repository tracks files in a build/)
+    "(?d)**/.gradle" # Gradle's caches
+    "(?d)**/coverage" # Test coverage reports
+    "(?d)**/.pytest_cache"
+    "(?d)**/.mypy_cache"
+    "(?d)**/.ruff_cache"
     "(?d)**/.cache"
     "(?d)**/base/charts" # kustomize helmCharts caches (not YAML/charts, the chart sources)
     "(?d)**/overlays/*/charts"
     "(?d)**/.terraform"
+    "(?d)**/tfplan" # OpenTofu's saved plans: each machine's own
     # Containers' local state (local-stacks): files owned by their (rootless Docker) users, unreadable. Not
     # rebuildable: never deleted by Syncthing (no (?d)), a directory holding it is left for a person to remove.
     "**/.persist"
