@@ -55,6 +55,10 @@
 
   hardware.asahi.enable = true;
 
+  # Wi-Fi (Broadcom BCM4387, brcmfmac) without power saving: with it, the chip's firmware stopped answering during
+  # large transfers (rsync), until a reboot ("brcmf_msgbuf_query_dcmd: Timeout on response for query command").
+  networking.networkmanager.wifi.powersave = false;
+
   # nixos-apple-silicon tracks nixos-unstable: its video decoder firmware is not in nixos-26.05 yet
   nixpkgs.overlays = [ (final: prev: { inherit (pkgs-unstable) avd-fw; }) ];
 
