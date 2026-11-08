@@ -69,7 +69,7 @@ in
         "workbench.startupEditor" = "none";
 
         # Extensions: installed from Nix (above), no updates nor recommendations
-        "extensions.autoUpdate" = false;
+        "extensions.autoUpdate" = "off"; # No longer a boolean: VS Code rewrites false (read-only here) to "off"
         "extensions.ignoreRecommendations" = true;
 
         # Git
