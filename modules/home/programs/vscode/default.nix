@@ -14,7 +14,7 @@ in
   programs.vscode = {
     enable = true;
     package = pkgs-unstable.vscode;
-    # Extensions from Nix only (updated with flake.lock): ~/.vscode/extensions is a read-only store directory, with
+    # Extensions from Nix only (updated with flake.lock): their directory (below) is a read-only store directory, with
     # its own extensions.json. A mutable one mixes VS Code's own state with them (its Marketplace updates, marking
     # ours obsolete, and an extensions.json rebuilt whenever this list changes), which broke extensions.
     mutableExtensionsDir = false;
@@ -104,5 +104,16 @@ in
         }
       ];
     };
+  };
+
+  # VS Code's extensions and its CLI's data (code tunnel...) in XDG directories, instead of ~/.vscode, which keeps only
+  # argv.json (its location can't be changed, but for portable mode). The extensions directory home-manager makes
+  # (always ~/.vscode/extensions), moved; VS Code finds it with VSCODE_EXTENSIONS. The variables reach the desktop's
+  # apps at the next login (systemd user environment).
+  home.file.".vscode/extensions".enable = lib.mkForce false;
+  xdg.dataFile."vscode/extensions".source = config.home.file.".vscode/extensions".source;
+  home.sessionVariables = {
+    VSCODE_EXTENSIONS = "${config.xdg.dataHome}/vscode/extensions";
+    VSCODE_CLI_DATA_DIR = "${config.xdg.dataHome}/vscode/cli";
   };
 }
