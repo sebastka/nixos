@@ -37,6 +37,7 @@ let
     "(?d)**/result"
     "(?d)**/result-*"
     "(?d)**/target"
+    "(?d)**/build" # CMake, Gradle and JS/TS bundles' output (no repository tracks files in a build/)
     "(?d)**/.cache"
     "(?d)**/base/charts" # kustomize helmCharts caches (not YAML/charts, the chart sources)
     "(?d)**/overlays/*/charts"
