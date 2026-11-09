@@ -63,6 +63,12 @@
   # Wi-Fi (Broadcom BCM4387, brcmfmac) without power saving: with it, the chip's firmware stopped answering during
   # large transfers (rsync), until a reboot ("brcmf_msgbuf_query_dcmd: Timeout on response for query command").
   networking.networkmanager.wifi.powersave = false;
+  # The same firmware hang under Syncthing's full-speed transfers (its first sync of ~/Dev, 7 GB): limited to ~20 MB/s
+  # each way. A workaround, until the hangs themselves are understood (lower it if they persist).
+  services.syncthing.settings.options = {
+    maxRecvKbps = 20000;
+    maxSendKbps = 20000;
+  };
 
   # nixos-apple-silicon tracks nixos-unstable: its video decoder firmware is not in nixos-26.05 yet
   nixpkgs.overlays = [ (final: prev: { inherit (pkgs-unstable) avd-fw; }) ];
