@@ -25,6 +25,7 @@ in
     ./syncthing.nix
     ./tailscale.nix
     ./tern.nix
+    ./uncached.nix
   ];
 
   # User configuration for every user on desktops (home-manager)
@@ -92,16 +93,22 @@ in
   programs.firefox.enable = true;
   programs.thunderbird.enable = true;
 
-  environment.systemPackages = with pkgs; [
-    libsecret # secret-tool: secrets in the keyring
-    chromium # Also runs the web apps (modules/home/programs/web-apps, above)
-    pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
-    # Matrix client, on matrix-rust-sdk's encryption. Not NeoChat: it needs libolm, deprecated and marked insecure.
-    # Its latest release (nixpkgs lags behind)
-    (callPackage ../../../pkgs/fractal { inherit pkgs-unstable; })
-    php # The CLI (php), with its default extensions
-    php.packages.composer # Built on the php above
-    # Its latest release (nixpkgs lags behind), x86_64 and arm64, with the system's fonts in its documents
-    (callPackage ../../../pkgs/onlyoffice-desktopeditors { fonts = config.fonts.packages; })
-  ];
+  environment.systemPackages =
+    with pkgs;
+    [
+      libsecret # secret-tool: secrets in the keyring
+      chromium # Also runs the web apps (modules/home/programs/web-apps, above)
+      pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
+    ]
+    ++ lib.optionals config.desktop.uncachedPackages.enable [
+      # Matrix client, on matrix-rust-sdk's encryption. Not NeoChat: it needs libolm, deprecated and marked insecure.
+      # Its latest release (nixpkgs lags behind)
+      (callPackage ../../../pkgs/fractal { inherit pkgs-unstable; })
+    ]
+    ++ [
+      php # The CLI (php), with its default extensions
+      php.packages.composer # Built on the php above
+      # Its latest release (nixpkgs lags behind), x86_64 and arm64, with the system's fonts in its documents
+      (callPackage ../../../pkgs/onlyoffice-desktopeditors { fonts = config.fonts.packages; })
+    ];
 }

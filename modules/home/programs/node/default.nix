@@ -1,11 +1,14 @@
 {
   config,
+  lib,
+  osConfig,
   pkgs,
   pkgs-unstable,
   ...
 }:
 
-{
+# Compiled locally where no binary cache has it (modules/nixos/desktop/uncached.nix): left out there
+lib.mkIf (osConfig.desktop.uncachedPackages.enable or true) {
   # Node.js (the current LTS) and npm, its package manager: the default everywhere. Projects pinning another version
   # (.nvmrc, .node-version) get theirs from fnm (below).
   programs.npm = {
