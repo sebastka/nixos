@@ -27,6 +27,9 @@ let
   # node_modules) would otherwise stay on this one, the folder out of sync. Add more as needed: it applies to every
   # folder.
   ignorePatterns = [
+    # Exceptions first (the first matching pattern decides): scripts named like a generated directory below, e.g. this
+    # repository's bin/build, which **/build would match too (Syncthing patterns match files and directories alike)
+    "!**/bin/build"
     "(?d).DS_Store"
     "(?d)Thumbs.db"
     "(?d)**/node_modules"
