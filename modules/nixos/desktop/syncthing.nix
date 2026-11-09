@@ -93,6 +93,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # The config directory's parent (~/.config), the user's, early at boot: the service's key copy (as root, install
+    # -d) would otherwise create it as root on a new host, before home-manager, which then fails to write into it
+    systemd.tmpfiles.rules = [ "d ${dirOf cfg.configDir} 0755 ${cfg.user} ${cfg.group} -" ];
+
     # Desktop-only secret (not readable by servers): the password the server's copies are encrypted with
     sops.secrets."syncthing-encryption-password" = {
       sopsFile = ../../../secrets/desktop.sops.yaml;
