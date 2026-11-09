@@ -133,9 +133,9 @@ if ! mountpoint -q "${root}/boot"; then
 fi
 
 # Apple Silicon: the peripheral firmware extracted by the Asahi installer, referenced by its hash
-# (hardware.asahi.peripheralFirmwareDirectory), into the Nix store
+# (hardware.asahi.peripheralFirmwareDirectory), into the target's Nix store, where nixos-install builds the system
 if test -f "${root}/boot/vendorfw/firmware.cpio"; then
-    sudo nix-store --add-fixed sha256 "${root}/boot/vendorfw/firmware.cpio"
+    sudo nix-store --store "${root}" --add-fixed sha256 "${root}/boot/vendorfw/firmware.cpio"
 fi
 
 # Enroll the Yubikey (FIDO2) as LUKS unlock method: asks for the passphrase, FIDO2 PIN and a touch.
