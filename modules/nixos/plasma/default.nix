@@ -65,6 +65,37 @@
     ../../home/programs/dolphin
     # gpg-agent's PIN prompt (modules/nixos/desktop/gnupg.nix), Qt
     { services.gpg-agent.pinentry.package = pkgs.pinentry-qt; }
+
+    # The task manager's launchers by application ID, not by path: one pinned from a running window is saved as its
+    # desktop file in the Nix store (file:///nix/store/...-system-path/share/applications/x.desktop), which garbage
+    # collection deletes with its generation, leaving a blank icon. Rewritten to applications:x.desktop at each login,
+    # before the shell reads its config.
+    (
+      { config, ... }:
+      {
+        systemd.user.services.plasma-launchers-by-id = {
+          Unit = {
+            Description = "Plasma's pinned launchers by application ID instead of Nix store paths";
+            Before = [ "plasma-plasmashell.service" ];
+          };
+          Service = {
+            Type = "oneshot";
+            ExecStart = lib.getExe (
+              pkgs.writeShellApplication {
+                name = "plasma-launchers-by-id";
+                runtimeInputs = [ pkgs.gnused ];
+                text = ''
+                  file=${lib.escapeShellArg "${config.xdg.configHome}/plasma-org.kde.plasma.desktop-appletsrc"}
+                  [ -f "$file" ] || exit 0
+                  sed -i -E 's#file:///nix/store/[^,]*/share/applications/([^,/]+\.desktop)#applications:\1#g' "$file"
+                '';
+              }
+            );
+          };
+          Install.WantedBy = [ "plasma-workspace.target" ];
+        };
+      }
+    )
     # Plasma's viewers by default (xdg.mimeApps: modules/nixos/desktop), for the types their desktop entries declare:
     # Haruna for video, Gwenview for images, Okular for PDFs
     {
