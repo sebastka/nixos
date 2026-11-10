@@ -82,7 +82,7 @@ The repository includes a development shell with the tools to work on it (`sops`
 |---|---|---|
 | `ci.yaml` | Push to `master`, pull requests | yamllint and shellcheck (devShell tools), `nix flake check` on x86_64 and aarch64, host evaluation. Merges Dependabot pull requests once everything passed. |
 | `update.yaml` | Nightly (02:00 UTC), manually | `bin/update`, the same checks on both architectures, then opens a signed pull request and merges it. |
-| `cache.yaml` | Push to `master`, after `update.yaml`, manually (never pull requests) | Builds each x86_64 host on our runners (`talmox-nix`, ARC in sebastka/homelab) and pushes it to our binary cache (`modules/nixos/common/nix-cache.nix`). |
+| `cache.yaml` | Push to `master`, after `update.yaml`, manually (never pull requests) | Builds each host and pushes it to our binary cache (`modules/nixos/common/nix-cache.nix`): x86_64 hosts on our runners (`talmox-nix`, ARC in sebastka/homelab), boreas on GitHub's arm runner (`ubuntu-26.04-arm`). |
 | Dependabot | Weekly | Updates the actions (pinned by commit), only releases at least 7 days old. |
 
 Servers deploy what is merged on `master` by themselves (`system.autoUpgrade`, rebooting between 04:00 and 06:00 when
@@ -135,7 +135,7 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
 
 ### Desktops without a binary cache (`desktop.uncachedPackages`)
 
-Some desktop packages are in no binary cache for every platform: Tern (a flake input; our cache only has x86_64 hosts). `desktop.uncachedPackages.enable = false` (`modules/nixos/desktop/uncached.nix`) leaves it out of a host that would otherwise compile it itself. boreas has it off until CI builds aarch64 hosts into our cache. Node.js from nixpkgs-unstable (the `node` module, also needed by Renovate and the GitHub Copilot CLI) is often missing from cache.nixos.org for aarch64 too, and compiled on boreas then (about an hour).
+Some desktop packages are in no binary cache for every platform: Tern (a flake input; our cache only has x86_64 hosts). `desktop.uncachedPackages.enable = false` (`modules/nixos/desktop/uncached.nix`) leaves it out of a host that would otherwise compile it itself. boreas has it off for now: CI now builds it into our cache (`cache.yaml`), so Tern can come back once that works. Node.js from nixpkgs-unstable (the `node` module, also needed by Renovate and the GitHub Copilot CLI) is often missing from cache.nixos.org for aarch64 too, and compiled on boreas then (about an hour).
 
 ### `boreas` (Apple Silicon, dual boot with macOS)
 

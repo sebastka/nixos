@@ -1,9 +1,12 @@
 ---
-# Builds each x86_64 host's system on our runners (talmox-nix: ARC in sebastka/homelab, image
-# sebastka/nix-actions-runner) and pushes it to our binary cache (pithos, modules/nixos/common/nix-cache.nix): hosts
-# then download what cache.nixos.org lacks instead of building it. aarch64 hosts (hermes, boreas): not yet, no runners.
+# Builds each host's system and pushes it to our binary cache (pithos, modules/nixos/common/nix-cache.nix): hosts then
+# download what cache.nixos.org lacks instead of building it. x86_64 hosts on our runners (talmox-nix: ARC in
+# sebastka/homelab, image sebastka/nix-actions-runner); aarch64 ones on GitHub's (no aarch64 node of ours), which reach
+# Attic through its public route (sebastka/homelab: k8s/applications/utils/attic; its tokens decide who reads and
+# writes). hermes: once installed.
 #
-# Never on pull requests: the runners run jobs unsandboxed, in our cluster, and with ATTIC_TOKEN (a push token).
+# Never on pull requests: our runners run jobs unsandboxed, in our cluster, and every job gets ATTIC_TOKEN (a push
+# token).
 name: Binary cache
 
 'on':
@@ -37,8 +40,13 @@ jobs:
       fail-fast: false
       matrix:
         host: [geras, zeus, helios, file]
-    runs-on: talmox-nix
-    timeout-minutes: 240
+        runner: [talmox-nix]
+        include:
+          # GitHub's arm runner (4 CPUs): the Asahi kernel and unstable's Node.js are built there, ~3 h the first time
+          - {host: boreas, runner: ubuntu-26.04-arm, hosted: true}
+    runs-on: ${{ matrix.runner }}
+    # GitHub's runners stop at 6 h
+    timeout-minutes: ${{ matrix.hosted && 350 || 240 }}
     # The latest commit only: a newer run replaces a host's older one
     concurrency:
       group: ${{ github.workflow }}-${{ matrix.host }}
@@ -48,6 +56,24 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           ref: master
+
+      # GitHub's runners: room for the system's closure and its builds (~30 GB; the runner has ~15 GB free), by removing
+      # preinstalled toolchains we don't use; then Nix (ours have it, and the Attic client, in their image)
+      - name: Free disk space
+        if: matrix.hosted
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache \
+            /usr/local/share/powershell /usr/share/swift /usr/local/lib/node_modules
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+          df -h /
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b  # v31.11.3
+        if: matrix.hosted
+      - name: Install the Attic client
+        if: matrix.hosted
+        run: |
+          attic="$(nix build --no-link --print-out-paths --inputs-from . nixpkgs#attic-client)"
+          echo "${attic}/bin" >> "${GITHUB_PATH}"
 
       # Our cache as a substituter too (a rebuild reuses what is already there): private, so the token in a netrc
       # file, outside the workspace
