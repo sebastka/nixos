@@ -17,7 +17,6 @@ packages=(
     "bws            bitwarden/sdk-sm            bws-v"
     "cilium-cli     cilium/cilium-cli           v"
     "domeneshop-cli sebastka/domeneshop-sdk     v"
-    "fractal        gitlab.gnome.org/World/fractal -"
     "helm           helm/helm                   v"
     "kube-capacity  robscott/kube-capacity      v"
     "kubeseal       bitnami-labs/sealed-secrets v"
