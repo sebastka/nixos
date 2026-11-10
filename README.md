@@ -12,7 +12,7 @@ Yubikeys for disk unlocking, SSH and signing.
 |---|---|---|---|
 | `geras` | Dell XPS 15 7590 (x86_64) | Desktop (KDE Plasma) | Installed |
 | `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (KDE Plasma), dual boot with Windows | Installed |
-| `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Not installed yet (Fedora Asahi Remix) |
+| `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Installed (without the uncached packages, see below) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
 | `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall (with the homelab's CrowdSec decisions), DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
 | `file` | KubeVirt VM in the homelab cluster (x86_64, on hera; its data is hera's passed-through NVMe) | Server: NFS, off-site backups (Kopia, to Hetzner, nightly), Zabbix agent, firewall | Installed |
@@ -28,10 +28,11 @@ modules/nixos/
   common/              Every host: nix, boot, locale and keyboard, sops-nix, users (email and picture), OpenSSH server
   desktop/             Desktops: PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH agent), Tailscale,
                        Bluetooth, rootless Docker, Syncthing, fonts; apps for every user (Firefox, Thunderbird,
-                       Chromium, Telegram, OnlyOffice, Tern), and their user config (coding agents, Node, ops tools,
-                       VS Code)
-  plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, Tailscale in the
-  cinnamon/            network applet: plasma-nm-ts), GNOME (with GNOME Classic) or Cinnamon
+                       Chromium, Telegram, OnlyOffice, Tern), their default apps (mimeapps.list) and their user config
+                       (coding agents, Node, ops tools, VS Code); desktop.uncachedPackages (uncached.nix)
+  plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, Haruna,
+  cinnamon/            Gwenview and Okular as default viewers, Tailscale in the network applet: plasma-nm-ts),
+                       GNOME (with GNOME Classic) or Cinnamon
   server/              Servers: systemd-networkd, resolved, Zabbix agent, SMART monitoring (smartd), unattended
                        upgrades
   secure-boot.nix      Lanzaboote with our own keys (geras, zeus; helios boots legacy BIOS, without it)
@@ -131,6 +132,21 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
    stages the Secure Boot keys and reboots, then systemd-boot enrolls them (with Microsoft's keys, needed by the NVIDIA
    option ROM). Check with `bootctl status` (`Secure Boot: enabled (user)`) or `sudo sbctl status`.
 5. **User session:** run `gpg --card-status` once per Yubikey (links the GnuPG subkeys to the cards, SSH included).
+
+### Desktops without a binary cache (`desktop.uncachedPackages`)
+
+Some desktop packages are in no binary cache for every platform: Tern (a flake input), and Node.js with what needs it (the `node` module: Node.js, npm, pnpm, yarn, fnm; Renovate; the GitHub Copilot CLI), whose aarch64 builds nixpkgs-unstable's cache often lacks. `desktop.uncachedPackages.enable = false` (`modules/nixos/desktop/uncached.nix`) leaves them out of a host that would otherwise compile them itself, about an hour for Node.js alone. boreas has it off until CI builds aarch64 hosts into our cache.
+
+### `boreas` (Apple Silicon, dual boot with macOS)
+
+NixOS replaces Fedora Asahi Remix in the same space; macOS, its stub volume (the boot picker's "Fedora" entry) and the ESP made by the Asahi installer stay. The steps are at the top of `hosts/boreas/default.nix`; what differs from the steps above:
+
+- **Firmware:** the Wi-Fi, Bluetooth... firmware is extracted by the Asahi installer into the ESP (`vendorfw/firmware.cpio`) and pinned by its hash in `hosts/boreas/default.nix`. Rebuilding it (the Asahi installer from macOS, `curl https://alx.sh | sh`) changes its hash: update it there. The installer can also upgrade m1n1's first stage.
+- **Installer:** nixos-apple-silicon's release image (kernel 7.1) crashed in its display driver with the device tree Fedora's m1n1 passes. Build one from our inputs instead, natively on the Mac (Nix on Fedora), with the overlay boreas uses for `avd-fw`: `inputs.nixos-apple-silicon.lib.mkInstallerBootstrapCustom { system = "aarch64-linux"; extraModules = [ { nixpkgs.overlays = [ (final: prev: { inherit (pkgs-unstable) avd-fw; }) ]; } ]; }`. Boot it from the boot picker's "Fedora" entry; in U-Boot, `bootflow scan -l usb`, `bootflow select 0`, `bootflow boot`.
+- **USB at boot:** a device already plugged in when Linux starts isn't seen (no Type-C event): when the installer waits for its disk, unplug the stick and plug it in again. The same goes for the Yubikey.
+- **Partitions:** Fedora's `/boot` and root are deleted with `sgdisk`, and one partition named `nixos` takes their space (`hosts/boreas/disko.nix` finds it by that name). Never touch Apple's partitions.
+- **Live store:** the installer's writable store (RAM) is too small for our flake. Before `bin/install-host`: `sudo mount -o remount,size=12G,nr_inodes=0 /nix/.rw-store`.
+- **First boot:** U-Boot keeps Fedora's EFI boot entry, which starts Fedora's GRUB: from U-Boot, `load nvme 0:4 ${kernel_addr_r} EFI/systemd/systemd-bootaa64.efi` then `bootefi ${kernel_addr_r}`, and once NixOS is up, `sudo rm -r /boot/EFI/fedora`.
 
 ### `zeus` (dual boot with Windows)
 
@@ -284,3 +300,6 @@ imported where libsecret looks for it.
 - **Impermanence** (`hosts/geras/impermanence.nix`) is prepared but disabled.
 - **Copilot in VS Code:** its CLI sessions watch `~/.copilot/session-state` (hard-coded), so they may recreate
   `~/.copilot`, and miss sessions in `COPILOT_HOME`.
+- **boreas's Wi-Fi:** its firmware (Broadcom BCM4387, `brcmfmac`) stops answering during sustained transfers on the 5 GHz network ("Timeout on response for query command"), until the driver is reloaded: `sudo modprobe -r brcmfmac_wcc brcmfmac && sudo modprobe brcmfmac`. Neither power saving off nor `brcmfmac.roamoff=1` helped; the 2.4 GHz network held (at ~20 MB/s). Syncthing is limited to ~20 MB/s on boreas meanwhile.
+- **Default apps:** `~/.config/mimeapps.list` comes from home-manager, read-only: "Always open with" and apps' "set as default" don't save; set them in the module of the app (`xdg.mimeApps.defaultApplications`).
+- **Plasma's pinned launchers:** one pinned from a running window is saved by its path in the Nix store, which garbage collection deletes. They are rewritten as application IDs at each login (`modules/nixos/plasma`); pinning from the application menu avoids it.
