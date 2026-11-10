@@ -262,7 +262,7 @@ Notes:
 
 ## Coding agents
 
-Claude Code, Codex and the GitHub Copilot CLI are installed on desktops from nixpkgs-unstable
+Claude Code and the GitHub Copilot CLI are installed on desktops from nixpkgs-unstable (Codex too, but disabled: `programs.codex.enable`)
 (`modules/home/programs/coding-agents`): they move fast, and are updated with `flake.lock`, never by themselves
 (Copilot's self-update is off: `COPILOT_AUTO_UPDATE=false`). Their config directories are in `~/.config`, not `~/`:
 

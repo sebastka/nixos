@@ -33,7 +33,9 @@
     # it whenever Claude is opened elsewhere: set here, settings.json being read-only.
     "claudeCode.preferredLocation" = "panel";
     # Replaces the bundled binary's path (extension openai.chatgpt, from the marketplace)
-    "chatgpt.cliExecutable" = lib.getExe config.programs.codex.package;
+    "chatgpt.cliExecutable" = lib.mkIf config.programs.codex.enable (
+      lib.getExe config.programs.codex.package
+    );
   };
 
   # Zed's Agent Panel: Claude Code through the ACP adapter from Nix (unfree, as its SDK: built by our CI, from the
@@ -55,7 +57,7 @@
     };
     # Codex through the ACP adapter from Nix (instead of the registry's, npx), running our CLI: the same CODEX_HOME,
     # so the same login and settings as in a terminal
-    Codex = {
+    Codex = lib.mkIf config.programs.codex.enable {
       type = "custom";
       command = lib.getExe pkgs-unstable.codex-acp;
       env = {
@@ -78,8 +80,11 @@
 
   # CODEX_HOME = ~/.config/codex (home.preferXdgDirectories)
   programs.codex = {
-    enable = true;
-    package = pkgs-unstable.codex;
+    enable = false; # Unused; its package below stays ready
+    # Its crates' bundled libraries, as before: unstable's Rust builds now make crates use the system's (cargo setup
+    # hook: cargoUseSystemLibs), which its package doesn't provide (AWS-LC, zstd, SQLite, Oniguruma: 0.167.0 fails to
+    # build, so isn't in cache.nixos.org either). Remove once nixpkgs' package builds again.
+    package = pkgs-unstable.codex.overrideAttrs { dontCargoUseSystemLibs = true; };
     # Not programs.mcp's servers: they'd make its config.toml a read-only file from the store, which Codex writes to
     # (trusted projects, /model)
   };
