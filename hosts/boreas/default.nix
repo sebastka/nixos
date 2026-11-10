@@ -84,10 +84,12 @@
   };
 
   # Norwegian Mac keyboard: its keys are engraved as the Mac layout, not the PC one (the default, "no"): e.g. ' left of
-  # 1 and @ next to Æ, where the PC layout has | and '
+  # 1 and @ next to Æ, where the PC layout has | and '. Its third level (| on 7, [ ] { } $ \...: Option on macOS) with
+  # the right Option, as AltGr (the variant sets none); the left one stays Alt, for shortcuts.
   services.xserver.xkb = {
     model = "applealu_iso";
     variant = "mac";
+    options = "terminate:ctrl_alt_bksp,lv3:ralt_switch"; # The first: NixOS's default
   };
 
   home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
