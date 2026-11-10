@@ -41,6 +41,9 @@ in
         "editor.minimap.enabled" = false;
         "editor.renderWhitespace" = "boundary";
         "editor.bracketPairColorization.enabled" = true;
+        # Solid cursors (editor and terminal, below): a blinking one repaints every half second, which keeps the GPU and
+        # the compositor busy on battery
+        "editor.cursorBlinking" = "solid";
         "editor.rulers" = [
           80
           120
@@ -67,6 +70,7 @@ in
 
         # Terminal
         "terminal.integrated.defaultProfile.linux" = "zsh";
+        "terminal.integrated.cursorBlinking" = false;
         # Without the kitty keyboard protocol (on by default): with it, Shift+number on a non-US layout (Norwegian)
         # reached programs using it (Neovim) as Shift+1... instead of "!", "#"..., and typed nothing
         "terminal.integrated.enableKittyKeyboardProtocol" = false;
