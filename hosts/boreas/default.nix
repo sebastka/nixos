@@ -55,9 +55,8 @@
 
   hardware.asahi.enable = true;
 
-  # No binary cache for aarch64 yet: no Tern, Fractal, nor Node.js and what needs it (Renovate, the Copilot CLI), which
-  # would be compiled here (Node.js alone, twice, ~1 h). Back on once boreas is built by CI
-  # (modules/nixos/desktop/uncached.nix).
+  # No binary cache for aarch64 yet: no Tern, nor Node.js and what needs it (Renovate, the Copilot CLI), which would be
+  # compiled here (Node.js alone, twice, ~1 h). Back on once boreas is built by CI (modules/nixos/desktop/uncached.nix).
   desktop.uncachedPackages.enable = false;
 
   # Wi-Fi (Broadcom BCM4387, brcmfmac) without power saving: with it, the chip's firmware stopped answering during

@@ -100,11 +100,6 @@ in
       chromium # Also runs the web apps (modules/home/programs/web-apps, above)
       pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
     ]
-    ++ lib.optionals config.desktop.uncachedPackages.enable [
-      # Matrix client, on matrix-rust-sdk's encryption. Not NeoChat: it needs libolm, deprecated and marked insecure.
-      # Its latest release (nixpkgs lags behind)
-      (callPackage ../../../pkgs/fractal { inherit pkgs-unstable; })
-    ]
     ++ [
       php # The CLI (php), with its default extensions
       php.packages.composer # Built on the php above
