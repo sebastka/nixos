@@ -3,7 +3,6 @@
   pkgs-unstable,
   config,
   lib,
-  osConfig,
   ...
 }:
 
@@ -75,12 +74,7 @@ in
     # CI/CD
     pkgs.gh
     pkgs.act
-  ]
-  # Compiled locally where no binary cache has it (modules/nixos/desktop/uncached.nix): its Node.js, on aarch64
-  ++ lib.optionals (osConfig.desktop.uncachedPackages.enable or true) [
     pkgs-unstable.renovate # Also renovate-config-validator (renovate.json). Released daily: unstable is the closest
-  ]
-  ++ [
     pkgs-unstable.attic-client
 
     # Linting

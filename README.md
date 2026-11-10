@@ -12,7 +12,7 @@ Yubikeys for disk unlocking, SSH and signing.
 |---|---|---|---|
 | `geras` | Dell XPS 15 7590 (x86_64) | Desktop (KDE Plasma) | Installed |
 | `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (KDE Plasma), dual boot with Windows | Installed |
-| `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Installed (without the uncached packages, see below) |
+| `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Installed (without Tern, see below) |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
 | `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall (with the homelab's CrowdSec decisions), DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
 | `file` | KubeVirt VM in the homelab cluster (x86_64, on hera; its data is hera's passed-through NVMe) | Server: NFS, off-site backups (Kopia, to Hetzner, nightly), Zabbix agent, firewall | Installed |
@@ -135,7 +135,7 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
 
 ### Desktops without a binary cache (`desktop.uncachedPackages`)
 
-Some desktop packages are in no binary cache for every platform: Tern (a flake input), and Node.js with what needs it (the `node` module: Node.js, npm, pnpm, yarn, fnm; Renovate; the GitHub Copilot CLI), whose aarch64 builds nixpkgs-unstable's cache often lacks. `desktop.uncachedPackages.enable = false` (`modules/nixos/desktop/uncached.nix`) leaves them out of a host that would otherwise compile them itself, about an hour for Node.js alone. boreas has it off until CI builds aarch64 hosts into our cache.
+Some desktop packages are in no binary cache for every platform: Tern (a flake input; our cache only has x86_64 hosts). `desktop.uncachedPackages.enable = false` (`modules/nixos/desktop/uncached.nix`) leaves it out of a host that would otherwise compile it itself. boreas has it off until CI builds aarch64 hosts into our cache. Node.js from nixpkgs-unstable (the `node` module, also needed by Renovate and the GitHub Copilot CLI) is often missing from cache.nixos.org for aarch64 too, and compiled on boreas then (about an hour).
 
 ### `boreas` (Apple Silicon, dual boot with macOS)
 

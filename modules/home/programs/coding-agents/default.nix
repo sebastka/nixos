@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  osConfig,
   pkgs,
   pkgs-unstable,
   ...
@@ -88,8 +87,7 @@
   # COPILOT_HOME = ~/.config/copilot (home.preferXdgDirectories), instead of ~/.copilot. Its self-update is off: it
   # would download newer releases into COPILOT_HOME/pkg, and run them instead of ours.
   programs.github-copilot-cli = {
-    # Its Node.js is compiled locally where no binary cache has it (modules/nixos/desktop/uncached.nix): left out there
-    enable = osConfig.desktop.uncachedPackages.enable or true;
+    enable = true;
     package = pkgs-unstable.github-copilot-cli;
     enableMcpIntegration = true;
   };
