@@ -21,6 +21,7 @@ in
     ./docker.nix
     ./fonts.nix
     ./gnupg.nix
+    ./laptop.nix
     ./networkmanager.nix
     ./syncthing.nix
     ./tailscale.nix

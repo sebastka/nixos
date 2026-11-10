@@ -14,6 +14,7 @@
   ];
 
   networking.hostName = "geras";
+  desktop.laptop.enable = true; # modules/nixos/desktop/laptop.nix
 
   # systemd-based initrd: unit-based stage 1, enables TPM2/FIDO2 LUKS unlock via systemd-cryptenroll.
   boot.initrd.systemd.enable = true;

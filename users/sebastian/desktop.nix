@@ -92,9 +92,13 @@ in
         programs.zsh.shellAliases.nixos = "cd ${config.home.homeDirectory}/Dev/Private/Nix/nixos";
 
         # Rootless Docker (modules/nixos/desktop/docker.nix: not started by default) started at login, as
-        # `systemctl --user enable` would (it can't: the unit has no [Install] section)
-        xdg.configFile."systemd/user/default.target.wants/docker.service".source =
-          config.lib.file.mkOutOfStoreSymlink "/etc/systemd/user/docker.service";
+        # `systemctl --user enable` would (it can't: the unit has no [Install] section). Not on laptops
+        # (modules/nixos/desktop/laptop.nix): `systemctl --user start docker` when needed.
+        xdg.configFile."systemd/user/default.target.wants/docker.service" =
+          lib.mkIf (!nixosConfig.desktop.laptop.enable)
+            {
+              source = config.lib.file.mkOutOfStoreSymlink "/etc/systemd/user/docker.service";
+            };
 
         # Bitwarden CLI (bw, modules/home/programs/bw): the private account (bitwarden.com), the default one
         programs.bw.accounts.karlsenfr.server = "https://vault.bitwarden.com";

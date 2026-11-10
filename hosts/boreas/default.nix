@@ -41,6 +41,7 @@
   ];
 
   networking.hostName = "boreas";
+  desktop.laptop.enable = true; # modules/nixos/desktop/laptop.nix
 
   # systemd-boot on the ESP made by the Asahi installer (loaded by m1n1 and U-Boot). EFI variables can't be set.
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
