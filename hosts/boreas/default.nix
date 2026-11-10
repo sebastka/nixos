@@ -83,7 +83,12 @@
     };
   };
 
-  services.xserver.xkb.model = "applealu_iso"; # Norwegian layout: the default
+  # Norwegian Mac keyboard: its keys are engraved as the Mac layout, not the PC one (the default, "no"): e.g. ' left of
+  # 1 and @ next to Æ, where the PC layout has | and '
+  services.xserver.xkb = {
+    model = "applealu_iso";
+    variant = "mac";
+  };
 
   home-manager.extraSpecialArgs = { inherit pkgs-unstable; };
 
