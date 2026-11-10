@@ -42,6 +42,9 @@ in
         # Sent with the active checks' first contact, so a new server appears in Zabbix without being added by hand.
         HostMetadata = "nixos";
         LogRemoteCommands = 1; # system.run (denied by default); agent 2: Plugins.SystemRun.LogRemoteCommands
+        # Passive checks' processes (10 by default): the template's items are active checks (one process of their
+        # own), passive ones are occasional (remote commands, zabbix_get). Not 0: that closes the passive port.
+        StartAgents = 3;
       };
     };
 
