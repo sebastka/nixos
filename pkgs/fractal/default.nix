@@ -9,7 +9,7 @@ let
   cargoHash = "sha256-wRTXNnM8NscEjNbO7sXaO8LM1u2iuDYUtVuot7csBcg=";
 in
 pkgs-unstable.fractal.overrideAttrs (
-  finalAttrs: _: {
+  finalAttrs: old: {
     inherit version;
     src = pkgs-unstable.fetchFromGitLab {
       domain = "gitlab.gnome.org";
@@ -22,5 +22,8 @@ pkgs-unstable.fractal.overrideAttrs (
       inherit (finalAttrs) src;
       hash = cargoHash;
     };
+    # 14.3's TLS (aws-lc-sys, unlike 14.1) uses the system's AWS-LC: nixpkgs' Rust builds no longer let crates build
+    # their own copy of a system library (AWS_LC_SYS_USE_SYSTEM, its cargo setup hook)
+    buildInputs = old.buildInputs ++ [ pkgs-unstable.aws-lc ];
   }
 )
