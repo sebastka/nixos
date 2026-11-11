@@ -49,6 +49,8 @@ in
             "x-scheme-handler/mailto"
             "x-scheme-handler/mid"
             "message/rfc822"
+            "text/calendar" # Invitations (.ics)
+            "x-scheme-handler/net.thunderbird" # Its own links (OAuth logins...)
           ] (_: "thunderbird.desktop")
           // lib.genAttrs [
             "x-scheme-handler/tg"
@@ -91,8 +93,16 @@ in
   services.orca.enable = false;
   services.speechd.enable = false;
 
-  programs.firefox.enable = true;
-  programs.thunderbird.enable = true;
+  # Not asking at each start to be the default app: mimeapps.list is read-only (home-manager, above), so they couldn't
+  # record it, and the defaults are set there instead
+  programs.firefox = {
+    enable = true;
+    preferences."browser.shell.checkDefaultBrowser" = false;
+  };
+  programs.thunderbird = {
+    enable = true;
+    preferences."mail.shell.checkDefaultClient" = false;
+  };
 
   environment.systemPackages =
     with pkgs;
