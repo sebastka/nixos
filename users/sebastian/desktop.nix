@@ -132,6 +132,34 @@ in
         home.sessionVariables.ARGOCD_OPTS = "--core --config ${config.xdg.cacheHome}/argocd/karlsenfr.yaml";
         home.sessionVariables.CSCLI_CONFIG = config.programs.cscli.profiles.karlsenfr.configFile;
 
+        # Element (modules/nixos/desktop), one instance per Matrix account: its own login, data and tray icon each
+        # (--profile <name>: ~/.config/Element-<name>). The private account's entry replaces the package's (same name,
+        # in ~/.local/share/applications: first in the search path), so Element always opens with a profile, and gets
+        # the element:// links.
+        xdg.desktopEntries =
+          let
+            element = profile: {
+              name = "Element (${profile})";
+              genericName = "Matrix Client";
+              exec = "element-desktop --profile ${profile} %u";
+              icon = "element";
+              categories = [
+                "Network"
+                "InstantMessaging"
+                "Chat"
+              ];
+            };
+          in
+          {
+            element-desktop = element "karlsen.fr" // {
+              mimeType = [
+                "x-scheme-handler/element"
+                "x-scheme-handler/io.element.desktop"
+              ];
+            };
+            element-corp-inbox-com = element "corp.inbox.com";
+          };
+
         # Web apps (modules/home/programs/web-apps)
         programs.webApps.apps = {
           bitwarden-private = {

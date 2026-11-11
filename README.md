@@ -28,8 +28,8 @@ modules/nixos/
   common/              Every host: nix, boot, locale and keyboard, sops-nix, users (email and picture), OpenSSH server
   desktop/             Desktops: PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH agent), Tailscale,
                        Bluetooth, rootless Docker, Syncthing, fonts; apps for every user (Firefox, Thunderbird,
-                       Chromium, Telegram, OnlyOffice, Tern), their default apps (mimeapps.list) and their user config
-                       (coding agents, Node, ops tools, VS Code); desktop.uncachedPackages (uncached.nix)
+                       Chromium, Telegram, Element, OnlyOffice, Tern), their default apps (mimeapps.list) and their
+                       user config (coding agents, Node, ops tools, VS Code); desktop.uncachedPackages (uncached.nix)
   plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, Haruna,
   cinnamon/            Gwenview and Okular as default viewers, Tailscale in the network applet: plasma-nm-ts),
                        GNOME (with GNOME Classic) or Cinnamon
