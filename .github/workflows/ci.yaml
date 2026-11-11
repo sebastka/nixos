@@ -10,8 +10,11 @@ name: CI
 permissions:
   contents: read
 
+# Not on the nightly update's own pull request (update.yaml): its check job already checked it on both systems, and it
+# merges the pull request right away. Its branch is kept, so this workflow still loads, with its jobs skipped.
 jobs:
   yamllint:
+    if: github.head_ref != 'automated/update-dependencies'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -30,6 +33,7 @@ jobs:
 
   # Evaluate every host and build pkgs/, natively on both systems
   flake-check:
+    if: github.head_ref != 'automated/update-dependencies'
     strategy:
       matrix:
         runner:
