@@ -77,6 +77,11 @@
     AutoSuspendAction=0
   '';
 
+  # aarch64 builds (boreas, hermes: their system, an SD card image) under QEMU user emulation, here rather than on the
+  # laptops: native aarch64 binaries, not cross-compiled (so cache.nixos.org's are used as is), but several times slower
+  # than native for what has to be compiled. Also sets nix.settings.extra-platforms.
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   # systemd-based initrd: unit-based stage 1, enables TPM2 LUKS unlock via systemd-cryptenroll.
   boot.initrd.systemd.enable = true;
   boot.initrd.systemd.tpm2.enable = true;

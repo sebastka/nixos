@@ -9,8 +9,8 @@
 
 # Installing hermes (Raspberry Pi 4,). See also README.md, "Installing a host".
 #
-# 1. On geras, enable aarch64 emulation (boot.binfmt.emulatedSystems in hosts/geras/default.nix) and rebuild.
-# 2. Build the SD card image of this configuration (mostly from the binary cache):
+# 1. zeus emulates aarch64 (boot.binfmt.emulatedSystems in hosts/zeus/default.nix).
+# 2. Build the SD card image of this configuration on zeus (mostly from the binary cache):
 #      nix build .#nixosConfigurations.hermes.config.system.build.sdImage
 # 3. Flash it to the SD card:
 #      zstd -dc result/sd-image/*.img.zst | sudo dd of=/dev/<SD card> bs=4M conv=fsync status=progress
