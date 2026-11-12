@@ -80,9 +80,9 @@ The repository includes a development shell with the tools to work on it (`sops`
 
 | Workflow | When | What |
 |---|---|---|
-| `ci.yaml` | Push to `master`, pull requests | yamllint and shellcheck (devShell tools), `nix flake check` on x86_64 and aarch64, host evaluation. Merges Dependabot pull requests once everything passed. |
-| `update.yaml` | Nightly (02:00 UTC), manually | `bin/update`, the same checks on both architectures, then opens a signed pull request and merges it. |
-| `cache.yaml` | Push to `master`, after `update.yaml`, manually (never pull requests) | Builds each host and pushes it to our binary cache (`modules/nixos/common/nix-cache.nix`): x86_64 hosts on our runners (`talmox-nix`, ARC in sebastka/homelab), boreas on GitHub's arm runner (`ubuntu-26.04-arm`). |
+| `ci.yaml` | Push to `master`, pull requests | yamllint and shellcheck (devShell tools), `nix flake check` on x86_64 and aarch64, host evaluation: `master`'s required checks (ruleset "Protect master"). Merges Dependabot pull requests once everything passed. |
+| `update.yaml` | Nightly (02:00 UTC), manually | `bin/update`, then opens a signed pull request as the `sebastka-dependabot-merge` GitHub App, with auto-merge: merged once CI passed. |
+| `cache.yaml` | Push to `master` (the update's merge included), manually (never pull requests) | Builds each host and pushes it to our binary cache (`modules/nixos/common/nix-cache.nix`): x86_64 hosts on our runners (`talmox-nix`, ARC in sebastka/homelab), boreas on GitHub's arm runner (`ubuntu-26.04-arm`). |
 | Dependabot | Weekly | Updates the actions (pinned by commit), only releases at least 7 days old. |
 
 Servers deploy what is merged on `master` by themselves (`system.autoUpgrade`, rebooting between 04:00 and 06:00 when
@@ -96,7 +96,7 @@ The hosts' times are local (Europe/Oslo), GitHub's are UTC (02:00 UTC is 03:00 i
 |---|---|---|
 | 01:00-01:30 | `file` | Kopia snapshots, one per share (`hosts/file/backup.nix`): a few seconds to minutes each |
 | 02:00-04:00 | `file` | Kopia full maintenance: renews the object locks, 1-2 h depending on Hetzner |
-| 02:00 UTC | GitHub | `update.yaml`, then `cache.yaml` |
+| 02:00 UTC | GitHub | `update.yaml`, its pull request's CI, then `cache.yaml` once merged |
 | 04:00 | `helios` | Upgrade (first: it's the DNS) |
 | 04:30-05:00 | Other servers | Upgrade |
 | 04:00-06:00 | Servers | Reboot window, when the kernel or initrd changed |

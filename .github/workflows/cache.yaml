@@ -10,15 +10,11 @@
 name: Binary cache
 
 'on':
+  # The nightly update's merge included (update.yaml: merged as a GitHub App, so it triggers workflows), before the
+  # servers' upgrade window (system.autoUpgrade, 04:00-06:00)
   push:
     branches:
       - master
-  # After the nightly update: it merges with GITHUB_TOKEN, which triggers no push event. Before the servers' upgrade
-  # window (system.autoUpgrade, 04:00-06:00).
-  workflow_run:
-    workflows: [Update dependencies]
-    types: [completed]
-    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -32,10 +28,6 @@ env:
 
 jobs:
   build:
-    # The update must have succeeded (it merged), and only for this repository's own runs
-    if: >-
-      github.event_name != 'workflow_run'
-      || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request')
     strategy:
       fail-fast: false
       matrix:
@@ -52,10 +44,7 @@ jobs:
       group: ${{ github.workflow }}-${{ matrix.host }}
       cancel-in-progress: true
     steps:
-      # master's head: a workflow_run event's own checkout would be the update workflow's commit, before its merge
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          ref: master
 
       # GitHub's runners: room for the system's closure and its builds (~30 GB; the runner has ~15 GB free), by removing
       # preinstalled toolchains we don't use; then Nix (ours have it, and the Attic client, in their image)
