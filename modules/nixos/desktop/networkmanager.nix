@@ -78,5 +78,26 @@
         method = "auto";
       };
     };
+    profiles."sebastka-grizzly" = {
+      connection = {
+        id = "sebastka-grizzly";
+        uuid = "4c043034-6409-4ab9-98eb-f05f00e277b7";
+        type = "wifi";
+      };
+      wifi = {
+        mode = "infrastructure";
+        ssid = "sebastka-grizzly";
+      };
+      "wifi-security" = {
+        "auth-alg" = "open";
+        "key-mgmt" = "sae";
+        psk = "$NM_SEBASTKA_GRIZZLY_PSK";
+      };
+      ipv4.method = "auto";
+      ipv6 = {
+        "addr-gen-mode" = "default";
+        method = "auto";
+      };
+    };
   };
 }
