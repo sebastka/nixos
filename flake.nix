@@ -66,7 +66,7 @@
     {
       # Packages from pkgs/, for both systems: used as `nix flake check` checks
       # (CI builds them natively on x86_64 and aarch64). Each only on the systems its meta.platforms
-      # lists: evaluating one elsewhere throws (pkgs/onlyoffice-desktopeditors is x86_64 only).
+      # lists: evaluating one elsewhere throws (e.g. a package with only an x86_64 release).
       packages = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (
         system:
         let

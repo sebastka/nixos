@@ -115,7 +115,8 @@ in
     ++ [
       php # The CLI (php), with its default extensions
       php.packages.composer # Built on the php above
-      # Its latest release (nixpkgs lags behind), x86_64 and arm64, with the system's fonts in its documents
-      (callPackage ../../../pkgs/onlyoffice-desktopeditors { fonts = config.fonts.packages; })
+      # Office suite: Euro-Office (OnlyOffice's European fork, not in nixpkgs), x86_64 and arm64, with the system's fonts
+      # in its documents
+      (callPackage ../../../pkgs/eurooffice-desktopeditors { fonts = config.fonts.packages; })
     ];
 }
