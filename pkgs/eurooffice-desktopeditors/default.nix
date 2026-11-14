@@ -111,8 +111,10 @@ buildFHSEnv {
       libsm
       libxtst
       nspr
+      noto-fonts-cjk-sans # CJK fallback; also makes /usr/share/fonts exist, which the fonts' mounts need (below)
       nss
       pango
+      pipewire # Qt Multimedia's audio
       systemd # libudev
       wayland
       xdg-user-dirs # Its launcher: the templates folder, for "New document"...
