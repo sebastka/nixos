@@ -37,9 +37,11 @@ let
       # Retries until the network is up (any error, a minute at most), so a missing WebFinger only delays briefly.
       curl() { command curl -fsSL --retry 5 --retry-all-errors --retry-max-time 60 "$@"; }
       fetch() { curl -o "$RUNTIME_DIRECTORY/avatar" "$1" 2>/dev/null; }
+      # An answer that isn't JSON (an error page, a captcha in front of the domain) counts as no WebFinger.
       avatar=""
       if finger=$(curl --get --data-urlencode "resource=acct:$email" "https://$domain/.well-known/webfinger"); then
-        avatar=$(jq -r '[.links[]? | select(.rel == "http://webfinger.net/rel/avatar")][0].href // empty' <<<"$finger")
+        avatar=$(jq -r '[.links[]? | select(.rel == "http://webfinger.net/rel/avatar")][0].href // empty' \
+          <<<"$finger" 2>/dev/null) || avatar=""
       fi
       if [ -n "$avatar" ] && fetch "$avatar"; then
         echo "Avatar: WebFinger ($avatar)"
