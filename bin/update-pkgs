@@ -85,14 +85,21 @@ for entry in "${packages[@]}"; do
     fi
 
     echo "${pkg}: ${current} -> ${latest}" >&2
+    original="$(cat "${file}")"
     sed -i -E "s|^( *version = \")[^\"]*(\";)|\1${latest}\2|" "${file}"
 
     # Release binaries: one entry per system (`<system> = {`, then its own `hash = "...";` line, then `};`, as nixfmt
-    # lays them out), each hash prefetched from its URL
+    # lays them out), each hash prefetched from its URL. A release whose files aren't all there yet (tagged first,
+    # uploaded later, e.g. stripe-cli's pre-releases): skipped, unchanged, until a later run.
     systems="$(sed -n 's|^ *\([a-z0-9_]*-linux\) *= *{ *$|\1|p' "${file}")"
     for system in ${systems}; do
         url="$(src_url "${pkg}" "${system}")"
-        hash="$(${nix} store prefetch-file --json --hash-type sha256 "${url}" | sed -n 's|.*"hash":"\([^"]*\)".*|\1|p')"
+        if ! prefetched="$(${nix} store prefetch-file --json --hash-type sha256 "${url}")"; then
+            echo "${pkg}: ${latest} has no ${system} file yet (${url}): skipped" >&2
+            printf '%s\n' "${original}" > "${file}"
+            continue 2
+        fi
+        hash="$(sed -n 's|.*"hash":"\([^"]*\)".*|\1|p' <<< "${prefetched}")"
         sed -i -E "/^ *${system} *= *\{ *$/,/^ *\};/ s|^( *hash = \")[^\"]*(\";)|\1${hash}\2|" "${file}"
     done
 
