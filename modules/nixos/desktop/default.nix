@@ -109,6 +109,9 @@ in
       libsecret # secret-tool: secrets in the keyring
       chromium # Also runs the web apps (modules/home/programs/web-apps, above)
       pkgs-unstable.telegram-desktop # Self-contained, moves fast (stable lags a release behind)
+      # RAR archives (also extracted by Ark and Dolphin on Plasma through it). Unfree: not in cache.nixos.org, built by
+      # our CI (cache.yaml), small
+      unrar
       element-desktop # Matrix client (Electron), on matrix-rust-sdk's encryption. Its tray icon: "Show tray icon and minimise window to it on close", in its settings. Several accounts: one profile each (--profile, users/<user>/desktop.nix)
     ]
     ++ [
