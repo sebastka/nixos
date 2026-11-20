@@ -59,6 +59,7 @@
   environment.systemPackages = [
     pkgs.kdePackages.kate
     pkgs.haruna # KDE's video player (on mpv: FFmpeg's codecs, VA-API hardware decoding)
+    pkgs.kdePackages.ktorrent # KDE's BitTorrent client
   ];
 
   home-manager.sharedModules = [
@@ -96,8 +97,8 @@
         };
       }
     )
-    # Plasma's viewers by default (xdg.mimeApps: modules/nixos/desktop), for the types their desktop entries declare:
-    # Haruna for video, Gwenview for images, Okular for PDFs
+    # Plasma's apps by default (xdg.mimeApps: modules/nixos/desktop), for the types their desktop entries declare:
+    # Haruna for video, Gwenview for images, Okular for PDFs, KTorrent for torrents and magnet links
     {
       xdg.mimeApps.defaultApplications =
         lib.genAttrs [
@@ -124,7 +125,11 @@
         ] (_: "org.kde.gwenview.desktop")
         // {
           "application/pdf" = "okularApplication_pdf.desktop"; # Okular's PDF entry (org.kde.okular.desktop declares no PDF)
-        };
+        }
+        // lib.genAttrs [
+          "application/x-bittorrent"
+          "x-scheme-handler/magnet"
+        ] (_: "org.kde.ktorrent.desktop");
     }
   ];
 }

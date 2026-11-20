@@ -30,8 +30,8 @@ modules/nixos/
                        Bluetooth, rootless Docker, Syncthing, fonts; apps for every user (Firefox, Thunderbird,
                        Chromium, Telegram, Element, Euro-Office, Tern), their default apps (mimeapps.list) and their
                        user config (coding agents, Node, ops tools, VS Code)
-  plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, Haruna,
-  cinnamon/            Gwenview and Okular as default viewers, Tailscale in the network applet: plasma-nm-ts),
+  plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, KTorrent;
+  cinnamon/            Haruna, Gwenview and Okular as default viewers, Tailscale in the network applet: plasma-nm-ts),
                        GNOME (with GNOME Classic) or Cinnamon
   server/              Servers: systemd-networkd, resolved, Zabbix agent, SMART monitoring (smartd), unattended
                        upgrades
