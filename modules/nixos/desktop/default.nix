@@ -26,7 +26,6 @@ in
     ./syncthing.nix
     ./tailscale.nix
     ./tern.nix
-    ./uncached.nix
   ];
 
   # User configuration for every user on desktops (home-manager)

@@ -56,10 +56,6 @@
 
   hardware.asahi.enable = true;
 
-  # No binary cache for aarch64 yet: no Tern, which would be compiled here. Back on once boreas is built by CI
-  # (modules/nixos/desktop/uncached.nix).
-  desktop.uncachedPackages.enable = false;
-
   # Wi-Fi (Broadcom BCM4387, brcmfmac): its firmware stops answering during sustained full-speed transfers on 5 GHz,
   # until the driver is reloaded ("brcmf_msgbuf_query_dcmd: Timeout on response for query command"; power saving off
   # and roamoff=1 didn't help). Syncthing (its first sync of ~/Dev, 7 GB) limited to ~20 MB/s each way, which held. A

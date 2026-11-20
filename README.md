@@ -12,7 +12,7 @@ Yubikeys for disk unlocking, SSH and signing.
 |---|---|---|---|
 | `geras` | Dell XPS 15 7590 (x86_64) | Desktop (KDE Plasma) | Installed |
 | `zeus` | Tower: Gigabyte X570 AORUS XTREME, Ryzen 9 5950X, Radeon RX 6800 XT (x86_64) | Desktop (KDE Plasma), dual boot with Windows | Installed |
-| `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Installed (without Tern, see below) |
+| `boreas` | MacBook Pro 14" 2021, M1 Pro (j314s; aarch64, Asahi) | Desktop (KDE Plasma), dual boot with macOS | Installed |
 | `hermes` | Raspberry Pi 4 Model B, 8 GB (aarch64) | Server: Zabbix agent, firewall (`modules/nixos/server`) | Not installed yet (Debian 13) |
 | `helios` | Protectli FW6: i5-8250U, 16 GB, 6x I211 (x86_64) | Router: NAT and firewall (with the homelab's CrowdSec decisions), DHCP (Kea, with the Stork agent), DNS (Unbound, NSD), metrics and logs to the homelab (node exporter, Vector) | Installed (legacy BIOS, no disk encryption) |
 | `file` | KubeVirt VM in the homelab cluster (x86_64, on hera; its data is hera's passed-through NVMe) | Server: NFS, off-site backups (Kopia, to Hetzner, nightly), Zabbix agent, firewall | Installed |
@@ -29,7 +29,7 @@ modules/nixos/
   desktop/             Desktops: PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH agent), Tailscale,
                        Bluetooth, rootless Docker, Syncthing, fonts; apps for every user (Firefox, Thunderbird,
                        Chromium, Telegram, Element, Euro-Office, Tern), their default apps (mimeapps.list) and their
-                       user config (coding agents, Node, ops tools, VS Code); desktop.uncachedPackages (uncached.nix)
+                       user config (coding agents, Node, ops tools, VS Code)
   plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, Haruna,
   cinnamon/            Gwenview and Okular as default viewers, Tailscale in the network applet: plasma-nm-ts),
                        GNOME (with GNOME Classic) or Cinnamon
@@ -132,10 +132,6 @@ Example: `geras` (disk layout in `hosts/geras/disko.nix`, Secure Boot keys and S
    stages the Secure Boot keys and reboots, then systemd-boot enrolls them (with Microsoft's keys, needed by the NVIDIA
    option ROM). Check with `bootctl status` (`Secure Boot: enabled (user)`) or `sudo sbctl status`.
 5. **User session:** run `gpg --card-status` once per Yubikey (links the GnuPG subkeys to the cards, SSH included).
-
-### Desktops without a binary cache (`desktop.uncachedPackages`)
-
-Some desktop packages are in no binary cache for every platform: Tern (a flake input; our cache only has x86_64 hosts). `desktop.uncachedPackages.enable = false` (`modules/nixos/desktop/uncached.nix`) leaves it out of a host that would otherwise compile it itself. boreas has it off for now: CI now builds it into our cache (`cache.yaml`), so Tern can come back once that works. Node.js from nixpkgs-unstable (the `node` module, also needed by Renovate and the GitHub Copilot CLI) is often missing from cache.nixos.org for aarch64 too, and compiled on boreas then (about an hour).
 
 ### `boreas` (Apple Silicon, dual boot with macOS)
 
