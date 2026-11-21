@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 
 # Firewall and NAT of the router, from the former Ansible role (templates/etc/nftables.conf/routers.conf).
 # Interfaces are matched by name (iifname/oifname, flowtable and ingress devices): nftables loads before networkd
@@ -116,6 +116,7 @@ in
           type nat hook postrouting priority srcnat; policy accept;
           iifname "br0" oifname "${wan}" masquerade
           iifname "br0" oifname "br0" ct status dnat masquerade  # Hairpin NAT: replies go back through the router
+          iifname "tailscale0" oifname "br0" masquerade
         }
       '';
     };
@@ -155,6 +156,12 @@ in
           iifname "br0" ip daddr ${router} tcp dport { domain, domain-s } accept  # Unbound, DNS over TLS too
           iifname "br0" ip daddr ${router} udp dport domain accept
 
+          # Tailscale (./tailscale.nix): direct WireGuard paths from the internet, and the tailnet to the router itself as from the LAN (its grants decide who: tofu-tailscale/policy/grants.hujson)
+          iifname "${wan}" udp dport ${toString config.services.tailscale.port} accept
+          iifname "tailscale0" ip protocol icmp accept
+          iifname "tailscale0" ip daddr ${router} tcp dport { ssh, domain, domain-s } accept
+          iifname "tailscale0" ip daddr ${router} udp dport domain accept
+
           ${countDrops "input"}
         }
 
@@ -166,6 +173,9 @@ in
           # LAN <-> LAN and LAN -> WAN
           iifname "br0" oifname "${wan}" accept
           iifname "br0" oifname "br0" accept
+
+          # Tailnet -> LAN (./tailscale.nix: the subnet route; its grants decide who reaches what)
+          iifname "tailscale0" oifname "br0" accept
 
           # WAN -> homelab: per-source limits first (drops: nft list chain ip filter forward)
           iifname "${wan}" ct state new update @wan_new4 { ip saddr limit rate over 50/second burst 100 packets } counter drop

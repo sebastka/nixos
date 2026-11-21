@@ -45,6 +45,7 @@
     ./crowdsec.nix
     ./monitoring.nix
     ./port-latency.nix
+    ./tailscale.nix
     ../../modules/nixos/common
     ../../modules/nixos/server
   ];
