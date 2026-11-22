@@ -21,9 +21,11 @@
 # - First boot: lanzaboote enrolls our Secure Boot keys (Microsoft's included) and reboots. Check: `bootctl status`
 #   shows Secure Boot enabled (user).
 # - Then the TPM, for LUKS (./disko.nix), bound to PCR 7 (Secure Boot's state and keys): the disk unlocks by itself
-#   only while Secure Boot is on with our keys, the passphrase otherwise. And a recovery key, kept in Bitwarden (the
-#   firmware TPM is cleared by some firmware updates: passphrase, then enroll again with --wipe-slot=tpm2):
-#     sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks
+#   only while Secure Boot is on with our keys, the passphrase otherwise. And a recovery key, kept in Bitwarden. The
+#   TPM refuses after anything that changes Secure Boot's databases or clears the firmware TPM: some firmware updates,
+#   and Windows Update's Secure Boot updates (Microsoft's 2023 certificates into db and KEK, November 2026; dbx
+#   revocations). Then: passphrase, and enroll again with --wipe-slot=tpm2:
+#     sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks
 #     sudo systemd-cryptenroll --recovery-key /dev/disk/by-partlabel/disk-main-luks
 # - Boot Windows once (firmware boot menu, F12), then resume BitLocker: Resume-BitLocker -MountPoint C:
 # - Remove old boot entries (sudo efibootmgr -b <number> -B) and \EFI\<old entries> on Windows' ESP.
