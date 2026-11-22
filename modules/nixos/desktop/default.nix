@@ -20,6 +20,7 @@ in
     ./bluetooth.nix
     ./docker.nix
     ./fonts.nix
+    ./gamepad.nix
     ./gnupg.nix
     ./laptop.nix
     ./networkmanager.nix

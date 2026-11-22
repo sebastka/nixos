@@ -104,6 +104,9 @@ jobs:
       # per job: Attic chunks and compresses each in memory, and several jobs push at once (OOM-killed by the default).
       # A failed build still pushes what it built (the existing outputs of the system's derivations), or a single broken
       # derivation would leave the host to build hundreds of others itself; the job stays failed.
+      # Also the kernel's headers (its dev output, if built here): out-of-tree modules (xpadneo...) build against them,
+      # but they're not in the system's closure; without them, a module's change rebuilds a kernel cached only as its
+      # out output (boreas'). The x86 hosts' kernels: in cache.nixos.org, skipped.
       - name: Push ${{ matrix.host }}
         if: ${{ !cancelled() && steps.cached.outputs.cached != 'true' }}
         run: |
@@ -113,4 +116,9 @@ jobs:
             drv="$(nix eval --raw ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel.drvPath")"
             nix-store --query --requisites --include-outputs "${drv}" | grep -v '\.drv$' \
               | xargs --no-run-if-empty attic push --jobs 2 "karlsen:${ATTIC_CACHE}"
+          fi
+          kernel=".#nixosConfigurations.${{ matrix.host }}.config.boot.kernelPackages.kernel"
+          dev="$(nix eval --raw "${kernel}.dev.outPath")"
+          if [ -e "${dev}" ]; then
+            attic push --jobs 2 "karlsen:${ATTIC_CACHE}" "${dev}"
           fi

@@ -27,9 +27,9 @@ hosts/<host>/          Per-host configuration (hardware, disko, impermanence; he
 modules/nixos/
   common/              Every host: nix, boot, locale and keyboard, sops-nix, users (email and picture), OpenSSH server
   desktop/             Desktops: PipeWire, NetworkManager (Wi-Fi from sops), GnuPG (also the SSH agent), Tailscale,
-                       Bluetooth, rootless Docker, Syncthing, fonts; apps for every user (Firefox, Thunderbird,
-                       Chromium, Telegram, Element, Euro-Office, Tern), their default apps (mimeapps.list) and their
-                       user config (coding agents, Node, ops tools, VS Code)
+                       Bluetooth, Xbox controllers, rootless Docker, Syncthing, fonts; apps for every user (Firefox,
+                       Thunderbird, Chromium, Telegram, Element, Euro-Office, Tern), their default apps (mimeapps.list)
+                       and their user config (coding agents, Node, ops tools, VS Code)
   plasma/, gnome/,     The desktop environment, one per host: KDE Plasma (no Flatpak, Kate, Dolphin, KTorrent;
   cinnamon/            Haruna, Gwenview and Okular as default viewers, Tailscale in the network applet: plasma-nm-ts),
                        GNOME (with GNOME Classic) or Cinnamon
