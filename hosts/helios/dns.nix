@@ -87,6 +87,7 @@ in
           "10.0.0.0/8 allow"
           "172.16.0.0/12 allow"
           "192.168.0.0/16 allow"
+          "100.64.0.0/10 allow" # Tailnet clients (./tailscale.nix: the tailnet's split DNS for the home zones): not masqueraded, the queries are for helios itself. Only from tailscale0: the WAN drops this range (./firewall.nix, bogons4).
           "127.0.0.0/8 allow"
           "0.0.0.0/0 refuse"
         ];
