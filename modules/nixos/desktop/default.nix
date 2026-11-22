@@ -60,6 +60,7 @@ in
       xdg.configFile."mimeapps.list".force = true;
     }
     ../../home/programs/coding-agents
+    ../../home/programs/deluge # Thin client, for the homelab's daemon
     ../../home/programs/node
     ../../home/programs/ops
     ../../home/programs/vscode
