@@ -37,6 +37,11 @@ in
         Dev = {
           id = "dev";
           path = "~/Dev";
+          # Large, rebuildable, in single projects (after modules/nixos/desktop/syncthing.nix's patterns)
+          ignorePatterns = [
+            "(?d)/Private/TS/Adibou2/public/data" # npm run assets, from original/
+            "(?d)/Private/Rust/Ferrocine/dev/media-open" # Open movies (Blender Foundation...), downloadable again
+          ];
         };
         ClaudeProjects = {
           id = "claude-projects";

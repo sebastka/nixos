@@ -25,7 +25,7 @@ let
   # Rebuildable or machine-local: not synced. **/ matches at any depth; (?d) lets Syncthing delete them when they
   # block a directory removal: a directory deleted or renamed on another desktop (e.g. a project with its
   # node_modules) would otherwise stay on this one, the folder out of sync. Add more as needed: it applies to every
-  # folder.
+  # folder (a single folder's: its own ignorePatterns, added after these).
   ignorePatterns = [
     # Exceptions first (the first matching pattern decides): scripts named like a generated directory below, e.g. this
     # repository's bin/build, which **/build would match too (Syncthing patterns match files and directories alike)
@@ -82,7 +82,8 @@ in
                 encryptionPasswordFile = nixosConfig.sops.secrets."syncthing-encryption-password".path;
               }
             ];
-            ignorePatterns = lib.mkDefault (managed ++ ignorePatterns);
+            # First (mkBefore: its exceptions must precede what they except); a folder's own patterns are added after
+            ignorePatterns = lib.mkBefore (managed ++ ignorePatterns);
             # A few seconds after the last change (default 10s): saves never wait on it
             fsWatcherEnabled = lib.mkDefault true;
             versioning = lib.mkDefault {
