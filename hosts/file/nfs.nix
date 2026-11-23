@@ -16,6 +16,7 @@ let
     "Pictures"
     "Torrent"
     "Videos"
+    "Games" # Game dumps and BIOSes, also Texel's library (sebastka/homelab: k8s/applications/media/texel)
     "homelab/k8s"
   ];
   bind = share: {
@@ -47,6 +48,9 @@ in
   services.nfs.server = {
     enable = true;
     # LAN: 192.168.0.0/24 (desktops), 192.168.0.0/16 (also the Talos nodes, for kubelet mounts).
+    # Games: also read-only to the cluster (Texel's library). Overlapping subnets: mountd keeps the first entry that
+    # matches (support/export/cache.c, lookup_export; it logs "arbitrarily choosing options from first" once), so the
+    # desktops' read-write one first.
     # Pods' range for homelab/k8s: a kubelet on the VM's own node (hera) mounts from that node's Cilium router address
     # (cilium_host, 10.244.x.x), not its LAN address. Cilium only lets the nodes in (host, remote-node), not pods.
     exports = ''
@@ -56,6 +60,7 @@ in
       /mnt/nfs/Pictures                 192.168.0.0/24(rw,sync,no_subtree_check)
       /mnt/nfs/Torrent                  192.168.0.0/24(rw,sync,no_subtree_check)
       /mnt/nfs/Videos                   192.168.0.0/24(rw,sync,no_subtree_check)
+      /mnt/nfs/Games                    192.168.0.0/24(rw,sync,no_subtree_check) 192.168.0.0/16(ro,sync,no_subtree_check) ${lan.clusterPods}(ro,sync,no_subtree_check)
       /mnt/nfs/homelab/k8s              192.168.0.0/16(rw,sync,no_subtree_check,no_root_squash) ${lan.clusterPods}(rw,sync,no_subtree_check,no_root_squash)
     '';
   };

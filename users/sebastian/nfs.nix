@@ -17,6 +17,7 @@ let
     "Pictures"
     "Torrent"
     "Videos"
+    "Games"
     "homelab/k8s" # The cluster's volumes (no_root_squash: root here is root there)
   ];
   mountUnit = share: "${utils.escapeSystemdPath "${root}/${share}"}.mount";

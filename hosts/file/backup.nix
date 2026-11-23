@@ -38,6 +38,7 @@ let
     "Pictures"
     "Torrent"
     "Videos"
+    "Games" # Game dumps and BIOSes (also Texel's library): out of homelab/k8s to be backed up
   ];
 
   stateDir = "/var/lib/kopia";
