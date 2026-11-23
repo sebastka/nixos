@@ -145,6 +145,7 @@
     gatewayInternal = "192.168.2.1";
     gatewayDefault = "192.168.2.2"; # Ingress for the public domains (./dns.nix, local overrides)
     delugeTorrent = "192.168.2.10";
+    qbittorrentTorrent = "192.168.2.17"; # Peers (TCP and UDP 6882), forwarded from the WAN
     theloungeIdentd = "192.168.2.11";
     zabbixServer = "192.168.2.12";
     syncthing = "192.168.2.14"; # Sync connections (TCP and QUIC 22000), forwarded from the WAN

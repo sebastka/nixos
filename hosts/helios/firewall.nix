@@ -13,6 +13,7 @@ let
   inherit (lan.vips)
     gatewayDefault
     delugeTorrent
+    qbittorrentTorrent
     theloungeIdentd
     syncthing
     ;
@@ -103,6 +104,7 @@ in
           iifname "${wan}" tcp dport { http, https, ssh } dnat to ${gatewayDefault}
           iifname "${wan}" udp dport https dnat to ${gatewayDefault}  # HTTP/3 (QUIC)
           iifname "${wan}" meta l4proto { tcp, udp } th dport 6881 dnat to ${delugeTorrent}
+          iifname "${wan}" meta l4proto { tcp, udp } th dport 6882 dnat to ${qbittorrentTorrent}
           iifname "${wan}" tcp dport auth dnat to ${theloungeIdentd}
           iifname "${wan}" meta l4proto { tcp, udp } th dport 22000 dnat to ${syncthing}
 
