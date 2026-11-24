@@ -117,6 +117,7 @@
     yq-go
     dig
     gettext # GNU envsubst
+    zip
     unzip
     openssl
     pkgs-unstable.python3 # Bare interpreter: scripts and REPL (projects: uv)
